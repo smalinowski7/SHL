@@ -56,12 +56,24 @@ index_player_ratings <- function(seasons, league = 0, type = "regular") {
     print(i)
     temp_url <- GET("https://index.simulationhockey.com/api/v1/players/ratings", query = list(season = i, type = type, league = league))
     ratings <- fromJSON(rawToChar(temp_url$content))
+    
+    ratings <- ratings %>%
+      mutate(pos = case_when(position %in% c("LD", "RD") ~ "Defense",
+                             position %in% c("LW", "C", "RW") ~ "Forward"),
+             
+             pos_broad = case_when(position %in% c("LD", "RD") ~ "Defense",
+                                   position %in% c("LW", "RW") ~ "Wing",
+                                   position == "C" ~ "Center"),
+             
+             pos = factor(pos, levels = c("Forward", "Defense")),
+             
+             pos_broad = factor(pos_broad, levels = c("Center", "Wing", "Defense"))) 
+    
     ratings_list[[i]] <- ratings
   } 
   
   player_ratings <- do.call(bind_rows, ratings_list)
-  player_ratings <- do.call(bind_cols, player_ratings)
-  
+
   return(player_ratings)
 }
 
@@ -80,7 +92,8 @@ index_standings <- function(seasons, league = 0, type = "regular") {
   } 
   
   standings <- do.call(bind_rows, standings_list)
-  standings <- unnest(cols = c(home, away, shootout),
+  standings <- unnest(standings,
+                      cols = c(home, away, shootout),
                       names_sep = "_")
   
   return(standings)
@@ -88,5 +101,46 @@ index_standings <- function(seasons, league = 0, type = "regular") {
 
 
 
+#Scrape schedule
+index_schedule <- function(seasons, league = 0, type = "Regular Season") {
+  
+  schedule_list <- list()
+  
+  for (i in seasons) {
+    print(i)
+    temp_url <- GET("https://index.simulationhockey.com/api/v1/schedule", query = list(season = i, type = type, league = league))
+    schedule <- fromJSON(rawToChar(temp_url$content))
+    schedule$season <- i
+    schedule_list[[i]] <- schedule
+  } 
+  
+  schedule <- do.call(bind_rows, schedule_list)
+  # schedule <- unnest(schedule,
+  #                     cols = c(home, away, shootout),
+  #                     names_sep = "_")
+  
+  return(schedule)
+}
 
-https://index.simulationhockey.com/api/v1/standings
+
+
+#Scrape team meta
+index_meta <- function(seasons, league = 0, type = "Regular Season") {
+  
+  meta_list <- list()
+  
+  for (i in seasons) {
+    print(i)
+    temp_url <- GET("https://index.simulationhockey.com/api/v1/teams", query = list(season = i, type = type, league = league))
+    meta <- fromJSON(rawToChar(temp_url$content))
+    meta$season <- i
+    meta_list[[i]] <- meta
+  } 
+  
+  meta <- do.call(bind_rows, meta_list)
+  meta <- unnest(meta,
+                      cols = c(nameDetails, colors, stats),
+                      names_sep = "_")
+  
+  return(meta)
+}
