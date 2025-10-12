@@ -78,6 +78,30 @@ index_player_ratings <- function(seasons, league = 0, type = "regular") {
 }
 
 
+
+# Scrape goalie ratings
+index_goalie_ratings <- function(seasons, league = 0, type = "regular") {
+  
+  goalie_ratings_list <- list()
+  
+  for (i in seasons) {
+    print(i)
+    temp_url <- GET("https://index.simulationhockey.com/api/v1/goalies/ratings", query = list(season = i, type = type, league = league))
+    ratings <- fromJSON(rawToChar(temp_url$content))
+    
+    ratings <- ratings %>%
+      mutate(pos = "Goalie")
+    
+    goalie_ratings_list[[i]] <- ratings
+  } 
+  
+  goalie_ratings <- do.call(bind_rows, goalie_ratings_list)
+  
+  return(goalie_ratings)
+}
+
+
+
 # Scrape standings
 index_standings <- function(seasons, league = 0, type = "regular") {
   
@@ -143,4 +167,112 @@ index_meta <- function(seasons, league = 0, type = "Regular Season") {
                       names_sep = "_")
   
   return(meta)
+}
+
+
+#########################
+### From .csv exports ###
+#########################
+
+#scrape boxscores
+file_boxscores <- function(seasons, league = "shl") {
+  
+  if (!(league %in% c("shl", "smjhl"))) {
+    return("Choose either shl or smjhl for league")
+  }
+  
+  if (min(seasons) < 66) {
+    return("Boxscores not available for seasons before S66")
+  }
+  
+  
+  boxscore_list <- list()
+  
+  for (i in seasons) {
+    print(i)
+    df <- read.csv(paste0("https://simulationhockey.com/games/", league, "/S", i, "/csv/boxscore_skater_summary.csv"),
+                   sep = ";")
+    df$season <- i
+    boxscore_list[[i]] <- df
+ 
+  }
+  
+  boxscores <- do.call(bind_rows, boxscore_list)
+  
+  return(boxscores)
+}
+
+
+#scrape scoring summary
+file_scoring_summary <- function(seasons, league = "shl") {
+  
+  if (!(league %in% c("shl", "smjhl"))) {
+    return("Choose either shl or smjhl for league")
+  }
+  
+  if (min(seasons) < 66) {
+    return("Boxscores not available for seasons before S66")
+  }
+  
+  
+  scoring_summary_list <- list()
+  
+  for (i in seasons) {
+    print(i)
+    df <- read.csv(paste0("https://simulationhockey.com/games/", league, "/S", i, "/csv/boxscore_period_scoring_summary.csv"),
+                   sep = ";")
+    df$season <- i
+    scoring_summary_list[[i]] <- df
+    
+  }
+  
+  scoring_summary <- do.call(bind_rows, scoring_summary_list)
+  
+  return(scoring_summary)
+}
+
+
+
+
+#scrape goalie summary
+file_goalie_summary <- function(seasons, league = "shl") {
+  
+  if (!(league %in% c("shl", "smjhl"))) {
+    return("Choose either shl or smjhl for league")
+  }
+  
+  if (min(seasons) < 66) {
+    return("Boxscores not available for seasons before S66")
+  }
+  
+  
+  goalie_summary_list <- list()
+  
+  for (i in seasons) {
+    print(i)
+    df <- read.csv(paste0("https://simulationhockey.com/games/", league, "/S", i, "/csv/boxscore_goalie_summary.csv"),
+                   sep = ";")
+    df$season <- i
+    goalie_summary_list[[i]] <- df
+    
+  }
+  
+  goalie_summary <- do.call(bind_rows, goalie_summary_list)
+  
+  return(goalie_summary)
+}
+
+
+
+
+###################
+### From portal ###
+###################
+
+# Scrape portal for players
+portal_players <- function() {
+  portal <- GET("http://portal.simulationhockey.com/api/v1/player")
+  portal <- fromJSON(rawToChar(portal$content))
+  
+  return(portal)
 }
