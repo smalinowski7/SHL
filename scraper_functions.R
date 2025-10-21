@@ -264,6 +264,36 @@ file_goalie_summary <- function(seasons, league = "shl") {
 
 
 
+#scrape team lines
+file_team_lines <- function(seasons, league = "shl") {
+  
+  if (!(league %in% c("shl", "smjhl"))) {
+    return("Choose either shl or smjhl for league")
+  }
+  
+  if (min(seasons) < 66) {
+    return("Team lines not available for seasons before S66")
+  }
+  
+  
+  team_lines_list <- list()
+  
+  for (i in seasons) {
+    print(i)
+    df <- read_delim(paste0("https://simulationhockey.com/games/", league, "/S", i, "/csv/team_lines.csv"),
+                   delim = ";")
+                  
+    df$season <- i
+    team_lines_list[[i]] <- df
+    
+  }
+  
+  team_lines_summary <- do.call(bind_rows, team_lines_list)
+  
+  return(team_lines_summary)
+}
+
+
 
 ###################
 ### From portal ###
