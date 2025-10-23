@@ -268,11 +268,11 @@ file_goalie_summary <- function(seasons, league = "shl") {
 file_team_lines <- function(seasons, league = "shl") {
   
   if (!(league %in% c("shl", "smjhl"))) {
-    return("Choose either shl or smjhl for league")
+    stop("Choose either shl or smjhl for league")
   }
   
   if (min(seasons) < 66) {
-    return("Team lines not available for seasons before S66")
+    stop("Team lines not available for seasons before S66")
   }
   
   
