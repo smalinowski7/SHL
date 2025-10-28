@@ -8,7 +8,7 @@ rookie_season <- 85
   
 
 ### Load the mock responses
-mock_responses <- read_csv("Data/Misc/mock_draft_responses.csv")
+mock_responses <- read_csv("Projects/Mock draft/mock_draft_responses.csv")
 
 
 ### Scrape portal for rookie usernames  
