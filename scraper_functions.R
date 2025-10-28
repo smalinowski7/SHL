@@ -139,9 +139,7 @@ index_schedule <- function(seasons, league = 0, type = "Regular Season") {
   } 
   
   schedule <- do.call(bind_rows, schedule_list)
-  # schedule <- unnest(schedule,
-  #                     cols = c(home, away, shootout),
-  #                     names_sep = "_")
+  schedule$date <- as.Date(schedule$date)
   
   return(schedule)
 }
