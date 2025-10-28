@@ -4,16 +4,16 @@ library(tidyverse)
 library(jsonlite)
 library(httr)
 
-season <- 84
+season <- 85
 
 
 ### Scrape player and goalie ratings
 player_ratings <- index_player_ratings(seasons = season,
-                                       league = 2)
+                                       league = 0)
   
 
 goalie_ratings <- index_goalie_ratings(seasons = season,
-                                       league = 2)
+                                       league = 0)
 
 
 ### Average team TPE by positional group
