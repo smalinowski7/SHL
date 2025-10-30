@@ -10,6 +10,8 @@ library(jsonlite)
 shl_save_path <- here("Data/SHL")
 smjhl_save_path <- here("Data/SMJHL")
 save_path_numeric <- c(shl_save_path, smjhl_save_path)
+save_path_character <- c(shl_save_path, smjhl_save_path)
+names(save_path_character) <- c("shl", "smjhl")
 
 ##################
 ### From Index ###
@@ -238,7 +240,7 @@ file_boxscores <- function(seasons, league = "shl", append = FALSE) {
   boxscores <- do.call(bind_rows, boxscore_list)
   
   if (append == TRUE) {
-    merged_boxscores <- bind_rows(read_csv(paste0(save_path_numeric[league + 1], "/file_boxscore.csv")), boxscores)
+    merged_boxscores <- bind_rows(read_csv(paste0(save_path_character[league], "/file_boxscore.csv")), boxscores)
     return(merged_boxscores)
   }
   
@@ -274,7 +276,7 @@ file_scoring_summary <- function(seasons, league = "shl", append = FALSE) {
   scoring_summary <- do.call(bind_rows, scoring_summary_list)
   
   if (append == TRUE) {
-    merged_scoring_summary <- bind_rows(read_csv(paste0(save_path_numeric[league + 1], "/file_scoring_summary.csv")), scoring_summary)
+    merged_scoring_summary <- bind_rows(read_csv(paste0(save_path_character[league], "/file_scoring_summary.csv")), scoring_summary)
     return(merged_scoring_summary)
   }
   
@@ -310,7 +312,7 @@ file_goalie_summary <- function(seasons, league = "shl", append = FALSE) {
   goalie_summary <- do.call(bind_rows, goalie_summary_list)
   
   if (append == TRUE) {
-    merged_goalie_summary <- bind_rows(read_csv(paste0(save_path_numeric[league + 1], "/file_goalie_summary.csv")), goalie_summary)
+    merged_goalie_summary <- bind_rows(read_csv(paste0(save_path_character[league], "/file_goalie_summary.csv")), goalie_summary)
     return(merged_goalie_summary)
   }
   
@@ -346,7 +348,7 @@ file_team_lines <- function(seasons, league = "shl", append = FALSE) {
   team_lines_summary <- do.call(bind_rows, team_lines_list)
   
   if (append == TRUE) {
-    merged_team_lines <- bind_rows(read_csv(paste0(save_path_numeric[league + 1], "/file_goalie_summary.csv")), team_lines_summary)
+    merged_team_lines <- bind_rows(read_csv(paste0(save_path_character[league], "/file_goalie_summary.csv")), team_lines_summary)
     return(merged_team_lines)
   }
   
