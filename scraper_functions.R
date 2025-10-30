@@ -7,13 +7,17 @@ library(httr)
 library(jsonlite)
 
 
+shl_save_path <- here("Data/SHL")
+smjhl_save_path <- here("Data/SMJHL")
+save_path_numeric <- c(shl_save_path, smjhl_save_path)
+
 ##################
 ### From Index ###
 ##################
 
 
 # Scrape player stats
-index_player_stats <- function(seasons, league = 0, type = "regular") {
+index_player_stats <- function(seasons, league = 0, type = "regular", append = FALSE) {
   
   stats_list <- list()
   
@@ -42,13 +46,19 @@ index_player_stats <- function(seasons, league = 0, type = "regular") {
                          cols = c(advancedStats),
                          names_sep = "_")
   
+  
+  if (append == TRUE) {
+    merged_player_stats <- bind_rows(read_csv(paste0(save_path_numeric[league + 1], "/index_player_stats.csv")), player_stats)
+    return(merged_player_stats)
+  }
+  
   return(player_stats)
 }
 
 
 
 # Scrape player ratings
-index_player_ratings <- function(seasons, league = 0, type = "regular") {
+index_player_ratings <- function(seasons, league = 0, type = "regular", append = FALSE) {
   
   ratings_list <- list()
   
@@ -73,6 +83,11 @@ index_player_ratings <- function(seasons, league = 0, type = "regular") {
   } 
   
   player_ratings <- do.call(bind_rows, ratings_list)
+  
+  if (append == TRUE) {
+    merged_player_ratings <- bind_rows(read_csv(paste0(save_path_numeric[league + 1], "/index_player_ratings.csv")), player_ratings)
+    return(merged_player_ratings)
+  }
 
   return(player_ratings)
 }
@@ -80,7 +95,7 @@ index_player_ratings <- function(seasons, league = 0, type = "regular") {
 
 
 # Scrape goalie ratings
-index_goalie_ratings <- function(seasons, league = 0, type = "regular") {
+index_goalie_ratings <- function(seasons, league = 0, type = "regular", append = FALSE) {
   
   goalie_ratings_list <- list()
   
@@ -97,13 +112,18 @@ index_goalie_ratings <- function(seasons, league = 0, type = "regular") {
   
   goalie_ratings <- do.call(bind_rows, goalie_ratings_list)
   
+  if (append == TRUE) {
+    merged_goalie_ratings <- bind_rows(read_csv(paste0(save_path_numeric[league + 1], "/index_goalie_ratings.csv")), goalie_ratings)
+    return(merged_goalie_ratings)
+  }
+  
   return(goalie_ratings)
 }
 
 
 
 # Scrape standings
-index_standings <- function(seasons, league = 0, type = "regular") {
+index_standings <- function(seasons, league = 0, type = "regular", append = FALSE) {
   
   standings_list <- list()
   
@@ -112,6 +132,7 @@ index_standings <- function(seasons, league = 0, type = "regular") {
     temp_url <- GET("https://index.simulationhockey.com/api/v1/standings", query = list(season = i, type = type, league = league))
     standings <- fromJSON(rawToChar(temp_url$content))
     standings$season <- i
+    standings$winPercent <- as.numeric(standings$winPercent)
     standings_list[[i]] <- standings
   } 
   
@@ -120,13 +141,18 @@ index_standings <- function(seasons, league = 0, type = "regular") {
                       cols = c(home, away, shootout),
                       names_sep = "_")
   
+  if (append == TRUE) {
+    merged_standings <- bind_rows(read_csv(paste0(save_path_numeric[league + 1], "/index_standings.csv")), standings)
+    return(merged_standings)
+  }
+  
   return(standings)
 }
 
 
 
 #Scrape schedule
-index_schedule <- function(seasons, league = 0, type = "Regular Season") {
+index_schedule <- function(seasons, league = 0, type = "Regular Season", append = FALSE) {
   
   schedule_list <- list()
   
@@ -135,11 +161,17 @@ index_schedule <- function(seasons, league = 0, type = "Regular Season") {
     temp_url <- GET("https://index.simulationhockey.com/api/v1/schedule", query = list(season = i, type = type, league = league))
     schedule <- fromJSON(rawToChar(temp_url$content))
     schedule$season <- i
+    schedule$slug <- as.numeric(schedule$slug)
     schedule_list[[i]] <- schedule
   } 
   
   schedule <- do.call(bind_rows, schedule_list)
   schedule$date <- as.Date(schedule$date)
+  
+  if (append == TRUE) {
+    merged_schedule <- bind_rows(read_csv(paste0(save_path_numeric[league + 1], "/index_schedule.csv")), schedule)
+    return(merged_schedule)
+  }
   
   return(schedule)
 }
@@ -147,7 +179,7 @@ index_schedule <- function(seasons, league = 0, type = "Regular Season") {
 
 
 #Scrape team meta
-index_meta <- function(seasons, league = 0, type = "Regular Season") {
+index_meta <- function(seasons, league = 0, type = "Regular Season", append = FALSE) {
   
   meta_list <- list()
   
@@ -156,13 +188,21 @@ index_meta <- function(seasons, league = 0, type = "Regular Season") {
     temp_url <- GET("https://index.simulationhockey.com/api/v1/teams", query = list(season = i, type = type, league = league))
     meta <- fromJSON(rawToChar(temp_url$content))
     meta$season <- i
+    meta <- unnest(meta,
+                   cols = c(nameDetails, colors, stats),
+                   names_sep = "_")    
+    meta$stats_winPercent <- as.numeric(meta$stats_winPercent)
+    
     meta_list[[i]] <- meta
   } 
   
   meta <- do.call(bind_rows, meta_list)
-  meta <- unnest(meta,
-                      cols = c(nameDetails, colors, stats),
-                      names_sep = "_")
+
+  
+  if (append == TRUE) {
+    merged_meta <- bind_rows(read_csv(paste0(save_path_numeric[league + 1], "/index_team_meta.csv")), meta)
+    return(merged_meta)
+  }
   
   return(meta)
 }
@@ -173,7 +213,7 @@ index_meta <- function(seasons, league = 0, type = "Regular Season") {
 #########################
 
 #scrape boxscores
-file_boxscores <- function(seasons, league = "shl") {
+file_boxscores <- function(seasons, league = "shl", append = FALSE) {
   
   if (!(league %in% c("shl", "smjhl"))) {
     return("Choose either shl or smjhl for league")
@@ -197,12 +237,17 @@ file_boxscores <- function(seasons, league = "shl") {
   
   boxscores <- do.call(bind_rows, boxscore_list)
   
+  if (append == TRUE) {
+    merged_boxscores <- bind_rows(read_csv(paste0(save_path_numeric[league + 1], "/file_boxscore.csv")), boxscores)
+    return(merged_boxscores)
+  }
+  
   return(boxscores)
 }
 
 
 #scrape scoring summary
-file_scoring_summary <- function(seasons, league = "shl") {
+file_scoring_summary <- function(seasons, league = "shl", append = FALSE) {
   
   if (!(league %in% c("shl", "smjhl"))) {
     return("Choose either shl or smjhl for league")
@@ -224,7 +269,14 @@ file_scoring_summary <- function(seasons, league = "shl") {
     
   }
   
+  
+  
   scoring_summary <- do.call(bind_rows, scoring_summary_list)
+  
+  if (append == TRUE) {
+    merged_scoring_summary <- bind_rows(read_csv(paste0(save_path_numeric[league + 1], "/file_scoring_summary.csv")), scoring_summary)
+    return(merged_scoring_summary)
+  }
   
   return(scoring_summary)
 }
@@ -233,7 +285,7 @@ file_scoring_summary <- function(seasons, league = "shl") {
 
 
 #scrape goalie summary
-file_goalie_summary <- function(seasons, league = "shl") {
+file_goalie_summary <- function(seasons, league = "shl", append = FALSE) {
   
   if (!(league %in% c("shl", "smjhl"))) {
     return("Choose either shl or smjhl for league")
@@ -257,13 +309,18 @@ file_goalie_summary <- function(seasons, league = "shl") {
   
   goalie_summary <- do.call(bind_rows, goalie_summary_list)
   
+  if (append == TRUE) {
+    merged_goalie_summary <- bind_rows(read_csv(paste0(save_path_numeric[league + 1], "/file_goalie_summary.csv")), goalie_summary)
+    return(merged_goalie_summary)
+  }
+  
   return(goalie_summary)
 }
 
 
 
 #scrape team lines
-file_team_lines <- function(seasons, league = "shl") {
+file_team_lines <- function(seasons, league = "shl", append = FALSE) {
   
   if (!(league %in% c("shl", "smjhl"))) {
     stop("Choose either shl or smjhl for league")
@@ -287,6 +344,11 @@ file_team_lines <- function(seasons, league = "shl") {
   }
   
   team_lines_summary <- do.call(bind_rows, team_lines_list)
+  
+  if (append == TRUE) {
+    merged_team_lines <- bind_rows(read_csv(paste0(save_path_numeric[league + 1], "/file_goalie_summary.csv")), team_lines_summary)
+    return(merged_team_lines)
+  }
   
   return(team_lines_summary)
 }
