@@ -4,13 +4,16 @@ season <- 85
 
 ### Load libraries and dataframes
 source("scraper_functions.R")
+library(here)
 library(tidyverse)
+
 
 ### Mode function
 Mode <- function(x) {
   ux <- unique(x)
   ux[which.max(tabulate(match(x, ux)))]
 }
+
 
 ### Streaks function
 myrleid <- function(x) {
@@ -93,6 +96,25 @@ sg_stat_leaders <- boxscores_rg %>%
   select(season, abbreviation, name, all_of(stat), everything())
 
 
+sg_plot <- sg_stat_leaders %>%
+  
+  filter(get(stat) >= 13) %>%
+  
+  mutate(unique_id = paste0(name, Game.Id)) %>%
+  mutate(label = paste0(name, " (S", season, ")")) %>%
+  mutate(unique_id = factor(unique_id, levels = unique_id))
+
+ggplot(sg_plot, aes(x = .data[[stat]], y = fct_rev(unique_id))) +
+  geom_col(aes(fill = abbreviation),
+           col = "black",
+           show.legend = F) +
+  scale_y_discrete(breaks = sg_plot$unique_id, 
+                   labels = sg_plot$label) +
+  scale_fill_manual(values = team_colors) +
+  theme_bw(base_size = 14) +
+  theme(panel.grid = element_blank()) +
+  labs(title = paste0("Single game ", stat, " high"), y = NULL, x = paste0(stat, "s"))
+
 ##########################
 ### Single game multis ###
 ##########################
@@ -100,7 +122,7 @@ sg_stat_leaders <- boxscores_rg %>%
 ### Pick a stat here and calculate the number of mulit-stat games
 ### Stat should be how it appears on the boxscores
 
-stat <- "P"
+stat <- "HT"
 
 mg_stat_leaders <- boxscores_rg %>%
   mutate(multi_stat = ifelse(get(stat) > 1, 1, 0)) %>%
@@ -121,7 +143,10 @@ mg_stat_plot <- mg_stat_leaders %>%
   mutate(name = factor(name, levels = unique(name))) %>%
   mutate(rank = as.numeric(name)) %>%
   group_by(`get(stat)`) %>%
-  mutate(max = (n == max(n))) %>%
+  mutate(max = (n == max(n)),
+         final_label = paste0("#", rank, ". ", name),
+         final_label = factor(final_label, levels = unique(final_label))) %>%
+  
   
   filter(rank <= 15) 
 
@@ -129,7 +154,7 @@ mg_stat_plot <- mg_stat_leaders %>%
 ggplot(mg_stat_plot, aes(x = `get(stat)`, y = n, fill = abbreviation)) +
   geom_col(col = "black",
            show.legend = F) +
-  facet_wrap(.~ name, ncol = 1) +
+  facet_wrap(.~ final_label, ncol = 1) +
   scale_fill_manual(values = team_colors) +
   theme_bw(base_size = 12) +
   theme(panel.grid = element_blank()) +
@@ -152,7 +177,7 @@ ggsave("test.jpg", height = 15, width = 7, dpi = 300)
 ### Pick a stat here and calculate the streak number for players
 ### Stat should be how it appears on the boxscores
 
-stat <- "P"
+stat <- "HT"
 
 streaks <- boxscores_rg %>%
   mutate(streak_stat = ifelse(get(stat) > 0, 1, 0)) %>%
@@ -182,7 +207,7 @@ streak_plot <- stat_streaks %>%
                            TRUE ~ paste0(name, " (S", season_start, "-S", season_end, ")"))) %>%
   mutate(plot_id = paste0(label, steak_id)) %>%
   mutate(plot_id = factor(plot_id, levels = unique(plot_id))) %>%
-  filter(streak_length >= 20)
+  filter(streak_length >= 30)
 
 
 
