@@ -1,33 +1,68 @@
-### Load libraries 
+---
+title: "Untitled"
+output: html_document
+date: "2025-11-05"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+######################
+### Load Libraries ###
+######################
+
 library(tidyverse)
 library(httr)
 library(jsonlite)
+source("scraper_functions.R")
+```
 
 
 
-### Load datasets ###
+```{r}
+#########################
+### Load all datasets ###
+#########################
 
-# Load portal
-portal_url <- GET("https://portal.simulationhockey.com/api/v1/player")
-portal <- fromJSON(rawToChar(portal_url$content))
+# Load portal and filter for current players
+portal <- portal_players()
+current_players <- portal %>%
+  filter(currentLeague == "SHL")
 
 # Load events file
 events_url <- GET("https://portal.simulationhockey.com/api/v1/updateevents")
 event_history <- fromJSON(rawToChar(events_url$content))
 
+
 # Load SHL team meta
-shl_teams_url <- GET("https://index.simulationhockey.com/api/v1/teams")
-teams <- fromJSON(rawToChar(shl_teams_url$content))
+teams <- index_meta(85)
 team_names <- teams$name
 
+
 # Load SMJHL team meta
-j_teams_url <- GET("https://index.simulationhockey.com/api/v1/teams", query = list(league = 1))
-j_teams <- fromJSON(rawToChar(j_teams_url$content))
+j_teams <- index_meta(seasons = 85, league = 1)
 j_team_names <- c(j_teams$name, "Regina Elk")
+
+
+# Load team lines
+team_lines <- file_team_lines(85)
+
 
 # Load draft data
 draft_url <- GET("https://portal.simulationhockey.com/api/v1/history/draft")
 draft_data <- fromJSON(rawToChar(draft_url$content))
+```
+
+
+
+```{r}
+################################################
+### Format and process the data for analysis ###
+################################################
 
 # Get lists of teams SHL players were drafted to
 shl_draft_data <- draft_data %>%
@@ -36,14 +71,19 @@ shl_draft_data <- draft_data %>%
   select(playerUpdateID, name) %>%
   rename("draft_team" = "name")
 
+
 # Filter and format expansion draft players and teams
 s83_expansion <- draft_data %>%
   filter(isExpansion == TRUE & seasonID == 83)
 expansion_teams <- c("Cincinnati Six", "Denver Glacier Guardians", "Madison Valkyries", "Nashville Sound")
 
-# Filter the portal for current players
-current_players <- portal %>%
-  filter(currentLeague == "SHL")
+
+# Attemp to create player ID mapping from the portal
+player_mapping <- current_players %>%
+  select(name, indexRecords) %>%
+  unnest(indexRecords) %>%
+  filter(leagueID == 0) %>%
+  select(name, indexID)
 
 
 # Format and process transactions data 
@@ -56,7 +96,26 @@ transactions <- event_history %>%
   mutate(eventDate = as.Date(eventDate))
 
 
-# (Attempt to) classify each player movement event
+# Format the lines data to get a list of each player's current role
+lines_formatted <- team_lines %>%
+  pivot_longer(cols = `ES L1 LW`:`ES L3 RD`,
+               names_to = "role",
+               values_to = "player")%>%
+  select(TeamId, role, player) %>%
+  mutate(role = gsub(pattern = "ES ", replacement = "", x = role)) %>%
+  separate(role, into = c("line", "position"), sep = " ")
+```
+
+
+
+```{r}
+##################################################
+### Classify each player's transcation history ###
+###      Find their most recent transaction    ### 
+###      Summarize and group for each team.    ###
+##################################################
+
+# Classify each player movement event
 player_movement <- transactions %>%
   left_join(shl_draft_data) %>%
   arrange(playerName, eventID) %>%
@@ -108,16 +167,33 @@ current_players_short <- current_players %>%
                                event_type2 == "FA signing" ~ "FA",
                                event_type2 == "Expansion draft" ~ abbreviation.y)) 
 
-colors <- c(teams2$colors.primary, "grey75")
-names(colors) <- c(teams2$abbreviation, "FA")         
+colors <- c(teams$colors_primary, "grey75")
+names(colors) <- c(teams$abbreviation, "FA") 
+
+
+# Merge current players with their role
+plot_data <- current_players_short %>%
+  left_join(player_mapping, by = c("name.x" = "name"))
+```
 
 
 
-# Plot
+```{r}
+#########################
+### Plot team results ###
+#########################
+
+
 plot_teams <- current_players_short %>%
   filter(name.y == "Edmonton Blizzard") %>%
   mutate(row = c(1,2,3,5,6,7,9,10,11,1.5,2.5,5.5,6.5,9.5,10.5,5.5,6.5),
          column = c(1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,3,3))
+
+
+plot_teams <- current_players_short %>%
+  filter(name.y == "Edmonton Blizzard") %>%
+  mutate(row = c(1,2,3,1.5,2.5,1,2,3,1.5,2.5,1,2,3,1.5,2.5,1.5,2.5),
+         column = c(1,1,1,2,2,4,4,4,5,5,7,7,7,8,8,10,10))
 
 
 ggplot(plot_teams, aes(x = row, y = column)) +
@@ -128,15 +204,12 @@ ggplot(plot_teams, aes(x = row, y = column)) +
              show.legend = F) +
   geom_text(aes(label = plot_team),
             col = ifelse(plot_teams$plot_team %in% c("CIN", "FA"), "black", "white")) +
-  geom_text(aes(y = column - .2, 
+  geom_text(aes(y = column - .5, 
                 label = name.x),
             size = 3) +
   theme_void() +
   scale_fill_manual(values = colors) +
-  scale_y_reverse()
+  scale_y_reverse() +
+  xlim(c(.5,3.5))
+```
 
-
-ggplot(colorsdf, aes(x = x, y = y, fill = name)) +
-  geom_point(shape = 21, size = 15) +
-  geom_text(aes(label = name), col = "white") +
-  scale_fill_manual(values = colors)
