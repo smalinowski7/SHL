@@ -97,6 +97,43 @@ index_player_ratings <- function(seasons, league = 0, type = "regular", append =
 
 
 
+# Scrape goalie stats
+index_goalie_stats <- function(seasons, league = 0, type = "regular", append = FALSE) {
+  
+  goalie_stats_list <- list()
+  
+  for (i in seasons) {
+    print(i)
+    temp_url <- GET("https://index.simulationhockey.com/api/v1/goalies/stats", query = list(season = i, type = type, league = league))
+    goalie_stats <- fromJSON(rawToChar(temp_url$content))
+    
+    goalie_stats <- goalie_stats %>%
+      mutate(pos = "Goalie",
+             
+             pos_broad = "Goalie")
+    
+    goalie_stats$gaa <- as.numeric(goalie_stats$gaa)
+    goalie_stats$savePct <- as.numeric(goalie_stats$savePct)
+             
+
+    
+    goalie_stats_list[[i]] <- goalie_stats
+  } 
+  
+  goalie_stats <- do.call(bind_rows, goalie_stats_list)
+ 
+  
+  if (append == TRUE) {
+    merged_goalie_stats <- bind_rows(read_csv(paste0(save_path_numeric[league + 1], "/index_goalie_stats.csv")), goalie_stats)
+    return(merged_goalie_stats)
+  }
+  
+  return(goalie_stats)
+}
+
+
+
+
 # Scrape goalie ratings
 index_goalie_ratings <- function(seasons, league = 0, type = "regular", append = FALSE) {
   
@@ -349,7 +386,7 @@ file_team_lines <- function(seasons, league = "shl", append = FALSE) {
   team_lines_summary <- do.call(bind_rows, team_lines_list)
   
   if (append == TRUE) {
-    merged_team_lines <- bind_rows(read_csv(paste0(save_path_character[league], "/file_goalie_summary.csv")), team_lines_summary)
+    merged_team_lines <- bind_rows(read_csv(paste0(save_path_character[league], "/file_lines.csv")), team_lines_summary)
     return(merged_team_lines)
   }
   

@@ -126,7 +126,7 @@ ggsave(here("Projects/Game highs and streaks/plots/single_game_tk.png"),height =
 ### Pick a stat here and calculate the number of mulit-stat games
 ### Stat should be how it appears on the boxscores
 
-stat <- "TK"
+stat <- "P"
 
 mg_stat_leaders <- boxscores_rg %>%
   mutate(multi_stat = ifelse(get(stat) > 1, 1, 0)) %>%
@@ -181,7 +181,7 @@ ggsave(here("Projects/Game highs and streaks/plots/multi_tk.png"), height = 15, 
 ### Pick a stat here and calculate the streak number for players
 ### Stat should be how it appears on the boxscores
 
-stat <- "BS"
+stat <- "HT"
 
 streaks <- boxscores_rg %>%
   mutate(streak_stat = ifelse(get(stat) > 0, 1, 0)) %>%

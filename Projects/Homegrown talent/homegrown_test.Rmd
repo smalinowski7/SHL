@@ -1,0 +1,351 @@
+---
+title: "Untitled"
+output: html_document
+date: "2025-11-05"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+
+# Things to double check:
+### When plot_data is made, it auto assigns N/A plot colors as team.y
+### This is because they don't have transaction data, so the assumption is they've been on their team forever
+###### So I replaced with their draft team
+###### This may not always be the case, you might need to double check in future seasons
+
+
+######################
+### Load Libraries ###
+######################
+
+library(tidyverse)
+library(httr)
+library(jsonlite)
+library(stringi)
+source("scraper_functions.R")
+```
+
+
+
+```{r}
+#########################
+### Load all datasets ###
+#########################
+
+# Load portal and filter for current players
+portal <- portal_players()
+current_players <- portal %>%
+  filter(currentLeague == "SHL")
+
+# Load events file
+events_url <- GET("https://portal.simulationhockey.com/api/v1/updateevents")
+event_history <- fromJSON(rawToChar(events_url$content))
+
+
+# Load SHL team meta
+teams <- index_meta(85)
+team_names <- teams$name
+
+
+# Load SMJHL team meta
+j_teams <- index_meta(seasons = 85, league = 1)
+j_team_names <- c(j_teams$name, "Regina Elk")
+
+
+# Load team lines
+team_lines <- file_team_lines(85)
+
+
+# Load draft data
+draft_url <- GET("https://portal.simulationhockey.com/api/v1/history/draft")
+draft_data <- fromJSON(rawToChar(draft_url$content))
+
+
+# Load index stats for player mapping
+skater_ids <- index_player_ratings(85) %>%
+  select(name, id)
+
+goalie_ids <- index_goalie_stats(85) %>%
+  select(name, id)
+```
+
+
+
+```{r}
+################################################
+### Format and process the data for analysis ###
+################################################
+
+# Get lists of teams SHL players were drafted to
+shl_draft_data <- draft_data %>%
+  filter(leagueID == 0) %>%
+  left_join(teams, by = c("teamID" = "id")) %>%
+  select(playerUpdateID, name) %>%
+  rename("draft_team" = "name")
+
+
+# Filter and format expansion draft players and teams
+s83_expansion <- draft_data %>%
+  filter(isExpansion == TRUE & seasonID == 83)
+expansion_teams <- c("Cincinnati Six", "Denver Glacier Guardians", "Madison Valkyries", "Nashville Sound")
+
+
+
+# Format and process transactions data 
+transactions <- event_history %>% 
+  filter(attributeChanged %in% c("currentLeague", "shlRightsTeamID", "currentTeamID")) %>%
+  mutate(newValue = case_when(newValue == "Denver Glacial Guardians" ~ "Denver Glacier Guardians",
+                              TRUE ~ newValue)) %>%
+  separate(eventDate, into = c("eventDate", "extra"), sep = "T") %>%
+  select(-extra) %>%
+  mutate(eventDate = as.Date(eventDate))
+
+
+# Format the lines data to get a list of each player's current role
+lines_formatted <- team_lines %>%
+  pivot_longer(cols = `ES L1 LW`:`ES L3 RD`,
+               names_to = "role",
+               values_to = "player")%>%
+  select(TeamId, role, player) %>%
+  mutate(role = gsub(pattern = "ES ", replacement = "", x = role)) %>%
+  separate(role, into = c("line", "position"), sep = " ")
+
+
+# Attemp to create player ID mapping from the portal
+player_mapping <- rbind(skater_ids, goalie_ids) %>%
+  filter(id %in% goalie_ids$id | id %in% lines_formatted$player)
+
+```
+
+
+
+```{r}
+##################################################
+### Classify each player's transcation history ###
+###      Find their most recent transaction    ### 
+###      Summarize and group for each team.    ###
+##################################################
+
+# Classify each player movement event
+player_movement <- transactions %>%
+  left_join(shl_draft_data) %>%
+  arrange(playerName, eventID) %>%
+
+
+  group_by(playerName, attributeChanged) %>%
+  mutate(event_num = row_number()) %>%
+  group_by(playerName) %>%
+
+  filter(oldValue %in% team_names | newValue %in% team_names) %>%
+  
+  mutate(event_type = case_when(
+                                (newValue == draft_team & (length(unique(newValue[newValue != ""])) == 1)) ~ "Drafted",
+                                (oldValue != "" & newValue %in% expansion_teams & playerName %in% s83_expansion$playerName & eventDate <= "2025-06-10") ~ "Expansion draft",
+                                (oldValue == "" & newValue %in% team_names & attributeChanged == "shlRightsTeamID" & event_num == 1) ~ "Drafted",
+                                (oldValue %in% j_team_names & newValue %in% team_names) ~ "call-up",
+                                (oldValue %in% team_names & newValue %in% j_team_names) ~ "Send down",
+                                (oldValue == "" & newValue %in% team_names) ~ "FA signing",
+                                (oldValue %in% team_names & newValue == "") ~ "Left to FA",
+                                (oldValue %in% team_names & newValue %in% team_names) ~ "Trade",
+                                newValue == lag(oldValue) ~ "re-sign")) %>%
+  
+
+  mutate(event_type2 = case_when((event_type == "FA signing" & (newValue == lag(oldValue) | newValue == lag(newValue))) ~ "re-sign",
+                                TRUE ~ event_type)) %>%
+  
+  
+  filter(!(event_type2 %in% c("re-sign", "Left to FA", "Send down", "call-up")))
+
+
+# Filter the most recent player movement event for each player
+last_player_movement <- player_movement %>%
+  group_by(playerUpdateID) %>%
+  mutate(event_num_total = row_number()) %>%
+  filter(event_num_total == max(event_num_total)) %>%
+  ungroup()
+
+
+# Using current players, assign each team's roster to their transaction classifier
+current_players_short <- current_players %>%
+  select(name, currentTeamID, totalTPE, draftSeason) %>%
+  filter(!(is.na(currentTeamID))) %>%
+  left_join(select(last_player_movement, playerName, oldValue, newValue, event_type2), by = c("name" = "playerName")) %>%
+  left_join(select(teams, id, abbreviation, name), by = c("currentTeamID" = "id")) %>%
+  left_join(select(teams, abbreviation, name), by = c("oldValue" = "name")) %>%
+  
+  mutate(plot_team = case_when(event_type2 == "Drafted" ~ abbreviation.x,
+                               event_type2 == "Trade" ~ abbreviation.y,
+                               event_type2 == "FA signing" ~ "FA",
+                               event_type2 == "Expansion draft" ~ abbreviation.y)) 
+
+
+
+
+# Merge current players with their role
+current_players_short_ids <- current_players_short %>%
+  mutate(name_raw = stri_trans_general(name.x, "Latin-ASCII")) %>%
+  mutate(name_raw = case_when(name_raw == "- bongo" ~ "bongo",
+                              name_raw == "Jiggle E. Puff" ~ "Jiggle E Puff",
+                              name_raw == "Toasty" ~ "Toasty ",
+                             TRUE ~ name_raw)) %>%
+  left_join(player_mapping, by = c("name_raw" = "name")) %>%
+  filter(id %in% player_mapping$id) %>%
+
+  
+  
+  ### Reminder, this section I assume all N/A plot values belong to their original team (team.y) ###
+  ### Double check for future seasons ###
+  
+  mutate(event_type2 = case_when(is.na(plot_team) ~ "Drafted",
+                                 TRUE ~ event_type2),
+         plot_team = case_when(is.na(plot_team) ~ abbreviation.x,
+                               TRUE ~ plot_team)) 
+
+
+# Merge with lines and format the plot data
+plot_data <- current_players_short_ids %>%
+  left_join(lines_formatted, by = c("id" = "player")) %>%
+  mutate(line = case_when(is.na(line) ~ "L4",
+                          TRUE ~ line),
+         position = case_when(is.na(position) ~ "G",
+                              TRUE ~ position)) %>%
+  
+  #factor position for easier sorting and graph position
+  mutate(position = factor(position, levels = c("LW", "C", "RW", "LD", "RD", "G"))) %>%
+  arrange(name.y, line, position) %>%
+  mutate(row = rep(c(1,2,3,1.5,2.5,1,2,3,1.5,2.5,1,2,3,1.5,2.5,1.5,2.5), 24),
+         column = rep(c(1,1,1,1.5,1.5,2.5,2.5,2.5,3,3,4,4,4,4.5,4.5,5.5,5.5), 24))
+```
+
+
+
+```{r}
+#########################
+### Plot team results ###
+#########################
+colors <- c(teams$colors_primary, "grey75")
+names(colors) <- c(teams$abbreviation, "FA") 
+
+
+event_colors <- c("#223F47", "#198cc1", "#92B8FF", "#DCF5FF")
+names(event_colors) <- c("Drafted", "Trade", "FA signing", "Expansion draft")
+
+
+# set plot x axis range
+plot_x_range <- 65:83
+plot_x_range_label <- plot_x_range
+plot_x_range_label[1] <- "<65"
+
+
+
+
+team_summary_plot <- plot_data %>%
+  group_by(name.y, event_type2) %>%
+  summarise(n = n()) %>%
+  mutate(event_type2 = factor(event_type2,
+                              levels = names(event_colors))) %>%
+  ungroup() %>%
+  arrange(event_type2, desc(n)) %>%
+  mutate(name.y = factor(name.y, levels = unique(name.y)))
+
+
+ggplot(team_summary_plot, aes(x = n, y = fct_rev(name.y), fill = fct_rev(event_type2))) +
+  geom_col(col = "black") +
+  scale_fill_manual(values = event_colors) +
+  guides(fill = guide_legend(reverse=T)) +
+  theme_bw() +
+  theme(panel.grid = element_blank()) +
+  scale_x_continuous(expand = c(0,0)) +
+  scale_y_discrete(expand = c(0,0)) +
+  labs(x = "Number of players", y = NULL, fill = NULL) 
+
+ggsave("Plots/team_rank.jpg", width = 11, height = 6.5, dpi = 300)
+
+
+for (i in unique(plot_data$name.y)) {
+  
+  print(i)
+  
+  plot_teams <- filter(plot_data, name.y == i)
+  
+  
+  
+  
+  p1 <- plot_teams %>%
+    group_by(event_type2) %>%
+    summarise(n = n()) %>%
+    mutate(event_type2 = factor(event_type2,
+                                levels = names(event_colors))) %>%
+    
+    ggplot(aes(x = n, y = fct_rev(event_type2), fill = event_type2)) +
+    geom_col(col = "black",
+             show.legend = F) +
+    scale_fill_manual(breaks = names(event_colors),
+                      values = event_colors) +
+    scale_y_discrete(drop = F) +
+    theme_bw() +
+    theme(panel.grid = element_blank()) +
+    labs(x = "Number of players", y = NULL)
+  
+  
+  
+  
+  p2 <- plot_teams %>%
+    group_by(draftSeason) %>%
+    arrange(desc(totalTPE)) %>%
+    mutate(n = row_number()) %>%
+    mutate(draftSeason_plot = case_when(draftSeason <= min(plot_x_range) ~ min(plot_x_range),
+                                        TRUE ~ draftSeason)) %>%
+    
+    ggplot(aes(x = draftSeason_plot, y = n)) +
+    geom_point(aes(fill = event_type2,
+                   size = totalTPE),
+               shape = 21,
+               col = "black") +
+    theme_bw() +
+    theme(panel.grid = element_blank(),
+          legend.position = "top") +
+    scale_size_continuous(range = c(1,7)) +
+    scale_x_continuous(breaks = plot_x_range,
+                       labels = plot_x_range_label, 
+                       limits = c(min(plot_x_range), max(plot_x_range))) +
+    scale_fill_manual(values = event_colors) +
+    guides(size = "none") +
+    labs(x = "Draft season", y = "Number of players", fill = NULL)
+
+  
+  p3 <- p1 / p2
+  
+  
+  
+  p4 <- ggplot(plot_teams, aes(x = row, y = column)) +
+    geom_point(aes(fill = plot_team),
+               shape = 21,
+               col = "black",
+               size = 15,
+               show.legend = F) +
+    geom_text(aes(label = plot_team),
+              col = ifelse(plot_teams$plot_team %in% c("CIN", "FA"), "black", "white")) +
+    geom_text(aes(label = name.x),
+              size = 3,
+              vjust = -3) +
+    theme_void() +
+    scale_fill_manual(values = colors) +
+    scale_y_reverse() +
+    xlim(c(.5,3.5))
+  
+  
+  p5 <- p4 + p3 + plot_layout(widths = c(2,1.25))
+  
+  
+  ggsave(paste0("Plots/", i, ".jpg"), width = 9.5, height = 12, dpi = 300)
+}
+
+
+```
+
