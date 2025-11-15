@@ -22,11 +22,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ######################
 ### Load Libraries ###
 ######################
-
+setwd(here())
 library(tidyverse)
 library(httr)
 library(jsonlite)
 library(stringi)
+library(patchwork)
 source("scraper_functions.R")
 ```
 
@@ -83,6 +84,7 @@ goalie_ids <- index_goalie_stats(85) %>%
 
 # Get lists of teams SHL players were drafted to
 shl_draft_data <- draft_data %>%
+  filter(isExpansion == FALSE) %>%
   filter(leagueID == 0) %>%
   left_join(teams, by = c("teamID" = "id")) %>%
   select(playerUpdateID, name) %>%
@@ -296,11 +298,12 @@ for (i in unique(plot_data$name.y)) {
   
   
   p2 <- plot_teams %>%
-    group_by(draftSeason) %>%
+    
     arrange(desc(totalTPE)) %>%
-    mutate(n = row_number()) %>%
     mutate(draftSeason_plot = case_when(draftSeason <= min(plot_x_range) ~ min(plot_x_range),
                                         TRUE ~ draftSeason)) %>%
+    group_by(draftSeason_plot) %>%
+    mutate(n = row_number()) %>%
     
     ggplot(aes(x = draftSeason_plot, y = n)) +
     geom_point(aes(fill = event_type2,
@@ -310,7 +313,8 @@ for (i in unique(plot_data$name.y)) {
     theme_bw() +
     theme(panel.grid = element_blank(),
           legend.position = "top") +
-    scale_size_continuous(range = c(1,7)) +
+    scale_size(#range = c(1,7),
+                          breaks = min(plot_data$totalTPE):max(plot_data$totalTPE)) +
     scale_x_continuous(breaks = plot_x_range,
                        labels = plot_x_range_label, 
                        limits = c(min(plot_x_range), max(plot_x_range))) +
