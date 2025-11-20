@@ -1,0 +1,278 @@
+---
+title: "Untitled"
+output: html_document
+date: "2025-11-13"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r} 
+
+###############################
+### Load libraries and data ###
+###############################
+
+# Libraries
+source("scraper_functions.R")
+library(tidyverse)
+library(stringi)
+
+
+### Data ###
+
+# Load schedule
+schedule <- index_schedule(85, append = T)
+
+# Load scoring summary files
+boxscores <- file_scoring_summary(85, append = T)
+boxscores <- boxscores %>% 
+  filter(Game.Id %in% schedule$gameid)
+
+# Stats for player maps
+stats <- index_player_stats(85, append = TRUE)
+player_map <- stats %>%
+  mutate(name = stri_trans_general(name, "Latin-ASCII")) %>%
+  group_by(id, season) %>%
+  summarise(name_g = name,
+            name_a1 = name,
+            name_a2 = name,
+            pos_g = position,
+            pos_a1 = position,
+            pos_a2 = position)
+
+# Load team colors
+team_meta <- index_meta(85)
+team_colors <- team_meta$colors_primary
+names(team_colors) <- team_meta$abbreviation
+```
+
+
+
+
+```{r}
+
+##########################################################
+### Format 3 individual dataframes for duo combiations ###
+##########################################################
+
+# Filter boxscores for at least 1 assist
+boxscores_filtered <- boxscores %>%
+  filter(!(is.na(Assist.1))) %>%
+  left_join(select(player_map, id, name_g, season, pos_g), by = c("Scorer" = "id", "season")) %>%
+  left_join(select(player_map, id, name_a1, season, pos_a1), by = c("Assist.1" = "id", "season")) %>%
+  left_join(select(player_map, id, name_a2, season, pos_a2), by = c("Assist.2" = "id", "season"))
+
+
+### Create 3 different duo boxscore files to later merge ###
+
+# goal scorer and primary assist
+boxscores_1 <- boxscores_filtered %>%
+  select(season, TeamId, name_g, name_a1, pos_g, pos_a1) %>%
+  rowwise() %>%
+  mutate(duo = paste(sort(c(name_g, name_a1)), collapse = ", "),
+         duo_pos = paste(c(pos_g, pos_a1), collapse = ", ")) 
+
+
+# goal scorer and 2nd assist 
+boxscores2 <- boxscores_filtered %>%
+  filter(!(is.na(name_a2))) %>%
+  select(season, TeamId, name_g, name_a2, pos_g, pos_a2) %>%
+  rowwise() %>%
+  mutate(duo = paste(sort(c(name_g, name_a2)), collapse = ", "),
+         duo_pos = paste(c(pos_g, pos_a2), collapse = ", ")) 
+
+
+  
+# both assists
+boxscores3 <- boxscores_filtered %>%
+  filter(!(is.na(name_a1)) & !(is.na(name_a2))) %>%
+  select(season, TeamId, name_a1, name_a2, pos_a1, pos_a2) %>%
+  rowwise() %>%
+  mutate(duo = paste(sort(c(name_a1, name_a2)), collapse = ", "),
+         duo_pos = paste(c(pos_a1, pos_a2), collapse = ", ")) 
+
+
+
+# merged boxscores
+merged_duos <- bind_rows(boxscores_1, boxscores2, boxscores3) %>%
+  select(season, TeamId, duo, duo_pos, name_g, name_a1, name_a2) %>%
+  left_join(select(team_meta, id, abbreviation), by = c("TeamId" = "id"))
+
+```
+
+
+
+
+```{r}
+
+#################################
+### Top duos of all time plot ###
+#################################
+
+top_duo_all_time <- merged_duos %>%
+  group_by(duo, abbreviation) %>%
+  summarize(n = n()) %>%
+  group_by(duo) %>%
+  mutate(total = sum(n)) %>%
+  ungroup() %>%
+  arrange(desc(total)) %>%
+  mutate(duo = factor(duo, levels = unique(duo))) %>%
+  mutate(rank = as.numeric(duo)) %>%
+  filter(rank <= 25)
+
+
+ggplot(top_duo_all_time, aes(x = n, y = fct_rev(duo), fill = abbreviation)) +
+  geom_col(col = "black",
+           show.legend = F) +
+  geom_text(aes(label = abbreviation),
+            col = "white",
+            position = position_stack(vjust = .5),
+            size = 3) +
+  theme_bw(base_size = 14) +
+  theme(panel.grid = element_blank()) +
+  scale_fill_manual(values = team_colors) +
+  scale_x_continuous(expand = c(0,0)) +
+  scale_y_discrete(expand = c(0,0)) +
+  labs(x = "Combined goals", y = NULL)
+```
+
+
+
+
+
+```{r}
+
+
+###########################################
+### Top defensman duos of all time plot ###
+###########################################
+
+top_d_duo_all_time <- merged_duos %>%
+  filter(duo_pos %in% c("RD, LD", "RD, RD", "LD, RD", "LD, LD")) %>%
+  group_by(duo, abbreviation) %>%
+  summarize(n = n()) %>%
+  group_by(duo) %>%
+  mutate(total = sum(n)) %>%
+  ungroup() %>%
+  arrange(desc(total)) %>%
+  mutate(duo = factor(duo, levels = unique(duo))) %>%
+  mutate(rank = as.numeric(duo)) %>%
+  filter(rank <= 25)
+
+
+ggplot(top_d_duo_all_time, aes(x = n, y = fct_rev(duo), fill = abbreviation)) +
+  geom_col(col = "black",
+           show.legend = F) +
+  geom_text(aes(label = abbreviation),
+            col = "white",
+            position = position_stack(vjust = .5),
+            size = 3) +
+  theme_bw(base_size = 14) +
+  theme(panel.grid = element_blank()) +
+  scale_fill_manual(values = team_colors) +
+  scale_x_continuous(expand = c(0,0)) +
+  scale_y_discrete(expand = c(0,0)) +
+  labs(x = "Combined goals", y = NULL)
+```
+
+
+
+
+
+
+
+```{r}
+##############################
+### Top duos for each team ###
+##############################
+
+top_duo_per_team <- merged_duos %>%
+  group_by(duo, abbreviation) %>%
+  summarize(n = n()) %>%
+  group_by(abbreviation) %>%
+  arrange(abbreviation, desc(n)) %>%
+  mutate(duo_label = paste0(duo, " (", abbreviation, ")")) %>%
+  mutate(duo_label = factor(duo_label, levels = duo_label)) %>%
+  mutate(rank = row_number()) %>%
+  filter(rank <= 3) %>%
+  ungroup() %>%
+  mutate(facet = case_when(row_number() <= 36 ~ 1,
+                           TRUE ~ 2))
+
+
+ggplot(top_duo_per_team, aes(x = n, y = fct_rev(duo_label), fill = abbreviation, alpha = factor(rank))) +
+  geom_col(col = "black",
+           show.legend = F) +
+  facet_wrap(.~ facet, scales = "free_y") +
+  scale_fill_manual(values = team_colors) +
+  scale_alpha_manual(values = c(1,.8,.6)) +
+  theme_bw(base_size = 14) +
+  theme(panel.grid = element_blank(),
+        strip.text = element_blank(),
+        strip.background = element_blank(),
+        axis.ticks.y = element_blank()) +
+  scale_x_continuous(expand = c(0,0)) +
+  scale_y_discrete(expand = c(0,0)) +
+  labs(x = "Combined goals", y = NULL)
+```
+
+
+
+
+```{r}
+################################
+### Top duos for each season ###
+################################
+
+top_duo_per_season <- merged_duos %>%
+  group_by(duo, season) %>%
+  summarize(n = n(),
+            team = abbreviation[1]) %>%
+  group_by(season) %>%
+  arrange(season, desc(n)) %>%
+  mutate(duo_label = paste0(duo, " (", team, ")")) %>%
+  mutate(duo_label = factor(duo_label, levels = duo_label)) %>%
+  mutate(rank = row_number()) %>%
+  ungroup() %>%
+  mutate(label = case_when(rank <= 3 ~ TRUE,
+                           TRUE ~ FALSE),
+         y_pos = 80-(10*(rank-1)))
+
+
+ggplot(top_duo_per_season, aes(x = rank, y = n)) +
+  geom_point(aes(shape = label,
+                 fill = team,
+                 size = label),
+             show.legend = F) +
+  facet_wrap(.~ season) +
+  geom_label(data = filter(top_duo_per_season, label == TRUE),
+             aes(label = duo_label,
+                 x = 150,
+                 y = y_pos,
+                 col = team),
+             size = 3,
+             hjust = 0,
+             show.legend = F) +
+  scale_shape_manual(values = c(16, 21)) +
+  scale_fill_manual(values = team_colors) +
+  scale_size_manual(values = c(1,3)) +
+  scale_color_manual(values = team_colors) +
+  geom_segment(data = filter(top_duo_per_season, label == TRUE),
+               aes(x = rank,
+                   xend = 150,
+                   y = n,
+                   yend = y_pos,
+                   col = team),
+               show.legend = F) +
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face = "bold")) +
+  labs(x = "Duo rank", y = "Combined goals")
+         
+```
+
