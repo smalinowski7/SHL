@@ -17,6 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ###############################
 
 # Libraries
+setwd(here())
 source("scraper_functions.R")
 library(tidyverse)
 library(stringi)
@@ -26,6 +27,11 @@ library(stringi)
 
 # Load schedule
 schedule <- index_schedule(85, append = T)
+
+
+# Create opponent map
+opp_map <- schedule %>%
+  select(season, gameid, homeTeam, awayTeam)
 
 # Load scoring summary files
 boxscores <- file_scoring_summary(85, append = T)
@@ -64,14 +70,18 @@ boxscores_filtered <- boxscores %>%
   filter(!(is.na(Assist.1))) %>%
   left_join(select(player_map, id, name_g, season, pos_g), by = c("Scorer" = "id", "season")) %>%
   left_join(select(player_map, id, name_a1, season, pos_a1), by = c("Assist.1" = "id", "season")) %>%
-  left_join(select(player_map, id, name_a2, season, pos_a2), by = c("Assist.2" = "id", "season"))
+  left_join(select(player_map, id, name_a2, season, pos_a2), by = c("Assist.2" = "id", "season")) %>%
+  left_join(opp_map, by = c("season", "Game.Id" = "gameid")) %>%
+  mutate(opp = case_when(TeamId == homeTeam ~ awayTeam,
+                         TeamId == awayTeam ~ homeTeam)) %>%
+  select(-homeTeam, -awayTeam)
 
 
 ### Create 3 different duo boxscore files to later merge ###
 
 # goal scorer and primary assist
 boxscores_1 <- boxscores_filtered %>%
-  select(season, TeamId, name_g, name_a1, pos_g, pos_a1) %>%
+  select(season, TeamId, opp, name_g, name_a1, pos_g, pos_a1) %>%
   rowwise() %>%
   mutate(duo = paste(sort(c(name_g, name_a1)), collapse = ", "),
          duo_pos = paste(c(pos_g, pos_a1), collapse = ", ")) 
@@ -80,7 +90,7 @@ boxscores_1 <- boxscores_filtered %>%
 # goal scorer and 2nd assist 
 boxscores2 <- boxscores_filtered %>%
   filter(!(is.na(name_a2))) %>%
-  select(season, TeamId, name_g, name_a2, pos_g, pos_a2) %>%
+  select(season, TeamId, opp, name_g, name_a2, pos_g, pos_a2) %>%
   rowwise() %>%
   mutate(duo = paste(sort(c(name_g, name_a2)), collapse = ", "),
          duo_pos = paste(c(pos_g, pos_a2), collapse = ", ")) 
@@ -90,7 +100,7 @@ boxscores2 <- boxscores_filtered %>%
 # both assists
 boxscores3 <- boxscores_filtered %>%
   filter(!(is.na(name_a1)) & !(is.na(name_a2))) %>%
-  select(season, TeamId, name_a1, name_a2, pos_a1, pos_a2) %>%
+  select(season, TeamId, opp, name_a1, name_a2, pos_a1, pos_a2) %>%
   rowwise() %>%
   mutate(duo = paste(sort(c(name_a1, name_a2)), collapse = ", "),
          duo_pos = paste(c(pos_a1, pos_a2), collapse = ", ")) 
@@ -99,8 +109,12 @@ boxscores3 <- boxscores_filtered %>%
 
 # merged boxscores
 merged_duos <- bind_rows(boxscores_1, boxscores2, boxscores3) %>%
-  select(season, TeamId, duo, duo_pos, name_g, name_a1, name_a2) %>%
-  left_join(select(team_meta, id, abbreviation), by = c("TeamId" = "id"))
+  select(season, TeamId, duo, opp, duo_pos, name_g, name_a1, name_a2) %>%
+  left_join(select(team_meta, id, abbreviation), by = c("TeamId" = "id")) %>%
+  left_join(select(team_meta, id, abbreviation), by = c("opp" = "id")) %>%
+  rename("abbreviation" = "abbreviation.x",
+         "opp_abbreviation" = "abbreviation.y")
+
 
 ```
 
@@ -222,6 +236,57 @@ ggplot(top_duo_per_team, aes(x = n, y = fct_rev(duo_label), fill = abbreviation,
 
 
 
+```{r}
+##################################
+### Top duos against each team ###
+##################################
+
+
+### First, find the top 3 duos per team, to later filter
+### Not sure how to directly filter
+top_duo_against_team_rank <- merged_duos %>%
+  group_by(duo, opp_abbreviation) %>%
+  summarize(n = n()) %>%
+  mutate(duo_label = paste0(duo, " (", opp_abbreviation, ")")) %>%
+  arrange(opp_abbreviation, desc(n)) %>%
+  group_by(opp_abbreviation) %>%
+  mutate(rank = row_number()) %>%
+  filter(rank <= 3)
+
+
+top_duo_against_team <- merged_duos %>%
+  group_by(duo, opp_abbreviation, abbreviation) %>%
+  summarize(n = n()) %>%
+  group_by(duo, opp_abbreviation) %>%
+  mutate(tot = sum(n)) %>%
+  arrange(opp_abbreviation, desc(tot)) %>%
+  group_by(opp_abbreviation) %>%
+  mutate(duo_label = paste0(duo, " (", opp_abbreviation, ")")) %>%
+  mutate(duo_label = factor(duo_label, levels = unique(duo_label))) %>%
+  filter(duo_label %in% top_duo_against_team_rank$duo_label)
+
+
+ggplot(top_duo_against_team, aes(x = n, y = fct_rev(duo_label), fill = abbreviation))+
+  geom_col(col = "black",
+           show.legend = F) +
+  facet_wrap(.~ opp_abbreviation, 
+             scales = "free_y",
+             ncol = 2, 
+             dir = "v") +
+  scale_fill_manual(values = team_colors) +
+  theme_bw(base_size = 12) +
+  theme(panel.grid = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face = "bold")) +
+  scale_x_continuous(expand = c(0,0)) +
+  scale_y_discrete(expand = c(0,0),
+                   breaks = top_duo_against_team$duo_label,
+                   labels = top_duo_against_team$duo) +
+  labs(x = "Combined goals", y = NULL)
+```
+
+
+
 
 ```{r}
 ################################
@@ -274,5 +339,85 @@ ggplot(top_duo_per_season, aes(x = rank, y = n)) +
         strip.text = element_text(face = "bold")) +
   labs(x = "Duo rank", y = "Combined goals")
          
+```
+
+
+
+
+
+```{r}
+#######################################
+### Highest percent of total points ###
+#######################################
+
+# Get career totals first
+# Remove the one season of the Lucas Raymond name duplicate, oh well
+
+career_totals <- stats %>%
+  mutate(name = stri_trans_general(name, "Latin-ASCII")) %>%
+  filter(!(name == "Lucas Raymond" & season == 68)) %>%
+  filter(season >= 66) %>%
+  group_by(name) %>%
+  summarise(g = sum(goals),
+            a = sum(assists),
+            p = sum(points)) 
+
+  
+
+
+
+merged_duos_long <- merged_duos %>%
+  group_by(duo) %>%
+  mutate(duo_goals = n()) %>%
+  mutate(assist = case_when(is.na(name_a1) ~ name_a2,
+                            is.na(name_a2) ~ name_a1)) %>%
+  select(-duo_pos, -name_a1, -name_a2) %>%
+  pivot_longer(cols = c(name_g, assist),
+               names_to = "role",
+               values_to = "name") %>%
+  left_join(career_totals, by = "name") %>%
+  group_by(name) %>%
+  mutate(perc_duo = duo_goals/p) %>%
+  
+  #filter for players with at least 100 career points
+  filter(p >= 200)
+
+
+duo_long_plot <- merged_duos_long %>%
+  group_by(duo, name) %>%
+  summarise(p = p[1],
+            duo_goals = duo_goals[1],
+            perc_duo = perc_duo[1])
+
+
+ggplot(duo_long_plot, aes(x = duo_goals, y = p)) +
+  geom_jitter() +
+  theme_bw(base_size = 16) +
+  theme(panel.grid = element_blank(),
+        panel.border = element_blank(),
+        axis.line = element_line())
+
+
+top_duo_perc <- duo_long_plot %>%
+  ungroup() %>%
+  mutate(label = paste0(name, duo)) %>%
+  arrange(desc(perc_duo)) %>%
+  filter(row_number() <= 25) %>%
+  mutate(label = factor(label, levels = label))
+
+ggplot(top_duo_perc, aes(x = p, y = fct_rev(label))) +
+  geom_col(alpha = .5,
+           col = "black") +
+  geom_col(aes(x = duo_goals),
+           col = "black") +
+  scale_y_discrete(breaks = top_duo_perc$label, 
+                   labels = top_duo_perc$name,
+                   expand = c(0,0)) +
+  geom_text(aes(x = 1150, label = duo),
+            hjust = 1) +
+  geom_text(aes(label = paste0(round(perc_duo, 2), "%"),
+                x = duo_goals/2)) +
+  theme_bw(base_size = 14) +
+  theme(panel.grid = element_blank()) 
 ```
 
