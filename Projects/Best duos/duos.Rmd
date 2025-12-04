@@ -400,24 +400,72 @@ ggplot(duo_long_plot, aes(x = duo_goals, y = p)) +
 
 top_duo_perc <- duo_long_plot %>%
   ungroup() %>%
-  mutate(label = paste0(name, duo)) %>%
+  mutate(label = paste0("(",name, duo)) %>%
   arrange(desc(perc_duo)) %>%
   filter(row_number() <= 25) %>%
   mutate(label = factor(label, levels = label))
 
 ggplot(top_duo_perc, aes(x = p, y = fct_rev(label))) +
-  geom_col(alpha = .5,
-           col = "black") +
-  geom_col(aes(x = duo_goals),
-           col = "black") +
+  geom_col(aes(fill = perc_duo),
+           alpha = .5,
+           col = "black",
+           show.legend = F) +
+  geom_col(aes(x = duo_goals,
+               fill = perc_duo),
+           col = "black",
+           show.legend = F) +
+  
   scale_y_discrete(breaks = top_duo_perc$label, 
                    labels = top_duo_perc$name,
                    expand = c(0,0)) +
-  geom_text(aes(x = 1150, label = duo),
+  scale_fill_gradient(low = "#56B1F7", high = "#132B43") +
+  scale_x_continuous(expand = c(0,0)) +
+  
+  geom_text(aes(x = 1100, label = paste0("(", duo, ")")),
             hjust = 1) +
   geom_text(aes(label = paste0(round(perc_duo, 2), "%"),
-                x = duo_goals/2)) +
+                x = duo_goals/2),
+            col = ifelse(top_duo_perc$perc_duo > .52, "white", "black")) +
+  
+  geom_text(aes(x=1125, label="")) +
+  
   theme_bw(base_size = 14) +
-  theme(panel.grid = element_blank()) 
+  theme(panel.grid = element_blank(),
+        axis.ticks.y = element_blank()) +
+  labs(x = "Total points (Duo | Solo)", y = NULL)
+```
+
+
+
+```{r}
+
+####################################
+### Unassisted and empty netters ###
+####################################
+
+### Unassisted goals
+unassisted_goals <- boxscores %>%
+  filter(is.na(Assist.1) & is.na(Assist.2)) %>%
+  left_join(select(player_map, id, season, name_g), by = c("Scorer" = "id", "season"))
+
+unassisted_leaders <- unassisted_goals %>%
+  group_by(Scorer) %>%
+  summarise(name = last(name_g),
+            n = n())
+
+
+
+### Empty net leaders
+empty_netters <- boxscores %>% 
+  filter(grepl(pattern = "ENG",
+               x = Note)) %>%
+  left_join(select(player_map, id, season, name_g), by = c("Scorer" = "id", "season"))
+
+
+
+empty_net_leaders <- empty_netters %>% 
+  group_by(Scorer) %>%
+  summarise(name = last(name_g),
+            n = n())
 ```
 
