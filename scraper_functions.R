@@ -14,6 +14,59 @@ save_path_numeric <- c(shl_save_path, smjhl_save_path)
 save_path_character <- c(shl_save_path, smjhl_save_path)
 names(save_path_character) <- c("shl", "smjhl")
 
+
+
+##################################################
+### Update and save new season's worth of data ###
+##################################################
+
+season_to_add <- 85
+league_char <- "smjhl"
+league_numeric <- 1
+directory <- "SMJHL"
+
+
+bs <- file_boxscores(season_to_add, league = league_char, append = T)
+gs <- file_goalie_summary(season_to_add, league = league_char, append = T)
+lines <- file_team_lines(season_to_add, league = league_char, append = T)
+ss <- file_scoring_summary(season_to_add, league = league_char, append = T)
+gr <- index_goalie_ratings(season_to_add, league = league_numeric, append = T)
+gs <- index_goalie_stats(season_to_add, league = league_numeric, append = T)
+pr <- index_player_ratings(season_to_add, league = league_numeric, append = T)
+ps <- index_player_stats(season_to_add, league = league_numeric, append = T)
+sch <- index_schedule(season_to_add, league = league_numeric, append = T)
+stand <- index_standings(season_to_add, league = league_numeric, append = T)
+meta <- index_meta(season_to_add, league = league_numeric, append = T)
+
+
+# Check unqiue seasons
+unique(bs$season)
+unique(gs$season)
+unique(lines$season)
+unique(ss$season)
+unique(gr$season)
+unique(gs$season)
+unique(pr$season)
+unique(ps$season)
+unique(sch$season)
+unique(stand$season)
+unique(meta$season)
+
+
+# Save
+write_csv(bs, paste0("Data/", directory, "/file_boxscore.csv"))
+write_csv(gs, paste0("Data/", directory, "/file_goalie_summary.csv"))
+write_csv(lines, paste0("Data/", directory, "/file_lines.csv"))
+write_csv(ss, paste0("Data/", directory, "/file_scoring_summary.csv"))
+write_csv(gr, paste0("Data/", directory, "/index_goalie_ratings.csv"))
+write_csv(gs, paste0("Data/", directory, "/index_goalie_stats.csv"))
+write_csv(pr, paste0("Data/", directory, "/index_player_ratings.csv"))
+write_csv(ps, paste0("Data/", directory, "/index_player_stats.csv"))
+write_csv(sch, paste0("Data/", directory, "/index_schedule.csv"))
+write_csv(stand, paste0("Data/", directory, "/index_standings.csv"))
+write_csv(meta, paste0("Data/", directory, "/index_team_meta.csv"))
+
+
 ##################
 ### From Index ###
 ##################

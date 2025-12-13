@@ -1,57 +1,57 @@
 position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,goalsFor,goalsAgainst,goalDiff,home_wins,home_losses,home_OTL,away_wins,away_losses,away_OTL,shootout_wins,shootout_losses,season
-1,7,Detroit Falcons,Detroit,DET,50,41,7,2,84,0.840,40,204,89,115,22,3,0,19,4,2,1,2,53
-2,1,Kelowna Knights,Kelowna,KEL,50,31,16,3,65,0.650,28,136,125,11,20,5,0,11,11,3,3,1,53
-3,0,Anchorage Armada,Anchorage,ANC,50,29,18,3,61,0.610,26,159,123,36,16,9,0,13,9,3,3,3,53
-4,8,St. Louis Scarecrows,St. Louis,STL,50,27,20,3,57,0.570,23,145,146,-1,13,10,2,14,10,1,4,2,53
-5,5,Anaheim Outlaws,Anaheim,ANA,50,27,20,3,57,0.570,23,140,142,-2,14,9,2,13,11,1,4,2,53
-6,4,Newfoundland Berserkers,Newfoundland,NL,50,23,22,5,51,0.510,20,134,133,1,10,12,3,13,10,2,3,3,53
-7,6,Colorado Raptors,Colorado,COL,50,20,27,3,43,0.430,18,129,147,-18,10,12,3,10,15,0,2,3,53
-8,9,Carolina Kraken,Carolina,CAR,50,18,29,3,39,0.390,18,109,160,-51,7,15,3,11,14,0,0,2,53
-9,3,Vancouver Whalers,Vancouver,VAN,50,17,30,3,37,0.370,17,108,151,-43,9,15,1,8,15,2,0,2,53
-10,2,Maine Timber,Maine,MET,50,17,30,3,37,0.370,14,109,157,-48,8,15,2,9,15,1,3,3,53
-1,4,Newfoundland Berserkers,Newfoundland,NL,50,34,13,3,71,0.710,32,180,119,61,20,4,1,14,9,2,2,1,54
-2,1,Kelowna Knights,Kelowna,KEL,50,32,11,7,71,0.710,32,165,99,66,18,4,3,14,7,4,0,5,54
-3,9,Carolina Kraken,Carolina,CAR,50,32,13,5,69,0.690,30,183,134,49,18,7,0,14,6,5,2,3,54
-4,5,Anaheim Outlaws,Anaheim,ANA,50,27,20,3,57,0.570,22,146,151,-5,16,9,0,11,11,3,5,1,54
-5,8,St. Louis Scarecrows,St. Louis,STL,50,26,23,1,53,0.530,22,147,148,-1,18,6,1,8,17,0,4,1,54
-6,6,Colorado Raptors,Colorado,COL,50,24,21,5,53,0.530,19,123,127,-4,16,7,2,8,14,3,5,3,54
-7,0,Anchorage Armada,Anchorage,ANC,50,22,23,5,49,0.490,21,139,148,-9,11,10,4,11,13,1,1,4,54
-8,7,Detroit Falcons,Detroit,DET,50,22,25,3,47,0.470,22,122,134,-12,12,13,0,10,12,3,0,1,54
-9,2,Maine Timber,Maine,MET,50,20,30,0,40,0.400,19,121,173,-52,14,11,0,6,19,0,1,0,54
-10,3,Vancouver Whalers,Vancouver,VAN,50,11,37,2,24,0.240,11,84,177,-93,6,18,1,5,19,1,0,1,54
-1,4,Newfoundland Berserkers,Newfoundland,NL,50,35,9,6,76,0.760,35,185,105,80,17,5,3,18,4,3,0,3,55
-2,9,Carolina Kraken,Carolina,CAR,50,37,12,1,75,0.750,34,184,102,82,20,5,0,17,7,1,3,1,55
-3,0,Anchorage Armada,Anchorage,ANC,50,35,12,3,73,0.730,33,176,89,87,19,5,1,16,7,2,2,1,55
-4,1,Kelowna Knights,Kelowna,KEL,50,33,13,4,70,0.700,30,165,132,33,19,4,2,14,9,2,3,3,55
-5,6,Colorado Raptors,Colorado,COL,50,27,18,5,59,0.590,23,154,134,20,12,8,5,15,10,0,4,3,55
-6,2,Maine Timber,Maine,MET,50,25,22,3,53,0.530,24,160,149,11,14,9,2,11,13,1,1,2,55
-7,5,Anaheim Outlaws,Anaheim,ANA,50,24,21,5,53,0.530,20,147,149,-2,12,10,3,12,11,2,4,3,55
-8,3,Vancouver Whalers,Vancouver,VAN,50,24,23,3,51,0.510,19,117,136,-19,13,9,3,11,14,0,5,3,55
-9,8,St. Louis Scarecrows,St. Louis,STL,50,18,28,4,40,0.400,17,113,162,-49,10,14,1,8,14,3,1,0,55
-10,15,Quebec City Citadelles,Quebec City,QCC,50,17,32,1,35,0.350,15,120,199,-79,12,12,1,5,20,0,2,1,55
-11,7,Detroit Falcons,Detroit,DET,50,15,31,4,34,0.340,14,122,178,-56,6,16,3,9,15,1,1,3,55
-12,14,Nevada Battleborn,Nevada,NBB,50,10,36,4,24,0.240,10,102,210,-108,6,17,2,4,19,2,0,3,55
-1,3,Vancouver Whalers,Vancouver,VAN,50,39,11,0,78,0.780,36,169,101,68,20,5,0,19,6,0,3,0,56
-2,9,Carolina Kraken,Carolina,CAR,50,31,17,2,64,0.640,28,163,142,21,18,7,0,13,10,2,3,1,56
-3,0,Anchorage Armada,Anchorage,ANC,50,29,17,4,62,0.620,28,170,136,34,18,4,3,11,13,1,1,1,56
-4,4,Newfoundland Berserkers,Newfoundland,NL,50,28,17,5,61,0.610,26,153,137,16,17,6,2,11,11,3,2,3,56
-5,14,Nevada Battleborn,Nevada,NBB,50,28,18,4,60,0.600,26,158,142,16,14,7,4,14,11,0,2,2,56
-6,5,Anaheim Outlaws,Anaheim,ANA,50,27,18,5,59,0.590,22,176,154,22,16,6,3,11,12,2,5,5,56
-7,2,Maine Timber,Maine,MET,50,23,21,6,52,0.520,17,147,155,-8,11,9,5,12,12,1,6,5,56
-8,6,Colorado Raptors,Colorado,COL,50,24,24,2,50,0.500,23,151,149,2,14,10,1,10,14,1,1,1,56
-9,15,Quebec City Citadelles,Quebec City,QCC,50,23,23,4,50,0.500,22,147,139,8,14,9,2,9,14,2,1,3,56
-10,8,St. Louis Scarecrows,St. Louis,STL,50,18,29,3,39,0.390,17,119,173,-54,9,14,2,9,15,1,1,2,56
-11,1,Kelowna Knights,Kelowna,KEL,50,17,29,4,38,0.380,16,106,157,-51,10,13,2,7,16,2,1,3,56
-12,7,Detroit Falcons,Detroit,DET,50,13,34,3,29,0.290,11,118,192,-74,6,19,0,7,15,3,2,2,56
+1,7,Detroit Falcons,Detroit,DET,50,41,7,2,84,0.84,40,204,89,115,22,3,0,19,4,2,1,2,53
+2,1,Kelowna Knights,Kelowna,KEL,50,31,16,3,65,0.65,28,136,125,11,20,5,0,11,11,3,3,1,53
+3,0,Anchorage Armada,Anchorage,ANC,50,29,18,3,61,0.61,26,159,123,36,16,9,0,13,9,3,3,3,53
+4,8,St. Louis Scarecrows,St. Louis,STL,50,27,20,3,57,0.57,23,145,146,-1,13,10,2,14,10,1,4,2,53
+5,5,Anaheim Outlaws,Anaheim,ANA,50,27,20,3,57,0.57,23,140,142,-2,14,9,2,13,11,1,4,2,53
+6,4,Newfoundland Berserkers,Newfoundland,NL,50,23,22,5,51,0.51,20,134,133,1,10,12,3,13,10,2,3,3,53
+7,6,Colorado Raptors,Colorado,COL,50,20,27,3,43,0.43,18,129,147,-18,10,12,3,10,15,0,2,3,53
+8,9,Carolina Kraken,Carolina,CAR,50,18,29,3,39,0.39,18,109,160,-51,7,15,3,11,14,0,0,2,53
+9,3,Vancouver Whalers,Vancouver,VAN,50,17,30,3,37,0.37,17,108,151,-43,9,15,1,8,15,2,0,2,53
+10,2,Maine Timber,Maine,MET,50,17,30,3,37,0.37,14,109,157,-48,8,15,2,9,15,1,3,3,53
+1,4,Newfoundland Berserkers,Newfoundland,NL,50,34,13,3,71,0.71,32,180,119,61,20,4,1,14,9,2,2,1,54
+2,1,Kelowna Knights,Kelowna,KEL,50,32,11,7,71,0.71,32,165,99,66,18,4,3,14,7,4,0,5,54
+3,9,Carolina Kraken,Carolina,CAR,50,32,13,5,69,0.69,30,183,134,49,18,7,0,14,6,5,2,3,54
+4,5,Anaheim Outlaws,Anaheim,ANA,50,27,20,3,57,0.57,22,146,151,-5,16,9,0,11,11,3,5,1,54
+5,8,St. Louis Scarecrows,St. Louis,STL,50,26,23,1,53,0.53,22,147,148,-1,18,6,1,8,17,0,4,1,54
+6,6,Colorado Raptors,Colorado,COL,50,24,21,5,53,0.53,19,123,127,-4,16,7,2,8,14,3,5,3,54
+7,0,Anchorage Armada,Anchorage,ANC,50,22,23,5,49,0.49,21,139,148,-9,11,10,4,11,13,1,1,4,54
+8,7,Detroit Falcons,Detroit,DET,50,22,25,3,47,0.47,22,122,134,-12,12,13,0,10,12,3,0,1,54
+9,2,Maine Timber,Maine,MET,50,20,30,0,40,0.4,19,121,173,-52,14,11,0,6,19,0,1,0,54
+10,3,Vancouver Whalers,Vancouver,VAN,50,11,37,2,24,0.24,11,84,177,-93,6,18,1,5,19,1,0,1,54
+1,4,Newfoundland Berserkers,Newfoundland,NL,50,35,9,6,76,0.76,35,185,105,80,17,5,3,18,4,3,0,3,55
+2,9,Carolina Kraken,Carolina,CAR,50,37,12,1,75,0.75,34,184,102,82,20,5,0,17,7,1,3,1,55
+3,0,Anchorage Armada,Anchorage,ANC,50,35,12,3,73,0.73,33,176,89,87,19,5,1,16,7,2,2,1,55
+4,1,Kelowna Knights,Kelowna,KEL,50,33,13,4,70,0.7,30,165,132,33,19,4,2,14,9,2,3,3,55
+5,6,Colorado Raptors,Colorado,COL,50,27,18,5,59,0.59,23,154,134,20,12,8,5,15,10,0,4,3,55
+6,2,Maine Timber,Maine,MET,50,25,22,3,53,0.53,24,160,149,11,14,9,2,11,13,1,1,2,55
+7,5,Anaheim Outlaws,Anaheim,ANA,50,24,21,5,53,0.53,20,147,149,-2,12,10,3,12,11,2,4,3,55
+8,3,Vancouver Whalers,Vancouver,VAN,50,24,23,3,51,0.51,19,117,136,-19,13,9,3,11,14,0,5,3,55
+9,8,St. Louis Scarecrows,St. Louis,STL,50,18,28,4,40,0.4,17,113,162,-49,10,14,1,8,14,3,1,0,55
+10,15,Quebec City Citadelles,Quebec City,QCC,50,17,32,1,35,0.35,15,120,199,-79,12,12,1,5,20,0,2,1,55
+11,7,Detroit Falcons,Detroit,DET,50,15,31,4,34,0.34,14,122,178,-56,6,16,3,9,15,1,1,3,55
+12,14,Nevada Battleborn,Nevada,NBB,50,10,36,4,24,0.24,10,102,210,-108,6,17,2,4,19,2,0,3,55
+1,3,Vancouver Whalers,Vancouver,VAN,50,39,11,0,78,0.78,36,169,101,68,20,5,0,19,6,0,3,0,56
+2,9,Carolina Kraken,Carolina,CAR,50,31,17,2,64,0.64,28,163,142,21,18,7,0,13,10,2,3,1,56
+3,0,Anchorage Armada,Anchorage,ANC,50,29,17,4,62,0.62,28,170,136,34,18,4,3,11,13,1,1,1,56
+4,4,Newfoundland Berserkers,Newfoundland,NL,50,28,17,5,61,0.61,26,153,137,16,17,6,2,11,11,3,2,3,56
+5,14,Nevada Battleborn,Nevada,NBB,50,28,18,4,60,0.6,26,158,142,16,14,7,4,14,11,0,2,2,56
+6,5,Anaheim Outlaws,Anaheim,ANA,50,27,18,5,59,0.59,22,176,154,22,16,6,3,11,12,2,5,5,56
+7,2,Maine Timber,Maine,MET,50,23,21,6,52,0.52,17,147,155,-8,11,9,5,12,12,1,6,5,56
+8,6,Colorado Raptors,Colorado,COL,50,24,24,2,50,0.5,23,151,149,2,14,10,1,10,14,1,1,1,56
+9,15,Quebec City Citadelles,Quebec City,QCC,50,23,23,4,50,0.5,22,147,139,8,14,9,2,9,14,2,1,3,56
+10,8,St. Louis Scarecrows,St. Louis,STL,50,18,29,3,39,0.39,17,119,173,-54,9,14,2,9,15,1,1,2,56
+11,1,Kelowna Knights,Kelowna,KEL,50,17,29,4,38,0.38,16,106,157,-51,10,13,2,7,16,2,1,3,56
+12,7,Detroit Falcons,Detroit,DET,50,13,34,3,29,0.29,11,118,192,-74,6,19,0,7,15,3,2,2,56
 1,15,Quebec City Citadelles,Quebec City,QCC,66,49,8,9,107,0.811,48,263,161,102,23,4,6,26,4,3,1,6,57
 2,0,Anchorage Armada,Anchorage,ANC,66,42,16,8,92,0.697,38,210,143,67,22,7,4,20,9,4,4,4,57
 3,2,Maine Timber,Maine,MET,66,37,24,5,79,0.598,31,178,168,10,22,10,1,15,14,4,6,2,57
 4,1,Kelowna Knights,Kelowna,KEL,66,37,25,4,78,0.591,32,185,163,22,20,11,2,17,14,2,5,3,57
 5,7,Detroit Falcons,Detroit,DET,66,33,26,7,73,0.553,30,195,195,0,18,12,3,15,14,4,3,4,57
 6,6,Colorado Raptors,Colorado,COL,66,33,27,6,72,0.545,32,196,199,-3,14,17,2,19,10,4,1,3,57
-7,5,Anaheim Outlaws,Anaheim,ANA,66,32,28,6,70,0.530,30,199,199,0,15,16,2,17,12,4,2,4,57
+7,5,Anaheim Outlaws,Anaheim,ANA,66,32,28,6,70,0.53,30,199,199,0,15,16,2,17,12,4,2,4,57
 8,14,Nevada Battleborn,Nevada,NBB,66,30,29,7,67,0.508,25,186,185,1,17,13,3,13,16,4,5,4,57
-9,3,Vancouver Whalers,Vancouver,VAN,66,30,30,6,66,0.500,25,181,223,-42,21,10,2,9,20,4,5,4,57
+9,3,Vancouver Whalers,Vancouver,VAN,66,30,30,6,66,0.5,25,181,223,-42,21,10,2,9,20,4,5,4,57
 10,9,Carolina Kraken,Carolina,CAR,66,26,32,8,60,0.455,23,175,215,-40,11,17,5,15,15,3,3,4,57
 11,8,St. Louis Scarecrows,St. Louis,STL,66,25,36,5,55,0.417,18,163,206,-43,14,17,2,11,19,3,7,3,57
 12,4,Newfoundland Berserkers,Newfoundland,NL,66,22,39,5,49,0.371,21,161,235,-74,12,19,2,10,20,3,1,2,57
@@ -66,22 +66,22 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 9,9,Carolina Kraken,Carolina,CAR,66,26,39,1,53,0.402,22,166,228,-62,19,13,1,7,26,0,4,0,58
 10,5,Anaheim Outlaws,Anaheim,ANA,66,21,41,4,46,0.348,19,147,237,-90,17,14,2,4,27,2,2,4,58
 11,8,St. Louis Scarecrows,St. Louis,STL,66,19,40,7,45,0.341,19,170,254,-84,12,18,3,7,22,4,0,4,58
-12,2,Maine Timber,Maine,MET,66,17,46,3,37,0.280,14,138,243,-105,13,18,2,4,28,1,3,3,58
+12,2,Maine Timber,Maine,MET,66,17,46,3,37,0.28,14,138,243,-105,13,18,2,4,28,1,3,3,58
 1,1,Kelowna Knights,Kelowna,KEL,66,49,13,4,102,0.773,47,275,157,118,28,3,2,21,10,2,2,4,59
-2,0,Anchorage Armada,Anchorage,ANC,66,45,16,5,95,0.720,42,243,169,74,23,8,2,22,8,3,3,3,59
+2,0,Anchorage Armada,Anchorage,ANC,66,45,16,5,95,0.72,42,243,169,74,23,8,2,22,8,3,3,3,59
 3,4,Newfoundland Berserkers,Newfoundland,NL,66,41,18,7,89,0.674,39,234,151,83,20,7,6,21,11,1,2,5,59
 4,7,Detroit Falcons,Detroit,DET,66,41,20,5,87,0.659,35,213,168,45,24,8,1,17,12,4,6,3,59
 5,6,Colorado Raptors,Colorado,COL,66,35,23,8,78,0.591,26,198,189,9,19,10,4,16,13,4,9,7,59
-6,15,Quebec City Citadelles,Quebec City,QCC,66,35,31,0,70,0.530,33,192,192,0,20,13,0,15,18,0,2,0,59
+6,15,Quebec City Citadelles,Quebec City,QCC,66,35,31,0,70,0.53,33,192,192,0,20,13,0,15,18,0,2,0,59
 7,9,Carolina Kraken,Carolina,CAR,66,32,30,4,68,0.515,26,198,218,-20,18,13,2,14,17,2,6,3,59
-8,5,Anaheim Outlaws,Anaheim,ANA,66,30,30,6,66,0.500,28,181,199,-18,18,13,2,12,17,4,2,5,59
+8,5,Anaheim Outlaws,Anaheim,ANA,66,30,30,6,66,0.5,28,181,199,-18,18,13,2,12,17,4,2,5,59
 9,2,Maine Timber,Maine,MET,66,27,36,3,57,0.432,22,150,212,-62,12,19,2,15,17,1,5,3,59
 10,3,Vancouver Whalers,Vancouver,VAN,66,25,35,6,56,0.424,22,167,206,-39,10,21,2,15,14,4,3,5,59
 11,8,St. Louis Scarecrows,St. Louis,STL,66,20,40,6,46,0.348,18,161,241,-80,9,22,2,11,18,4,2,3,59
 12,14,Nevada Battleborn,Nevada,NBB,66,16,44,6,38,0.288,12,144,254,-110,8,22,3,8,22,3,4,5,59
 1,4,Newfoundland Berserkers,Newfoundland,NL,66,56,7,3,115,0.871,53,287,129,158,29,3,1,27,4,2,3,1,60
-2,3,Vancouver Whalers,Vancouver,VAN,66,47,14,5,99,0.750,43,263,162,101,27,5,1,20,9,4,4,3,60
-3,0,Anchorage Armada,Anchorage,ANC,66,46,17,3,95,0.720,44,276,160,116,25,6,2,21,11,1,2,3,60
+2,3,Vancouver Whalers,Vancouver,VAN,66,47,14,5,99,0.75,43,263,162,101,27,5,1,20,9,4,4,3,60
+3,0,Anchorage Armada,Anchorage,ANC,66,46,17,3,95,0.72,44,276,160,116,25,6,2,21,11,1,2,3,60
 4,15,Quebec City Citadelles,Quebec City,QCC,66,35,23,8,78,0.591,31,235,203,32,20,7,6,15,16,2,4,3,60
 5,9,Carolina Kraken,Carolina,CAR,66,36,26,4,76,0.576,35,238,216,22,18,12,3,18,14,1,1,1,60
 6,6,Colorado Raptors,Colorado,COL,66,37,27,2,76,0.576,32,212,194,18,21,11,1,16,16,1,5,1,60
@@ -99,7 +99,7 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 6,0,Anchorage Armada,Anchorage,ANC,66,36,25,5,77,0.583,33,209,167,42,20,10,3,16,15,2,3,2,61
 7,1,Kelowna Knights,Kelowna,KEL,66,34,29,3,71,0.538,29,193,203,-10,16,15,2,18,14,1,5,1,61
 8,2,Maine Timber,Maine,MET,66,29,31,6,64,0.485,26,190,203,-13,15,14,4,14,17,2,3,4,61
-9,17,Great Falls Grizzlies,Great Falls,GFG,66,30,34,2,62,0.470,29,202,229,-27,15,17,1,15,17,1,1,2,61
+9,17,Great Falls Grizzlies,Great Falls,GFG,66,30,34,2,62,0.47,29,202,229,-27,15,17,1,15,17,1,1,2,61
 10,8,St. Louis Scarecrows,St. Louis,STL,66,27,35,4,58,0.439,25,154,207,-53,13,19,1,14,16,3,2,2,61
 11,16,Regina Elk,Regina,REG,66,19,40,7,45,0.341,18,167,260,-93,12,15,6,7,25,1,1,6,61
 12,14,Nevada Battleborn,Nevada,NBB,66,21,42,3,45,0.341,17,180,273,-93,13,19,1,8,23,2,4,2,61
@@ -127,7 +127,7 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 6,9,Carolina Kraken,Carolina,CAR,66,39,26,1,79,0.598,37,230,206,24,21,11,1,18,15,0,2,1,63
 7,6,Colorado Raptors,Colorado,COL,66,35,25,6,76,0.576,33,232,220,12,18,12,3,17,13,3,2,3,63
 8,16,Regina Elk,Regina,REG,66,33,28,5,71,0.538,30,210,216,-6,18,11,4,15,17,1,3,1,63
-9,5,Anaheim Outlaws,Anaheim,ANA,66,34,30,2,70,0.530,33,195,181,14,19,13,1,15,17,1,1,2,63
+9,5,Anaheim Outlaws,Anaheim,ANA,66,34,30,2,70,0.53,33,195,181,14,19,13,1,15,17,1,1,2,63
 10,15,Quebec City Citadelles,Quebec City,QCC,66,27,35,4,58,0.439,25,190,227,-37,16,15,2,11,20,2,2,3,63
 11,0,Anchorage Armada,Anchorage,ANC,66,26,35,5,57,0.432,21,176,229,-53,12,17,4,14,18,1,5,1,63
 12,7,Detroit Falcons,Detroit,DET,66,20,42,4,44,0.333,19,181,245,-64,11,21,1,9,21,3,1,2,63
@@ -135,7 +135,7 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 14,8,St. Louis Scarecrows,St. Louis,STL,66,8,50,8,24,0.182,8,133,342,-209,4,25,4,4,25,4,0,7,63
 1,4,Newfoundland Berserkers,Newfoundland,NL,66,57,8,1,115,0.871,54,308,124,184,27,6,0,30,2,1,3,1,64
 2,6,Colorado Raptors,Colorado,COL,66,44,13,9,97,0.735,41,254,177,77,24,7,2,20,6,7,3,8,64
-3,15,Quebec City Citadelles,Quebec City,QCC,66,46,17,3,95,0.720,41,253,190,63,28,5,0,18,12,3,5,1,64
+3,15,Quebec City Citadelles,Quebec City,QCC,66,46,17,3,95,0.72,41,253,190,63,28,5,0,18,12,3,5,1,64
 4,7,Detroit Falcons,Detroit,DET,66,43,18,5,91,0.689,42,263,167,96,24,7,2,19,11,3,1,4,64
 5,14,Nevada Battleborn,Nevada,NBB,66,41,16,9,91,0.689,33,234,200,34,23,6,4,18,10,5,8,7,64
 6,2,Maine Timber,Maine,MET,66,41,24,1,83,0.629,38,237,206,31,23,9,1,18,15,0,3,0,64
@@ -148,18 +148,18 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 13,0,Anchorage Armada,Anchorage,ANC,66,12,47,7,31,0.235,9,144,283,-139,7,21,5,5,26,2,3,3,64
 14,3,Vancouver Whalers,Vancouver,VAN,66,11,46,9,31,0.235,7,140,282,-142,6,21,6,5,25,3,4,5,64
 1,7,Detroit Falcons,Detroit,DET,66,59,5,2,120,0.909,57,330,137,193,28,4,1,31,1,1,2,1,65
-2,15,Quebec City Citadelles,Quebec City,QCC,66,48,11,7,103,0.780,45,301,171,130,25,6,2,23,5,5,3,4,65
+2,15,Quebec City Citadelles,Quebec City,QCC,66,48,11,7,103,0.78,45,301,171,130,25,6,2,23,5,5,3,4,65
 3,4,Newfoundland Berserkers,Newfoundland,NL,66,47,15,4,98,0.742,45,291,139,152,25,8,0,22,7,4,2,3,65
 4,14,Nevada Battleborn,Nevada,NBB,66,42,19,5,89,0.674,40,298,190,108,20,9,4,22,10,1,2,2,65
 5,6,Colorado Raptors,Colorado,COL,66,39,26,1,79,0.598,37,268,216,52,21,11,1,18,15,0,2,1,65
 6,8,St. Louis Scarecrows,St. Louis,STL,66,38,26,2,78,0.591,37,244,213,31,21,11,1,17,15,1,1,0,65
 7,2,Maine Timber,Maine,MET,66,33,28,5,71,0.538,31,196,216,-20,20,11,2,13,17,3,2,2,65
-8,5,Yukon Malamutes,Yukon,YUM,66,30,30,6,66,0.500,25,203,240,-37,15,14,4,15,16,2,5,4,65
+8,5,Yukon Malamutes,Yukon,YUM,66,30,30,6,66,0.5,25,203,240,-37,15,14,4,15,16,2,5,4,65
 9,16,Regina Elk,Regina,REG,66,29,30,7,65,0.492,24,198,251,-53,12,17,4,17,13,3,5,5,65
 10,9,Carolina Kraken,Carolina,CAR,66,29,32,5,63,0.477,28,186,243,-57,14,15,4,15,17,1,1,5,65
 11,17,Great Falls Grizzlies,Great Falls,GFG,66,22,42,2,46,0.348,20,168,269,-101,12,19,2,10,23,0,2,1,65
 12,1,Kelowna Knights,Kelowna,KEL,66,17,45,4,38,0.288,12,162,294,-132,9,20,4,8,25,0,5,3,65
-13,0,Anchorage Armada,Anchorage,ANC,66,15,48,3,33,0.250,14,148,282,-134,6,25,2,9,23,1,1,1,65
+13,0,Anchorage Armada,Anchorage,ANC,66,15,48,3,33,0.25,14,148,282,-134,6,25,2,9,23,1,1,1,65
 14,3,Vancouver Whalers,Vancouver,VAN,66,14,50,2,30,0.227,13,169,301,-132,7,25,1,7,25,1,1,2,65
 1,14,Nevada Battleborn,Nevada,NBB,66,49,13,4,102,0.773,45,273,152,121,26,6,1,23,7,3,4,1,66
 2,6,Colorado Raptors,Colorado,COL,66,45,18,3,93,0.705,45,286,183,103,28,5,0,17,13,3,0,3,66
@@ -216,9 +216,9 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 11,16,Regina Elk,Regina,REG,66,24,38,4,52,0.394,21,173,242,-69,13,17,3,11,21,1,3,3,69
 12,3,Vancouver Whalers,Vancouver,VAN,66,24,39,3,51,0.386,21,165,247,-82,16,15,2,8,24,1,3,1,69
 13,5,Yukon Malamutes,Yukon,YUM,66,19,46,1,39,0.295,18,140,239,-99,14,19,0,5,27,1,1,1,69
-14,8,St. Louis Scarecrows,St. Louis,STL,66,13,50,3,29,0.220,12,130,294,-164,8,23,2,5,27,1,1,1,69
+14,8,St. Louis Scarecrows,St. Louis,STL,66,13,50,3,29,0.22,12,130,294,-164,8,23,2,5,27,1,1,1,69
 1,2,Maine Timber,Maine,MET,66,48,14,4,100,0.758,43,314,187,127,25,6,2,23,8,2,5,3,70
-2,6,Colorado Raptors,Colorado,COL,66,46,17,3,95,0.720,41,278,202,76,24,8,1,22,9,2,5,0,70
+2,6,Colorado Raptors,Colorado,COL,66,46,17,3,95,0.72,41,278,202,76,24,8,1,22,9,2,5,0,70
 3,4,Newfoundland Berserkers,Newfoundland,NL,66,45,19,2,92,0.697,45,268,207,61,24,7,2,21,12,0,0,1,70
 4,14,Nevada Battleborn,Nevada,NBB,66,41,19,6,88,0.667,37,291,213,78,23,8,2,18,11,4,4,4,70
 5,17,Great Falls Grizzlies,Great Falls,GFG,66,39,23,4,82,0.621,38,229,199,30,24,6,3,15,17,1,1,2,70
@@ -254,7 +254,7 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 7,16,Regina Elk,Regina,REG,66,36,29,1,73,0.553,35,294,246,48,19,13,1,17,16,0,1,0,72
 8,5,Yukon Malamutes,Yukon,YUM,66,35,30,1,71,0.538,32,288,258,30,20,13,0,15,17,1,3,0,72
 9,0,Anchorage Armada,Anchorage,ANC,66,31,34,1,63,0.477,29,261,284,-23,16,17,0,15,17,1,2,1,72
-10,15,Quebec City Citadelles,Quebec City,QCC,66,30,34,2,62,0.470,29,260,297,-37,18,14,1,12,20,1,1,0,72
+10,15,Quebec City Citadelles,Quebec City,QCC,66,30,34,2,62,0.47,29,260,297,-37,18,14,1,12,20,1,1,0,72
 11,1,Kelowna Knights,Kelowna,KEL,66,25,39,2,52,0.394,22,220,291,-71,14,17,2,11,22,0,3,2,72
 12,6,Colorado Raptors,Colorado,COL,66,22,38,6,50,0.379,21,260,383,-123,12,20,1,10,18,5,1,3,72
 13,7,Detroit Falcons,Detroit,DET,66,21,39,6,48,0.364,20,181,296,-115,13,16,4,8,23,2,1,4,72
@@ -265,7 +265,7 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 4,14,Nevada Battleborn,Nevada,NBB,66,38,25,3,79,0.598,36,271,227,44,23,9,1,15,16,2,2,2,73
 5,16,Regina Elk,Regina,REG,66,34,26,6,74,0.561,33,259,260,-1,17,13,3,17,13,3,1,2,73
 6,4,Newfoundland Berserkers,Newfoundland,NL,66,35,29,2,72,0.545,32,270,281,-11,20,13,0,15,16,2,3,1,73
-7,15,Quebec City Citadelles,Quebec City,QCC,66,34,30,2,70,0.530,32,282,255,27,19,13,1,15,17,1,2,1,73
+7,15,Quebec City Citadelles,Quebec City,QCC,66,34,30,2,70,0.53,32,282,255,27,19,13,1,15,17,1,2,1,73
 8,7,Detroit Falcons,Detroit,DET,66,31,28,7,69,0.523,30,218,234,-16,17,13,3,14,15,4,1,6,73
 9,8,St. Louis Scarecrows,St. Louis,STL,66,31,32,3,65,0.492,29,234,264,-30,17,15,1,14,17,2,2,1,73
 10,5,Yukon Malamutes,Yukon,YUM,66,30,33,3,63,0.477,29,233,238,-5,19,13,1,11,20,2,1,2,73
@@ -299,7 +299,7 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 10,9,Carolina Kraken,Carolina,CAR,66,29,31,6,64,0.485,29,252,251,1,22,9,2,7,22,4,0,3,75
 11,14,Nevada Battleborn,Nevada,NBB,66,24,42,0,48,0.364,22,216,363,-147,17,16,0,7,26,0,2,0,75
 12,1,Kelowna Knights,Kelowna,KEL,66,20,43,3,43,0.326,16,177,308,-131,12,19,2,8,24,1,4,2,75
-13,3,Vancouver Whalers,Vancouver,VAN,66,16,45,5,37,0.280,15,209,354,-145,9,23,1,7,22,4,1,2,75
+13,3,Vancouver Whalers,Vancouver,VAN,66,16,45,5,37,0.28,15,209,354,-145,9,23,1,7,22,4,1,2,75
 14,8,St. Louis Scarecrows,St. Louis,STL,66,15,50,1,31,0.235,14,137,369,-232,12,21,0,3,29,1,1,0,75
 1,15,Quebec City Citadelles,Quebec City,QCC,66,49,15,2,100,0.758,47,293,183,110,25,7,1,24,8,1,2,1,76
 2,4,Newfoundland Berserkers,Newfoundland,NL,66,44,20,2,90,0.682,41,301,235,66,24,8,1,20,12,1,3,1,76
@@ -310,7 +310,7 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 7,14,Nevada Battleborn,Nevada,NBB,66,36,23,7,79,0.598,34,238,228,10,22,8,3,14,15,4,2,2,76
 8,17,Great Falls Grizzlies,Great Falls,GFG,66,35,26,5,75,0.568,32,215,182,33,19,10,4,16,16,1,3,3,76
 9,19,San Diego Tidal,San Diego,SDT,66,33,32,1,67,0.508,29,280,284,-4,20,12,1,13,20,0,4,0,76
-10,0,Anchorage Armada,Anchorage,ANC,66,32,32,2,66,0.500,29,216,246,-30,23,10,0,9,22,2,3,1,76
+10,0,Anchorage Armada,Anchorage,ANC,66,32,32,2,66,0.5,29,216,246,-30,23,10,0,9,22,2,3,1,76
 11,7,Detroit Falcons,Detroit,DET,66,29,34,3,61,0.462,28,205,225,-20,19,11,3,10,23,0,1,3,76
 12,3,Vancouver Whalers,Vancouver,VAN,66,28,37,1,57,0.432,27,210,248,-38,18,15,0,10,22,1,1,1,76
 13,5,Yukon Malamutes,Yukon,YUM,66,24,36,6,54,0.409,23,174,259,-85,12,20,1,12,16,5,1,2,76
@@ -329,7 +329,7 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 10,1,Kelowna Knights,Kelowna,KEL,66,33,31,2,68,0.515,30,232,230,2,20,13,0,13,18,2,3,0,77
 11,9,Carolina Kraken,Carolina,CAR,66,30,28,8,68,0.515,28,213,221,-8,19,8,6,11,20,2,2,6,77
 12,4,Newfoundland Berserkers,Newfoundland,NL,66,30,31,5,65,0.492,29,229,254,-25,18,14,1,12,17,4,1,1,77
-13,5,Yukon Malamutes,Yukon,YUM,66,29,33,4,62,0.470,28,221,248,-27,20,12,1,9,21,3,1,2,77
+13,5,Yukon Malamutes,Yukon,YUM,66,29,33,4,62,0.47,28,221,248,-27,20,12,1,9,21,3,1,2,77
 14,0,Anchorage Armada,Anchorage,ANC,66,22,41,3,47,0.356,21,190,271,-81,13,18,2,9,23,1,1,2,77
 15,8,St. Louis Scarecrows,St. Louis,STL,66,22,42,2,46,0.348,21,207,302,-95,16,17,0,6,25,2,1,1,77
 16,19,San Diego Tidal,San Diego,SDT,66,21,44,1,43,0.326,19,200,326,-126,14,18,1,7,26,0,2,0,77
@@ -357,9 +357,9 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 6,6,Colorado Raptors,Colorado,COL,66,40,23,3,83,0.629,39,300,246,54,23,8,2,17,15,1,1,3,79
 7,8,St. Louis Scarecrows,St. Louis,STL,66,36,24,6,78,0.591,34,274,244,30,22,8,3,14,16,3,2,4,79
 8,18,Ottawa Highlanders,Ottawa,OTT,66,36,27,3,75,0.568,35,290,258,32,20,10,3,16,17,0,1,2,79
-9,7,Detroit Falcons,Detroit,DET,66,33,29,4,70,0.530,30,264,257,7,18,11,4,15,18,0,3,2,79
+9,7,Detroit Falcons,Detroit,DET,66,33,29,4,70,0.53,30,264,257,7,18,11,4,15,18,0,3,2,79
 10,16,Thunder Bay Walleye,Thunder Bay,TBW,66,29,32,5,63,0.477,28,233,259,-26,14,15,4,15,17,1,1,3,79
-11,5,Yukon Malamutes,Yukon,YUM,66,29,33,4,62,0.470,29,238,264,-26,17,16,0,12,17,4,0,0,79
+11,5,Yukon Malamutes,Yukon,YUM,66,29,33,4,62,0.47,29,238,264,-26,17,16,0,12,17,4,0,0,79
 12,17,Great Falls Grizzlies,Great Falls,GFG,66,29,36,1,59,0.447,26,237,297,-60,15,18,0,14,18,1,3,0,79
 13,14,Nevada Battleborn,Nevada,NBB,66,23,37,6,52,0.394,21,215,311,-96,14,17,2,9,20,4,2,3,79
 14,19,San Diego Tidal,San Diego,SDT,66,23,39,4,50,0.379,22,256,316,-60,15,16,2,8,23,2,1,3,79
@@ -372,8 +372,8 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 5,2,Maine Timber,Maine,MET,66,42,23,1,85,0.644,40,323,228,95,27,6,0,15,17,1,2,1,80
 6,18,Ottawa Highlanders,Ottawa,OTT,66,37,28,1,75,0.568,33,266,228,38,21,11,1,16,17,0,4,1,80
 7,1,Kelowna Knights,Kelowna,KEL,66,34,31,1,69,0.523,33,264,243,21,18,15,0,16,16,1,1,1,80
-8,14,Nevada Battleborn,Nevada,NBB,66,32,32,2,66,0.500,30,229,276,-47,22,10,1,10,22,1,2,0,80
-9,5,Yukon Malamutes,Yukon,YUM,66,31,31,4,66,0.500,30,243,297,-54,18,13,2,13,18,2,1,2,80
+8,14,Nevada Battleborn,Nevada,NBB,66,32,32,2,66,0.5,30,229,276,-47,22,10,1,10,22,1,2,0,80
+9,5,Yukon Malamutes,Yukon,YUM,66,31,31,4,66,0.5,30,243,297,-54,18,13,2,13,18,2,1,2,80
 10,19,San Diego Tidal,San Diego,SDT,66,28,29,9,65,0.492,25,218,261,-43,15,13,5,13,16,4,3,3,80
 11,6,Colorado Raptors,Colorado,COL,66,31,33,2,64,0.485,31,239,259,-20,15,17,1,16,16,1,0,1,80
 12,3,Vancouver Whalers,Vancouver,VAN,66,27,33,6,60,0.455,23,182,267,-85,17,15,1,10,18,5,4,4,80
@@ -390,14 +390,14 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 7,9,Carolina Kraken,Carolina,CAR,66,38,26,2,78,0.591,37,263,234,29,21,12,0,17,14,2,1,1,81
 8,19,San Diego Tidal,San Diego,SDT,66,36,27,3,75,0.568,35,275,232,43,19,13,1,17,14,2,1,1,81
 9,16,Thunder Bay Walleye,Thunder Bay,TBW,66,32,30,4,68,0.515,32,296,310,-14,22,9,2,10,21,2,0,1,81
-10,0,Anchorage Armada,Anchorage,ANC,66,28,32,6,62,0.470,24,212,246,-34,16,15,2,12,17,4,4,5,81
+10,0,Anchorage Armada,Anchorage,ANC,66,28,32,6,62,0.47,24,212,246,-34,16,15,2,12,17,4,4,5,81
 11,6,Colorado Raptors,Colorado,COL,66,27,34,5,59,0.447,25,232,286,-54,17,13,3,10,21,2,2,1,81
 12,14,Nevada Battleborn,Nevada,NBB,66,25,37,4,54,0.409,25,204,288,-84,12,20,1,13,17,3,0,3,81
 13,5,Yukon Malamutes,Yukon,YUM,66,22,40,4,48,0.364,21,221,302,-81,14,19,0,8,21,4,1,1,81
 14,8,St. Louis Scarecrows,St. Louis,STL,66,22,41,3,47,0.356,18,208,290,-82,15,16,2,7,25,1,4,1,81
 15,7,Detroit Falcons,Detroit,DET,66,22,43,1,45,0.341,21,188,268,-80,17,15,1,5,28,0,1,0,81
 16,17,Great Falls Grizzlies,Great Falls,GFG,66,20,41,5,45,0.341,20,199,288,-89,12,18,3,8,23,2,0,1,81
-1,8,St. Louis Scarecrows,St. Louis,STL,66,49,16,1,99,0.750,47,294,202,92,27,6,0,22,10,1,2,1,82
+1,8,St. Louis Scarecrows,St. Louis,STL,66,49,16,1,99,0.75,47,294,202,92,27,6,0,22,10,1,2,1,82
 2,17,Great Falls Grizzlies,Great Falls,GFG,66,42,19,5,89,0.674,41,236,172,64,23,7,3,19,12,2,1,1,82
 3,1,Kelowna Knights,Kelowna,KEL,66,41,20,5,87,0.659,38,315,231,84,22,9,2,19,11,3,3,2,82
 4,9,Carolina Kraken,Carolina,CAR,66,40,21,5,85,0.644,37,287,223,64,24,8,1,16,13,4,3,1,82
@@ -414,7 +414,7 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 15,0,Anchorage Armada,Anchorage,ANC,66,23,41,2,48,0.364,22,195,280,-85,12,19,2,11,22,0,1,1,82
 16,16,Thunder Bay Walleye,Thunder Bay,TBW,66,15,49,2,32,0.242,15,197,332,-135,11,21,1,4,28,1,0,2,82
 1,8,St. Louis Scarecrows,St. Louis,STL,66,48,13,5,101,0.765,47,322,201,121,25,5,3,23,8,2,1,4,83
-2,15,Quebec City Citadelles,Quebec City,QCC,66,48,15,3,99,0.750,46,378,217,161,28,5,0,20,10,3,2,1,83
+2,15,Quebec City Citadelles,Quebec City,QCC,66,48,15,3,99,0.75,46,378,217,161,28,5,0,20,10,3,2,1,83
 3,17,Great Falls Grizzlies,Great Falls,GFG,66,45,18,3,93,0.705,39,237,177,60,23,8,2,22,10,1,6,2,83
 4,7,Detroit Falcons,Detroit,DET,66,38,24,4,80,0.606,37,303,223,80,20,9,4,18,15,0,1,2,83
 5,14,Nevada Battleborn,Nevada,NBB,66,35,25,6,76,0.576,33,235,227,8,20,11,2,15,14,4,2,4,83
@@ -423,7 +423,7 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 8,3,Vancouver Whalers,Vancouver,VAN,66,32,30,4,68,0.515,30,237,242,-5,21,10,2,11,20,2,2,2,83
 9,5,Yukon Malamutes,Yukon,YUM,66,32,30,4,68,0.515,29,225,221,4,20,11,2,12,19,2,3,1,83
 10,6,Colorado Raptors,Colorado,COL,66,28,29,9,65,0.492,26,245,257,-12,14,12,7,14,17,2,2,4,83
-11,4,Newfoundland Berserkers,Newfoundland,NL,66,31,35,0,62,0.470,30,222,285,-63,21,12,0,10,23,0,1,0,83
+11,4,Newfoundland Berserkers,Newfoundland,NL,66,31,35,0,62,0.47,30,222,285,-63,21,12,0,10,23,0,1,0,83
 12,1,Kelowna Knights,Kelowna,KEL,66,27,34,5,59,0.447,25,214,243,-29,15,15,3,12,19,2,2,2,83
 13,16,Thunder Bay Walleye,Thunder Bay,TBW,66,25,35,6,56,0.424,23,214,291,-77,17,14,2,8,21,4,2,3,83
 14,0,Anchorage Armada,Anchorage,ANC,66,25,38,3,53,0.402,25,181,243,-62,14,18,1,11,20,2,0,1,83
@@ -445,3 +445,19 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 14,1,Kelowna Knights,Kelowna,KEL,66,25,38,3,53,0.402,23,187,305,-118,17,15,1,8,23,2,2,0,84
 15,5,Yukon Malamutes,Yukon,YUM,66,23,41,2,48,0.364,23,255,337,-82,14,18,1,9,23,1,0,0,84
 16,2,Maine Timber,Maine,MET,66,23,42,1,47,0.356,23,241,330,-89,12,21,0,11,21,1,0,0,84
+1,15,Quebec City Citadelles,Quebec City,QCC,66,51,12,3,105,0.795,50,407,209,198,26,6,1,25,6,2,1,2,85
+2,7,Detroit Falcons,Detroit,DET,66,40,18,8,88,0.667,40,294,238,56,21,7,5,19,11,3,0,0,85
+3,19,San Diego Tidal,San Diego,SDT,66,42,21,3,87,0.659,41,368,260,108,25,6,2,17,15,1,1,1,85
+4,1,Kelowna Knights,Kelowna,KEL,66,41,23,2,84,0.636,40,287,227,60,25,7,1,16,16,1,1,1,85
+5,6,Colorado Raptors,Colorado,COL,66,41,24,1,83,0.629,40,324,258,66,23,10,0,18,14,1,1,1,85
+6,3,Vancouver Whalers,Vancouver,VAN,66,38,23,5,81,0.614,37,302,262,40,24,6,3,14,17,2,1,2,85
+7,18,Ottawa Highlanders,Ottawa,OTT,66,35,25,6,76,0.576,35,278,260,18,19,10,4,16,15,2,0,2,85
+8,0,Anchorage Armada,Anchorage,ANC,66,36,28,2,74,0.561,35,290,255,35,23,8,2,13,20,0,1,1,85
+9,4,Newfoundland Berserkers,Newfoundland,NL,66,35,29,2,72,0.545,35,290,269,21,21,11,1,14,18,1,0,2,85
+10,9,Carolina Kraken,Carolina,CAR,66,34,28,4,72,0.545,32,235,231,4,19,11,3,15,17,1,2,3,85
+11,5,Yukon Malamutes,Yukon,YUM,66,29,31,6,64,0.485,28,252,285,-33,11,18,4,18,13,2,1,0,85
+12,2,Maine Timber,Maine,MET,66,26,38,2,54,0.409,25,253,351,-98,15,17,1,11,21,1,1,1,85
+13,17,Great Falls Grizzlies,Great Falls,GFG,66,24,37,5,53,0.402,24,219,290,-71,16,15,2,8,22,3,0,0,85
+14,16,Thunder Bay Walleye,Thunder Bay,TBW,66,21,42,3,45,0.341,19,190,312,-122,11,20,2,10,22,1,2,0,85
+15,8,St. Louis Scarecrows,St. Louis,STL,66,21,43,2,44,0.333,18,226,343,-117,12,20,1,9,23,1,3,1,85
+16,14,Nevada Battleborn,Nevada,NBB,66,14,48,4,32,0.242,12,225,390,-165,9,21,3,5,27,1,2,0,85
