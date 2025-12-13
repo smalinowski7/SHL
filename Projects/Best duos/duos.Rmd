@@ -152,6 +152,7 @@ ggplot(top_duo_all_time, aes(x = n, y = fct_rev(duo), fill = abbreviation)) +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_discrete(expand = c(0,0)) +
   labs(x = "Combined goals", y = NULL)
+ggsave("Plots/best_duos.jpg", width = 8, height = 10, dpi = 300)
 ```
 
 
@@ -191,6 +192,8 @@ ggplot(top_d_duo_all_time, aes(x = n, y = fct_rev(duo), fill = abbreviation)) +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_discrete(expand = c(0,0)) +
   labs(x = "Combined goals", y = NULL)
+ggsave("Plots/best_d_duos.jpg", width = 8, height = 10, dpi = 300)
+
 ```
 
 
@@ -232,6 +235,7 @@ ggplot(top_duo_per_team, aes(x = n, y = fct_rev(duo_label), fill = abbreviation,
   scale_x_continuous(expand = c(0,0)) +
   scale_y_discrete(expand = c(0,0)) +
   labs(x = "Combined goals", y = NULL)
+ggsave("Plots/team_high_duos.jpg", width = 14.5, height = 8, dpi = 300)
 ```
 
 
@@ -283,6 +287,7 @@ ggplot(top_duo_against_team, aes(x = n, y = fct_rev(duo_label), fill = abbreviat
                    breaks = top_duo_against_team$duo_label,
                    labels = top_duo_against_team$duo) +
   labs(x = "Combined goals", y = NULL)
+ggsave("Plots/team_against_duos.jpg", width = 14.5, height = 12, dpi = 300)
 ```
 
 
@@ -338,7 +343,8 @@ ggplot(top_duo_per_season, aes(x = rank, y = n)) +
         strip.background = element_blank(),
         strip.text = element_text(face = "bold")) +
   labs(x = "Duo rank", y = "Combined goals")
-         
+ggsave("Plots/season_leaders.jpg", width = 15.5, height = 9.5, dpi = 300)
+
 ```
 
 
@@ -433,6 +439,8 @@ ggplot(top_duo_perc, aes(x = p, y = fct_rev(label))) +
   theme(panel.grid = element_blank(),
         axis.ticks.y = element_blank()) +
   labs(x = "Total points (Duo | Solo)", y = NULL)
+ggsave("Plots/duo_perc.jpg", width = 16.5, height = 7, dpi = 300)
+
 ```
 
 
