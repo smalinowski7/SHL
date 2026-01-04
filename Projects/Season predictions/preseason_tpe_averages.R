@@ -4,7 +4,7 @@ library(tidyverse)
 library(jsonlite)
 library(httr)
 
-season <- 85
+season <- 86
 
 
 ### Scrape player and goalie ratings
