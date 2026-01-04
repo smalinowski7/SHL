@@ -22,7 +22,7 @@ write_csv(name_test, "Projects/Luke ID check/WJC_multiple_IDs.csv")
 
 
 ### Multiple names for the same ID
-league <- 0
+league <- 3
 
 name_test_2 <- data_formatted %>%
   filter(TeamID != -1) %>%
@@ -34,7 +34,7 @@ name_test_2 <- data_formatted %>%
   summarise(seasons = paste0(SeasonID, collapse = ", ")) %>%
   arrange(PlayerID)
 
-write_csv(name_test_2, "Projects/Luke ID check/SHL_multiple_names.csv")
+write_csv(name_test_2, "Projects/Luke ID check/WJC_multiple_names.csv")
 
 
 

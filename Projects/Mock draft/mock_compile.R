@@ -4,7 +4,7 @@ library(httr)
 library(tidyverse)
 
 ### Enter the current draft season of the rookies
-rookie_season <- 85
+rookie_season <- 86
   
 
 ### Load the mock responses
