@@ -1,0 +1,7 @@
+c(303, 304, 306, 310, 457, 533, 1282, 2200, 2841, 2886)
+c("EDM", "EDM", "EDM", "EDM", "EDM", "EDM", "EDM", "EDM", "EDM", "EDM")
+c("Brady McIntyre", "FR Finn-Rhys", "Tor Tuck", "Tony Pepperoni", "Theo Morgan", "Jon Toner", "Ryu Jones", "Lev Lebedev", "Louise St. Martin", "Evan Winter")
+c("53,54,55", "53,54,55,56,57,58", "53,54,55,58", "53,54,55,56,57,58,59,60,61,62", "55", "55,56", "76", "63,64,65", "69,70,71,72,73,74,75", "71,72,73,74,75")
+c("D", "D", "D", "F", "F", "D", "F", "F", "D", "F")
+c(61, 71, 60, 67, 67, 63, 79, 78, 83, 80)
+c("S61 - D - Brady McIntyre (53,54,55)", "S71 - D - FR Finn-Rhys (53,54,55,56,57,58)", "S60 - D - Tor Tuck (53,54,55,58)", "S67 - F - Tony Pepperoni (53,54,55,56,57,58,59,60,61,62)", "S67 - F - Theo Morgan (55)", "S63 - D - Jon Toner (55,56)", "S79 - F - Ryu Jones (76)", "S78 - F - Lev Lebedev (63,64,65)", "S83 - D - Louise St. Martin (69,70,71,72,73,74,75)", "S80 - F - Evan Winter (71,72,73,74,75)")
