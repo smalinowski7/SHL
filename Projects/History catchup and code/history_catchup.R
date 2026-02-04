@@ -31,7 +31,7 @@ team_abb_map_j <- team_meta_j %>%
   group_by(abbreviation) %>%
   summarise(id = unique(id))
 
-team_abb_map_j <- team_meta_j %>%
+team_abb_map_j <- team_abb_map_j %>%
   select(id, abbreviation)
 
 
@@ -65,6 +65,20 @@ rs_stats_j <- read_csv("Data/SMJHL/index_player_stats.csv")
 po_stats_j <- read_csv('Data/SMJHL/Playoffs/index_player_stats.csv')
 rs_stats_g_j <- read_csv("Data/SMJHL/index_goalie_stats.csv")
 po_stats_g_j <- read_csv("Data/SMJHL/Playoffs/index_goalie_stats.csv")
+
+
+# Load ratings and select tpe
+player_ratings <- read_csv("Data/SHL/index_player_ratings.csv") %>%
+  select(id, season, appliedTPE)
+goalie_ratings <- read_csv("Data/SHL/index_goalie_ratings.csv") %>%
+  select(id, season, appliedTPE)
+ratings <- rbind(player_ratings, goalie_ratings)
+
+j_player_ratings <- read_csv("Data/SMJHL/index_player_ratings.csv") %>%
+  select(id, season, appliedTPE)
+j_goalie_ratings <- read_csv("Data/SMJHL/index_goalie_ratings.csv") %>%
+  select(id, season, appliedTPE)
+j_ratings <- rbind(j_player_ratings, j_goalie_ratings)
 
 
 # Load draft data
@@ -202,6 +216,7 @@ challenge_cup_summary <- function(cup_season) {
     unlist()
   
   
+  
   # Filter award season
   award_season <- player_award_winners %>%
     filter(seasonID == cup_season) %>%
@@ -228,15 +243,23 @@ challenge_cup_summary <- function(cup_season) {
   
   unique_roster <- rbind(rs_roster, po_roster, rs_roster_g, po_roster_g) %>%
     distinct() %>%
-    mutate(season = cup_season) 
+    mutate(season = cup_season) %>%
+    left_join(ratings) %>%
+    mutate(pos = case_when(position == "G" ~ "b",
+                           TRUE ~ "a")) %>%
+    arrange(pos, desc(appliedTPE)) %>%
+    mutate(label = paste0(name, " (", position, ")"))
   
   
   # merge with awards
-  unique_roster <- unique_roster %>%
-    left_join(select(award_season, fhmID, achievementName), by = c("id" = "fhmID")) %>%
-    left_join(select(hof_df, playerID, seasonInducted), by = c("id" = "playerID"))
+  awards_hof <- unique_roster %>%
+    left_join(select(award_season, fhmID, achievementName, achievementDescription), by = c("id" = "fhmID")) %>%
+    left_join(select(hof_df, playerID, seasonInducted), by = c("id" = "playerID")) %>%
+    filter(!is.na(achievementName) | !is.na(seasonInducted)) 
     
-  return(unique_roster)
+  write_lines(unique_roster$label, paste0("Projects/History catchup and code/s", cup_season, "_challenge_cup.txt"))
+  write_csv(awards_hof, paste0("Projects/History catchup and code/s", cup_season, "_award_hof_list.csv"))
+  
   
   
   
@@ -250,6 +273,7 @@ four_star_summary <- function(cup_season) {
   
   # Filter for winner
   winner <- four_star_cup %>%
+    distinct() %>%
     filter(seasonID == cup_season) %>%
     select(abbreviation) %>%
     unlist()
@@ -281,7 +305,21 @@ four_star_summary <- function(cup_season) {
   
   unique_roster <- rbind(rs_roster, po_roster, rs_roster_g, po_roster_g) %>%
     distinct() %>%
-    mutate(season = cup_season) 
+    mutate(season = cup_season) %>%
+    left_join(j_ratings) %>%
+    mutate(pos = case_when(position == "G" ~ "b",
+                           TRUE ~ "a")) %>%
+    arrange(pos, desc(appliedTPE), name) %>%
+    mutate(label = paste0(name, " (", position, ")"))
+  
+  
+  # merge with awards
+  awards_hof <- unique_roster %>%
+    left_join(select(award_season, fhmID, achievementName, achievementDescription), by = c("id" = "fhmID")) %>%
+    filter(!is.na(achievementName))
+    
+  write_lines(unique_roster$label, paste0("Projects/History catchup and code/s", cup_season, "_4star_cup.txt"))
+  write_csv(awards_hof, paste0("Projects/History catchup and code/s", cup_season, "_smjhl_award_list.csv"))
   
   
   # merge with awards
@@ -293,15 +331,6 @@ four_star_summary <- function(cup_season) {
   
   
 }
-
-cup_history_list <- list()
-
-for (i in 80:85) {
-  temp_df <- challenge_cup_summary(i)
-  cup_history_list[[i]] <- temp_df
-}
-
-combined_cup_history <- do.call(rbind, cup_history_list)
 
 
 
@@ -592,3 +621,5 @@ smjhl_profile_summary <- function(team_id,
   
   
 }
+
+
