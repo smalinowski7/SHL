@@ -1,0 +1,30 @@
+S56: Did not qualify
+S57: Did not qualify
+S58: Lost in Round 1 against Toronto North Stars (4-3)
+S59: Lost in Round 1 against Seattle Argonauts (4-2)
+S60: Lost in Round 1 against Chicago Syndicate (4-1)
+S61: Lost in Round 1 against Texas Renegades (4-0)
+S62: Lost in Round 1 against Los Angeles Panthers (4-2)
+S63: Lost in Round 1 against Los Angeles Panthers (4-1)
+S64: Lost in Conference Finals against Chicago Syndicate (4-3)
+S65: Lost in Round 2 against Los Angeles Panthers (4-0)
+S66: Lost in Round 1 against Seattle Argonauts (4-2)
+S67: Lost in Round 1 against Seattle Argonauts (4-0)
+S68: Did not qualify
+S69: Did not qualify
+S70: Did not qualify
+S71: Lost in Round 1 against Winnipeg Aurora (4-0)
+S72: Lost in Round 1 against Los Angeles Panthers (4-2)
+S73: Lost in Round 1 against Los Angeles Panthers (4-0)
+S74: Lost in Conference Finals against Winnipeg Aurora (4-1)
+S75: Lost in Round 1 against Los Angeles Panthers (4-0)
+S76: Won Challenge Cup against Baltimore Platoon (4-1)
+S77: Lost in Conference Finals against Texas Renegades (4-2)
+S78: Lost in Round 2 against Los Angeles Panthers (4-3)
+S79: Won Challenge Cup against Philadelphia Forge (4-1)
+S80: Won Challenge Cup against Tampa Bay Barracuda (4-2)
+S81: Won Challenge Cup against Tampa Bay Barracuda (4-2)
+S82: Did not qualify
+S83: Did not qualify
+S84: Did not qualify
+S85: Did not qualify

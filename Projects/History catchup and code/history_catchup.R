@@ -1,3 +1,10 @@
+##############
+### Notes ####
+##############
+
+# SHL team profile function
+  # Playoff results are hard coded to start at S68 - season when most of that section was stopped
+
 library(tidyverse)
 library(httr)
 library(jsonlite)
@@ -622,4 +629,36 @@ smjhl_profile_summary <- function(team_id,
   
 }
 
+
+for (i in unique(team_abb_map$id)) {
+  print(i)
+  shl_profile_summary(i)
+}
+
+
+p_perc <- function(r1, r2 = c(0,0,0)) {
+  w1 <- r1[1]
+  l1 <- r1[2]
+  otl1 <- r1[3]
+  
+  w2 <- r2[1]
+  l2 <- r2[2]
+  otl2 <- r2[3]
+  
+  points <-2*(w1+w2) + (otl1 + otl2)
+  points_possible = 2*(w1+l1+otl1+w2+l2+otl2)
+  
+  p_perc <- points/points_possible
+  
+  return(p_perc)
+}
+
+
+shl_profile_summary(team_id = 22, 
+                    season_record_last_updated = 82, 
+                    min_playoff_season = 83, 
+                    max_playoff_season = 85,
+                    min_draft_season = 83, 
+                    current_draft_season = 86)
+                    
 
