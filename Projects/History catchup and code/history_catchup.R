@@ -630,35 +630,115 @@ smjhl_profile_summary <- function(team_id,
 }
 
 
-for (i in unique(team_abb_map$id)) {
-  print(i)
-  shl_profile_summary(i)
+
+w_perc <- function(w,l,otl,sol) {
+  
+  gp = w+l+otl+sol
+  total_l <- otl + sol
+  total_record <- paste0(w, "-", l, "-", total_l)
+  w_perc <- w/gp
+  
+  return(list(w_perc, total_record))
 }
 
 
-p_perc <- function(r1, r2 = c(0,0,0)) {
-  w1 <- r1[1]
-  l1 <- r1[2]
-  otl1 <- r1[3]
+range_records <- function(seasons, team = NULL) {
   
-  w2 <- r2[1]
-  l2 <- r2[2]
-  otl2 <- r2[3]
+  team_records <- shl_standings %>%
+  filter(season >= min(seasons), season <= max(seasons)) %>%
+  group_by(id) %>%
+  summarise(abbreviation = last(abbreviation),
+            wins = sum(wins),
+            losses = sum(losses),
+            otl = sum(OTL),
+            w_perc = wins/(wins+losses+otl))
   
-  points <-2*(w1+w2) + (otl1 + otl2)
-  points_possible = 2*(w1+l1+otl1+w2+l2+otl2)
   
-  p_perc <- points/points_possible
+  if (!is.null(team)) {
+    team_records <- filter(team_records, abbreviation == team)
+  }
   
-  return(p_perc)
+  return(team_records)
 }
 
-
-shl_profile_summary(team_id = 22, 
-                    season_record_last_updated = 82, 
-                    min_playoff_season = 83, 
+shl_profile_summary(team_id = 6, 
+                    season_record_last_updated = 68, 
+                    min_playoff_season = 68, 
                     max_playoff_season = 85,
-                    min_draft_season = 83, 
+                    min_draft_season = 1, 
                     current_draft_season = 86)
+
+
+hof_fix <-
+  hof_by_team %>%
+  
+  filter(team == "DGG") %>%
+  
+  left_join(select(hof_df, playerID, designation, seasonInducted), by = c("id" = "playerID")) %>%
+  mutate(label = paste0("S", seasonInducted, " - ", designation, " - ", name, " (", seasons, ")")) %>%
+  arrange(team, seasonInducted)
+  
+write_lines(hof_fix$label, "Projects/History catchup and code/all_hof.txt")
                     
 
+
+
+
+
+shl_all_stars <- function(season) {
+  
+  all_stars <- player_awards_df %>%
+    filter(seasonID == season) %>%
+    filter(leagueID == 0,
+           achievementName %in% c("1st All Star Team", 
+                                  "2nd All Star Team", 
+                                  "3rd All Star Team", 
+                                  "Rookie All Star Team")) %>%
+    left_join(select(rs_stats, id, pos, season), by = c("fhmID" = "id", "seasonID" = "season")) %>%
+    left_join(select(team_meta, id, nameDetails_second, season), by = c("teamID" = "id", "seasonID" = "season")) %>%
+    mutate(pos = case_when(is.na(pos) ~ "G",
+                           pos == "Forward" ~ "F",
+                           pos == "Defense" ~ "D"),
+           pos = factor(pos, levels = c("F", "D", "G")),
+           
+           achievementName = factor(achievementName,
+                                    levels = c("1st All Star Team", 
+                                               "2nd All Star Team", 
+                                               "3rd All Star Team", 
+                                               "Rookie All Star Team"))) %>%
+    
+    arrange(achievementName, pos) %>%
+    
+    mutate(team_name = tolower(nameDetails_second)) %>%
+    
+    mutate(label = paste0(pos, " - ", playerName, " :", team_name, ":"))
+  
+  first_as <- all_stars$label[all_stars$achievementName == "1st All Star Team"]
+  second_as <- all_stars$label[all_stars$achievementName == "2nd All Star Team"]
+  third_as <- all_stars$label[all_stars$achievementName == "3rd All Star Team"]
+  rookie_as <- all_stars$label[all_stars$achievementName == "Rookie All Star Team"]
+  
+  file <- c(
+    "[align=center]",
+    ":shl: :shl: :shl: :shl: :shl: :shl: :shl:",
+    paste0("[size=x-large][b][u]S", season, " All-Star Teams[/u][/b][/size]"),
+    ":shl: :shl: :shl: :shl: :shl: :shl: :shl:",
+    "",
+    "",
+    "[size=large][b]1st Team All-SHL[/b][/size]",
+    first_as,
+    "",
+    "[size=large][b]2nd Team All-SHL[/b][/size]",
+    second_as,
+    "",
+    "[size=large][b]3rd Team All-SHL[/b][/size]",
+    third_as,
+    "",
+    "[size=large][b]Rookie Team All-SHL[/b][/size]",
+    rookie_as,
+    "[/align]"
+  )
+  
+  write_lines(file, paste0("Projects/History catchup and code/s", season, "all_stars.txt"))
+}
+  
