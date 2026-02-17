@@ -1,0 +1,38 @@
+[align=center]
+:shl: :shl: :shl: :shl: :shl: :shl: :shl:
+[size=x-large][b][u]S84 All-Star Teams[/u][/b][/size]
+:shl: :shl: :shl: :shl: :shl: :shl: :shl:
+
+
+[size=large][b]1st Team All-SHL[/b][/size]
+F - Sonja Solberg :blizzard:
+F - Emeric Gagner :panthers:
+F - Frøya Solberg :blizzard:
+D - Squidwardo Tentaclés :argonauts:
+D - Dash Jackson :blizzard:
+G - Florence-Amelie Mackenzie :syndicate:
+
+[size=large][b]2nd Team All-SHL[/b][/size]
+F - Shadow Fenix :argonauts:
+F - Ylib Kove :rage:
+F - Alexa Johansen :blizzard:
+D - Jennifer Huh :blizzard:
+D - Demir Bellona :patriotes:
+G - BASE PACK :forge:
+
+[size=large][b]3rd Team All-SHL[/b][/size]
+F - Violet Stoica :inferno:
+F - Lyle Odelein IV :specters:
+F - James Howlett :dragons:
+D - Journey Man :blizzard:
+D - Hodor :renegades:
+G - Song Ju-gong :patriotes:
+
+[size=large][b]Rookie Team All-SHL[/b][/size]
+F - Joe Primeau :specters:
+F - Jordan Lafrenière :platoon:
+F - No Cheddar :pride:
+D - Baldur-Ulysse Söderberg-Tremblay :glacier guardians:
+D - Paul Krugman :aurora:
+G - Cauliflower Pizza :inferno:
+[/align]

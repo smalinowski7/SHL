@@ -1,0 +1,38 @@
+[align=center]
+:shl: :shl: :shl: :shl: :shl: :shl: :shl:
+[size=x-large][b][u]S79 All-Star Teams[/u][/b][/size]
+:shl: :shl: :shl: :shl: :shl: :shl: :shl:
+
+
+[size=large][b]1st Team All-SHL[/b][/size]
+F - Tony Soprano :forge:
+F - Logan Webb :pride:
+F - Chris Valentine :renegades:
+D - Toasty :pride:
+D - Nathaniel Barca :forge:
+G - Justin Time :pride:
+
+[size=large][b]2nd Team All-SHL[/b][/size]
+F - Derek Martin :panthers:
+F - Antoine Beauregard :wolfpack:
+F - Dominik Winters :pride:
+D - Ace Lightning :north stars:
+D - Elena Maximova :panthers:
+G - Denebor Milasch :north stars:
+
+[size=large][b]3rd Team All-SHL[/b][/size]
+F - Aumy Junior II :north stars:
+F - Jiggle E. Puff :inferno:
+F - Max Carnage :barracuda:
+D - Jaromir Jagrbomb :rage:
+D - Willow Söderberg-Snooks :panthers:
+G - Rebecca Montagne :stampede:
+
+[size=large][b]Rookie Team All-SHL[/b][/size]
+F - Ólafur Atlason :blizzard:
+F - Brayden Point :barracuda:
+F - Alexa Johansen :blizzard:
+D - Jeyeff Effo :blizzard:
+D - Deth Klaw :patriotes:
+G - Dexter Harrison Jr. :stampede:
+[/align]

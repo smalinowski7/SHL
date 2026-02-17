@@ -1,0 +1,38 @@
+[align=center]
+:shl: :shl: :shl: :shl: :shl: :shl: :shl:
+[size=x-large][b][u]S82 All-Star Teams[/u][/b][/size]
+:shl: :shl: :shl: :shl: :shl: :shl: :shl:
+
+
+[size=large][b]1st Team All-SHL[/b][/size]
+F - Will Tomlander :argonauts:
+F - Frøya Solberg :dragons:
+F - Jae-ik Barron :inferno:
+D - Westley Kirkpatrick :dragons:
+D - Zedward Zilliams :barracuda:
+G - Denebor Milasch :inferno:
+
+[size=large][b]2nd Team All-SHL[/b][/size]
+F - Shadow Fenix :argonauts:
+F - Brayden Point :barracuda:
+F - Teemu Salami :panthers:
+D - Mikkel Enevoldsen :specters:
+D - Dash Jackson :blizzard:
+G - Justin Time :blizzard:
+
+[size=large][b]3rd Team All-SHL[/b][/size]
+F - Emeric Gagner :panthers:
+F - Lily Jin Morrow :wolfpack:
+F - Shawn Pawn :barracuda:
+D - Troy McClure IIII :wolfpack:
+D - Hodor :renegades:
+G - Anastasia Söderström :dragons:
+
+[size=large][b]Rookie Team All-SHL[/b][/size]
+F - Hughes Incorporated :steelhawks:
+F - Chuck Lumbermouth :aurora:
+D - John Kwansanity :monarchs:
+D - Jeremy Snugglemuffin III :aurora:
+D - Dieter Frühstück :monarchs:
+G - Jeff Kirkstone III :specters:
+[/align]

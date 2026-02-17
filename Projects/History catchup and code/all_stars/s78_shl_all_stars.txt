@@ -1,0 +1,38 @@
+[align=center]
+:shl: :shl: :shl: :shl: :shl: :shl: :shl:
+[size=x-large][b][u]S78 All-Star Teams[/u][/b][/size]
+:shl: :shl: :shl: :shl: :shl: :shl: :shl:
+
+
+[size=large][b]1st Team All-SHL[/b][/size]
+F - Adam Prpich :panthers:
+F - Jarrod Lakemore :stampede:
+F - Max Carnage :barracuda:
+D - Philippe-Eko Eel :inferno:
+D - Elena Maximova :panthers:
+G - Grzegorz Brzęczyszczykiewicz :panthers:
+
+[size=large][b]2nd Team All-SHL[/b][/size]
+F - Tony Soprano :forge:
+F - Johnny Wagner-Svenson :barracuda:
+F - Viktor Hargreeves :pride:
+D - Georg N'Zola :platoon:
+D - Jølngüštrâädüvich DuBølk :barracuda:
+G - Five-Hole Sieve :wolfpack:
+
+[size=large][b]3rd Team All-SHL[/b][/size]
+F - Derek Martin :panthers:
+F - Daniel Grumathan :stampede:
+F - Chris Valentine :renegades:
+D - Furious Chicken :stampede:
+D - Jack McCarthy :renegades:
+G - Justin Time :pride:
+
+[size=large][b]Rookie Team All-SHL[/b][/size]
+F - Mary Hollywood :rage:
+F - Edouard Lavoie :inferno:
+F - Jean-Jacques François Jacques-Jean :argonauts:
+D - Supah Dupah :pride:
+D - Eric Vanderberg Jr :stampede:
+G - Launchpad McQuack :forge:
+[/align]

@@ -1,0 +1,38 @@
+[align=center]
+:shl: :shl: :shl: :shl: :shl: :shl: :shl:
+[size=x-large][b][u]S77 All-Star Teams[/u][/b][/size]
+:shl: :shl: :shl: :shl: :shl: :shl: :shl:
+
+
+[size=large][b]1st Team All-SHL[/b][/size]
+F - Erik Bergmark :platoon:
+F - Cale Salad :forge:
+F - Viktor Hargreeves :pride:
+D - Toasty :pride:
+D - Nathaniel Barca :forge:
+G - BASE PACK :forge:
+
+[size=large][b]2nd Team All-SHL[/b][/size]
+F - Bruno Tooyo :wolfpack:
+F - Jarrod Lakemore :stampede:
+F - Chris Valentine :renegades:
+D - Philippe-Eko Eel :inferno:
+D - Pork Tenderloin :wolfpack:
+G - Five-Hole Sieve :stampede:
+
+[size=large][b]3rd Team All-SHL[/b][/size]
+F - Tony Soprano :forge:
+F - Oskar Scholz :pride:
+F - Marton Diehm :renegades:
+D - Hodor :renegades:
+D - Jack McCarthy :renegades:
+G - Bernard Lodge :specters:
+
+[size=large][b]Rookie Team All-SHL[/b][/size]
+F - Shadow Fenix :argonauts:
+F - Will Tomlander :argonauts:
+F - Gordon-William Gibbles :monarchs:
+D - Juan Tymer :aurora:
+D - Johnny Patey V2 :stampede:
+G - Tanner Pitts :inferno:
+[/align]

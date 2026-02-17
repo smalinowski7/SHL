@@ -1,0 +1,38 @@
+[align=center]
+:shl: :shl: :shl: :shl: :shl: :shl: :shl:
+[size=x-large][b][u]S75 All-Star Teams[/u][/b][/size]
+:shl: :shl: :shl: :shl: :shl: :shl: :shl:
+
+
+[size=large][b]1st Team All-SHL[/b][/size]
+F - Adam Prpich :panthers:
+F - Aleksandr Iskandrov :steelhawks:
+F - Jack St. Clair :blizzard:
+D - Emil Egli :blizzard:
+D - Isaac Forty-One :blizzard:
+G - Justin Time :blizzard:
+
+[size=large][b]2nd Team All-SHL[/b][/size]
+F - Binko Koivu :inferno:
+F - Graj Virrok :forge:
+F - Benson Fiorentini :barracuda:
+D - Nathaniel Barca :forge:
+D - Philippe-Eko Eel :inferno:
+G - Anthony Dionne :renegades:
+
+[size=large][b]3rd Team All-SHL[/b][/size]
+F - Shōyō Hinata :inferno:
+F - Derek Martin :panthers:
+F - Erik Bergmark :platoon:
+D - Dirty Boots :renegades:
+D - Hodor :renegades:
+G - Casey Fantobens :stampede:
+
+[size=large][b]Rookie Team All-SHL[/b][/size]
+F - Joseph Reed :stampede:
+F - König Wolf :specters:
+F - The Murray :barracuda:
+D - Jaromir Jagrbomb :rage:
+D - Zedward Zilliams :steelhawks:
+G - Wayne Holloway :rage:
+[/align]

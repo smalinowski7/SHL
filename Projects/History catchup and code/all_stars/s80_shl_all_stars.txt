@@ -1,0 +1,38 @@
+[align=center]
+:shl: :shl: :shl: :shl: :shl: :shl: :shl:
+[size=x-large][b][u]S80 All-Star Teams[/u][/b][/size]
+:shl: :shl: :shl: :shl: :shl: :shl: :shl:
+
+
+[size=large][b]1st Team All-SHL[/b][/size]
+F - Jae-ik Barron :inferno:
+F - Johnny Wagner-Svenson :barracuda:
+F - Jiggle E. Puff :inferno:
+D - Pork Tenderloin :wolfpack:
+D - Elena Maximova :panthers:
+G - Stun Gun :inferno:
+
+[size=large][b]2nd Team All-SHL[/b][/size]
+F - Jarrod Lakemore :stampede:
+F - Dominik Winters :pride:
+F - Activity Check :steelhawks:
+D - Georg N'Zola :inferno:
+D - Kristian Seppanen :inferno:
+G - Justin Time :pride:
+
+[size=large][b]3rd Team All-SHL[/b][/size]
+F - Trevor Lahey :steelhawks:
+F - Logan Webb :pride:
+F - Chris Valentine :renegades:
+D - Westley Kirkpatrick :north stars:
+D - Cale Salad :forge:
+G - Anastasia Söderström :dragons:
+
+[size=large][b]Rookie Team All-SHL[/b][/size]
+F - Yuri Boyka III :aurora:
+F - Baron Samedi :aurora:
+F - Nor Ge :forge:
+D - Cadmael Ixazaluoh :patriotes:
+D - Roquefort Cotswold :argonauts:
+G - Evil Kyle Murray :platoon:
+[/align]
