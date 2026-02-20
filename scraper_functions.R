@@ -21,9 +21,9 @@ names(save_path_character) <- c("shl", "smjhl")
 ##################################################
 
 # season_to_add <- 86
-# league_char <- "smjhl"
-# league_numeric <- 1
-# directory <- "SMJHL"
+# league_char <- "shl"
+# league_numeric <- 0
+# directory <- "SHL"
 # 
 # 
 # bs <- file_boxscores(season_to_add, league = league_char, append = T)
@@ -51,8 +51,8 @@ names(save_path_character) <- c("shl", "smjhl")
 # unique(sch$season)
 # unique(stand$season)
 # unique(meta$season)
-
-
+# 
+# 
 # # Save
 # write_csv(bs, paste0("Data/", directory, "/file_boxscore.csv"))
 # write_csv(gs, paste0("Data/", directory, "/file_goalie_summary.csv"))

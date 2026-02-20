@@ -1,7 +1,5 @@
 [align=center]
-:smjhl: :smjhl: :smjhl: :smjhl: :smjhl: :smjhl: :smjhl:
 [size=x-large][b][u]S83 All-Star Teams[/u][/b][/size]
-:smjhl: :smjhl: :smjhl: :smjhl: :smjhl: :smjhl: :smjhl:
 
 
 [size=large][b]1st Team All-SHL[/b][/size]
@@ -20,7 +18,13 @@ D - Gabriel Savoie :raptors:
 D - Smokin Jay Cutler :scarecrows:
 G - Victor Bjork-Pejlikka :highlanders:
 
-[size=large][b]Defensive Team All-SHL[/b][/size]
+[size=large][b]Defense Team All-SHL[/b][/size]
+F - Marks Liepa :timber:
+F - Luis Fenstermacher :kraken:
+F - Yoshinobu Ishii :grizzlies:
+D - Rawbie Gardner :knights:
+D - Cowboy Casanova :malamutes:
+G - Tyler Bodega :grizzlies:
 
 [size=large][b]Rookie Team All-SHL[/b][/size]
 F - Rurik Markov :scarecrows:

@@ -1,7 +1,5 @@
 [align=center]
-:smjhl: :smjhl: :smjhl: :smjhl: :smjhl: :smjhl: :smjhl:
 [size=x-large][b][u]S82 All-Star Teams[/u][/b][/size]
-:smjhl: :smjhl: :smjhl: :smjhl: :smjhl: :smjhl: :smjhl:
 
 
 [size=large][b]1st Team All-SHL[/b][/size]
@@ -20,7 +18,13 @@ D - Paul Krugman :malamutes:
 D - Jean Bon :scarecrows:
 G - Teemu Järvinen :scarecrows:
 
-[size=large][b]Defensive Team All-SHL[/b][/size]
+[size=large][b]Defense Team All-SHL[/b][/size]
+D - Uwe Bindewald :citadelles:
+D - Radley Yates :kraken:
+D - Jean Bon :scarecrows:
+D - Johan Lodewyk :citadelles:
+D - Apollo Seaborne :timber:
+D - Aartholomew Bittokallio Lorequavius :knights:
 
 [size=large][b]Rookie Team All-SHL[/b][/size]
 F - Five Hole Goes West :kraken:

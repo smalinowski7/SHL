@@ -751,7 +751,7 @@ smjhl_all_stars <- function(season) {
     filter(leagueID == 1,
            achievementName %in% c("1st All Star Team", 
                                   "2nd All Star Team", 
-                                  "Defensive All Star Team", 
+                                  "Defense All Star Team", 
                                   "Rookie All Star Team")) %>%
     left_join(select(rs_stats_j, id, pos, season), by = c("fhmID" = "id", "seasonID" = "season")) %>%
     left_join(select(team_meta_j, id, nameDetails_second, season), by = c("teamID" = "id", "seasonID" = "season")) %>%
@@ -763,7 +763,7 @@ smjhl_all_stars <- function(season) {
            achievementName = factor(achievementName,
                                     levels = c("1st All Star Team", 
                                                "2nd All Star Team", 
-                                               "Defensive All Star Team", 
+                                               "Defense All Star Team", 
                                                "Rookie All Star Team"))) %>%
     
     arrange(achievementName, pos) %>%
@@ -774,14 +774,12 @@ smjhl_all_stars <- function(season) {
   
   first_as <- all_stars$label[all_stars$achievementName == "1st All Star Team"]
   second_as <- all_stars$label[all_stars$achievementName == "2nd All Star Team"]
-  def_as <- all_stars$label[all_stars$achievementName == "Defensive All Star Team"]
+  def_as <- all_stars$label[all_stars$achievementName == "Defense All Star Team"]
   rookie_as <- all_stars$label[all_stars$achievementName == "Rookie All Star Team"]
   
   file <- c(
     "[align=center]",
-    ":smjhl: :smjhl: :smjhl: :smjhl: :smjhl: :smjhl: :smjhl:",
     paste0("[size=x-large][b][u]S", season, " All-Star Teams[/u][/b][/size]"),
-    ":smjhl: :smjhl: :smjhl: :smjhl: :smjhl: :smjhl: :smjhl:",
     "",
     "",
     "[size=large][b]1st Team All-SHL[/b][/size]",
@@ -790,7 +788,7 @@ smjhl_all_stars <- function(season) {
     "[size=large][b]2nd Team All-SHL[/b][/size]",
     second_as,
     "",
-    "[size=large][b]Defensive Team All-SHL[/b][/size]",
+    "[size=large][b]Defense Team All-SHL[/b][/size]",
     def_as,
     "",
     "[size=large][b]Rookie Team All-SHL[/b][/size]",

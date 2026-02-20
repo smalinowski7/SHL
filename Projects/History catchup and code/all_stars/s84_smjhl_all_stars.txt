@@ -1,7 +1,5 @@
 [align=center]
-:smjhl: :smjhl: :smjhl: :smjhl: :smjhl: :smjhl: :smjhl:
 [size=x-large][b][u]S84 All-Star Teams[/u][/b][/size]
-:smjhl: :smjhl: :smjhl: :smjhl: :smjhl: :smjhl: :smjhl:
 
 
 [size=large][b]1st Team All-SHL[/b][/size]
@@ -20,7 +18,13 @@ D - Penelope :walleye:
 G - Brain Fluid Explosion :tidal:
 G - Tyler Bodega :grizzlies:
 
-[size=large][b]Defensive Team All-SHL[/b][/size]
+[size=large][b]Defense Team All-SHL[/b][/size]
+F - Envy :berserkers:
+F - Carroll Niedfeldt :grizzlies:
+F - Yoshinobu Ishii :grizzlies:
+D - Holeh Guacamoleh :timber:
+D - Gary Winters :berserkers:
+G - Jonny Hockey :armada:
 
 [size=large][b]Rookie Team All-SHL[/b][/size]
 F - Kasey Karlsson :raptors:

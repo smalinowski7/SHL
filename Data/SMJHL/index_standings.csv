@@ -461,3 +461,19 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 14,16,Thunder Bay Walleye,Thunder Bay,TBW,66,21,42,3,45,0.341,19,190,312,-122,11,20,2,10,22,1,2,0,85
 15,8,St. Louis Scarecrows,St. Louis,STL,66,21,43,2,44,0.333,18,226,343,-117,12,20,1,9,23,1,3,1,85
 16,14,Nevada Battleborn,Nevada,NBB,66,14,48,4,32,0.242,12,225,390,-165,9,21,3,5,27,1,2,0,85
+1,3,Vancouver Whalers,Vancouver,VAN,66,55,9,2,112,0.848,55,425,171,254,30,1,2,25,8,0,0,1,86
+2,19,San Diego Tidal,San Diego,SDT,66,50,14,2,102,0.773,49,360,220,140,28,4,1,22,10,1,1,0,86
+3,4,Newfoundland Berserkers,Newfoundland,NL,66,48,16,2,98,0.742,48,366,245,121,25,7,1,23,9,1,0,0,86
+4,14,Nevada Battleborn,Nevada,NBB,66,48,17,1,97,0.735,46,303,198,105,27,6,0,21,11,1,2,0,86
+5,15,Quebec City Citadelles,Quebec City,QCC,66,44,21,1,89,0.674,42,360,244,116,26,7,0,18,14,1,2,1,86
+6,1,Kelowna Knights,Kelowna,KEL,66,41,21,4,86,0.652,41,322,247,75,23,8,2,18,13,2,0,2,86
+7,16,Thunder Bay Walleye,Thunder Bay,TBW,66,34,29,3,71,0.538,33,277,270,7,19,12,2,15,17,1,1,1,86
+8,18,Ottawa Highlanders,Ottawa,OTT,66,28,29,9,65,0.492,28,244,259,-15,18,11,4,10,18,5,0,3,86
+9,0,Anchorage Armada,Anchorage,ANC,66,29,33,4,62,0.47,28,248,289,-41,20,11,2,9,22,2,1,1,86
+10,5,Yukon Malamutes,Yukon,YUM,66,27,35,4,58,0.439,25,217,272,-55,15,17,1,12,18,3,2,1,86
+11,2,Maine Timber,Maine,MET,66,28,37,1,57,0.432,26,228,287,-59,17,16,0,11,21,1,2,0,86
+12,9,Carolina Kraken,Carolina,CAR,66,26,36,4,56,0.424,25,256,304,-48,15,16,2,11,20,2,1,1,86
+13,6,Colorado Raptors,Colorado,COL,66,25,37,4,54,0.409,21,246,315,-69,16,14,3,9,23,1,4,3,86
+14,17,Great Falls Grizzlies,Great Falls,GFG,66,17,49,0,34,0.258,17,177,329,-152,12,21,0,5,28,0,0,0,86
+15,7,Detroit Falcons,Detroit,DET,66,15,47,4,34,0.258,15,189,350,-161,11,20,2,4,27,2,0,1,86
+16,8,St. Louis Scarecrows,St. Louis,STL,66,13,49,4,30,0.227,13,176,394,-218,10,22,1,3,27,3,0,1,86
