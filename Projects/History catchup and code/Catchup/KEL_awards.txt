@@ -1,0 +1,160 @@
+S2: King-Kurczewski
+S2: Four Star Cup
+S3: King-Kurczewski
+S3: Four Star Cup
+S7: Laurifer Trophy
+S11: Nour Harrak - fever95
+S11: Linna-Landvik
+S11: Four Star Cup
+S12: Nour Harrak - fever95
+S12: Linna-Landvik
+S13: Nour Harrak - fever95/BDonini
+S13: Linna-Landvik
+S16: Elias Armia - Jean-Pierre Leroux
+S17: Jack Cross - Lars Slinger
+S17: Ron Bolt - Matej Stransky
+S18: Jack Cross - Kayl Kuzie
+S19: Elias Armia - Miikka Granlund
+S19: Ideen Fallah - Miikka Granlund
+S19: Jared Hanson - Miikka Granlund
+S19: Raymond Lindsay - Miikka Granlund
+S19: Roberto Martucci - Miikka Granlund
+S19: Laurifer Trophy
+S20: Jack Cross - Etienne Modano
+S20: Ronan O'Keefe - Kristian Eriksson
+S20: Linna-Landvik
+S21: Nour Harrak - Jedi/micool132
+S21: Brodie Witzel - Sean Leonidas
+S21: Elias Armia - Ales Smirnov
+S21: Ideen Fallah - Sean Leonidas
+S21: Jared Hanson - Sean Leonidas
+S21: Quilha Agante - Mariusz Kwik
+S21: Raymond Lindsay - Sean Leonidas
+S21: Ron Bolt - Merit Csonka
+S21: Laurifer Trophy
+S21: Linna-Landvik
+S21: Four Star Cup
+S22: Nour Harrak - Jedi/Kel
+S22: Brodie Witzel - Ales Smirnov
+S22: Raymond Lindsay - Ales Smirnov
+S22: Linna-Landvik
+S22: Four Star Cup
+S23: Jack Cross - Adam Abodobe
+S24: Cedric Robinson - Igor Ogorodnikov
+S24: Jared Hanson - Adam Abodobe
+S25: Brodie Witzel - Randy Randleman
+S25: Ronan O'Keefe - Randy Randleman
+S25: Linna-Landvik
+S25: Four Star Cup
+S26: Cedric Robinson - Christoffer Bjornsson
+S26: Ideen Fallah - Tony Flow
+S26: Jared Hanson - Tony Flow
+S26: Raymond Lindsay - Tony Flow
+S26: Linna-Landvik
+S28: Jack Cross - Mikael Talo
+S28: Ron Bolt - Mikael Talo
+S29: Cedric Robinson - Mikke Laukkanen
+S29: Ron Bolt - Mikko Linna
+S30: Roberto Martucci - Justs Sirmais
+S30: Laurifer Trophy
+S31: Nour Harrak - ej27/Jenny
+S31: Brandon Holmes - Alex Light
+S31: Brodie Witzel - Jason Aittokallio
+S31: Elias Armia - Cara Hohenberg
+S31: Ideen Fallah - Cara Hohenberg
+S31: Jared Hanson - Cara Hohenberg
+S31: Quilha Agante - Cara Hohenberg
+S31: Roberto Martucci - Alex Light
+S31: Ronan O'Keefe - Cara Hohenberg
+S31: Laurifer Trophy
+S31: Linna-Landvik
+S31: Four Star Cup
+S32: Nour Harrak - ej27/Jenny
+S32: Roberto Martucci - Alex Light
+S32: Linna-Landvik
+S32: Four Star Cup
+S33: Nour Harrak - ej27/Jenny
+S33: Brandon Holmes - John LangabeerI
+S33: Cedric Robinson - Sebastian Thompson
+S33: Ron Bolt - John LangabeerI
+S33: Linna-Landvik
+S34: Ideen Fallah - Leafer Rielly
+S34: Jared Hanson - Leafer Rielly
+S34: Ron Bolt - John LangabeerI
+S37: Elias Armia - Hunter Jones
+S40: Nour Harrak - nour/Thunder39
+S40: Brodie Witzel - Jacob Dorty
+S40: Quilha Agante - Mikhail Petrikov
+S40: Laurifer Trophy
+S40: Linna-Landvik
+S40: Four Star Cup
+S41: Brodie Witzel - Iam Essellemm
+S41: Roberto Martucci - Daddy Mack
+S41: Ronan O'Keefe - Iam Essellemm
+S41: Linna-Landvik
+S41: Four Star Cup
+S42: Brodie Witzel - Daddy Mack
+S42: Ronan O'Keefe - Daddy Mack
+S42: King-Kurczewski
+S42: Four Star Cup
+S43: Elias Armia - Vladislav Konstantin
+S43: Ideen Fallah - Vladislav Konstantin
+S43: Jared Hanson - Boris Denisovich
+S43: Raymond Lindsay - Vladislav Konstantin
+S43: Roberto Martucci - Vladislav Konstantin
+S44: Esa Anrikkanen - Sanyi Kocsis
+S44: Jared Hanson - Vladislav Konstantin
+S44: Roberto Martucci - Vladislav Konstantin
+S45: Nour Harrak - Zoone16/CptSquall
+S45: Ideen Fallah - Nickolas Klaus
+S45: Jared Hanson - Nickolas Klaus
+S45: Quilha Agante - Sanyi Kocsis
+S45: Raymond Lindsay - Nickolas Klaus
+S45: Roberto Martucci - Nolan Sawchuk
+S46: Brodie Witzel - Vivian Leblanc
+S46: Quilha Agante - Guy Zheng
+S46: Ronan O'Keefe - Bobby Sharp
+S46: Laurifer Trophy
+S46: Linna-Landvik
+S49: Nour Harrak - NJBadApple/Noble
+S49: Linna-Landvik
+S51: Ronan O'Keefe - Luciano Vessot
+S51: King-Kurczewski
+S52: Elias Armia - Adam Scianna
+S52: Ron Bolt - Ryan Shepard
+S53: Ronan O'Keefe - Kalevolaripaavo Kaspertom
+S53: Linna-Landvik
+S54: Cedric Robinson - Cillian Kavanagh
+S54: Roberto Martucci - Jaska Seppala
+S54: Laurifer Trophy
+S58: Nour Harrak - Katth/Naosu
+S58: Ideen Fallah - Kynwyl Pearce
+S58: Quilha Agante - Robert Feltersnatch
+S58: Raymond Lindsay - Kynwyl Pearce
+S58: Roberto Martucci - Kynwyl Pearce
+S58: Laurifer Trophy
+S59: Brodie Witzel - Roboute Gouilliman
+S59: Laurifer Trophy
+S59: King-Kurczewski
+S59: Four Star Cup
+S62: Esa Anrikkanen - Chris McZehrl Jr.
+S69: Cedric Robinson - Sea Jebus
+S69: Alex Light - Ekaterina Valieva
+S70: Elias Armia - Logan Webb
+S70: Matt Lewis-Flood - Sea Jebus
+S70: Matt Lewis-Flood - Tibuk Soonika
+S78: Ronan O'Keefe - Emeric Gagner
+S78: Ronan O'Keefe - Pohler Beargeron
+S78: King-Kurczewski
+S80: Alex Light - Mel Guolla
+S81: Linna-Landvik
+S82: Ideen Fallah - Mel Guolla
+S82: Jared Hanson - Mel Guolla
+S82: Matt Lewis-Flood - Travis Coates
+S82: Matt Lewis-Flood - George Dankse
+S82: Quilha Agante - Colton Paraygeko
+S82: Raymond Lindsay - Mel Guolla
+S82: Roberto Martucci - Mel Guolla
+S82: Linna-Landvik
+S83: Ronan O'Keefe - David Corrigan
+S83: Linna-Landvik

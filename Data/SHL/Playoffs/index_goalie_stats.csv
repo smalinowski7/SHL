@@ -753,3 +753,29 @@ id,name,position,league,team,season,gamesPlayed,minutes,wins,losses,ot,shotsAgai
 5524,K.J Daniels,G,0,CGY,85,4,182,0,3,0,154,133,21,6.9,0,0.864,60,TRUE,Goalie,Goalie
 5576,Tyler Bodega,G,0,MIN,85,7,419,3,4,0,208,185,23,3.29,0,0.889,68,TRUE,Goalie,Goalie
 5653,Travis Coates,G,0,TEX,85,5,272,1,4,0,165,139,26,5.73,0,0.842,47,TRUE,Goalie,Goalie
+2921,BASE PACK,G,0,PHI,86,3,108,0,0,1,84,74,10,5.51,0,0.881,61,FALSE,Goalie,Goalie
+3154,PeanutButter Zamboni,G,0,HAM,86,17,1012,11,4,2,535,469,66,3.91,0,0.877,64,FALSE,Goalie,Goalie
+3547,Grzegorz Brzeczyszczykiewicz,G,0,CIN,86,4,201,0,3,1,178,152,26,7.75,0,0.854,53,FALSE,Goalie,Goalie
+3843,"Rhett ""Shaggy"" Carpet",G,0,NSH,86,5,260,1,4,0,162,141,21,4.84,0,0.87,61,FALSE,Goalie,Goalie
+4278,Song Ju-gong,G,0,MAD,86,4,238,0,4,0,163,145,18,4.53,0,0.89,73,FALSE,Goalie,Goalie
+4478,Roman Cechmanek II,G,0,MAN,86,13,756,6,6,1,474,414,60,4.76,0,0.873,64,FALSE,Goalie,Goalie
+4512,Denebor Milasch,G,0,ATL,86,4,133,0,2,0,78,70,8,3.6,0,0.897,62,FALSE,Goalie,Goalie
+4546,Herman Stahl,G,0,MAN,86,4,56,0,0,0,37,30,7,7.43,0,0.811,45,FALSE,Goalie,Goalie
+4688,Yuri Satoshi,G,0,CIN,86,2,39,0,0,0,21,16,5,7.67,0,0.762,41,FALSE,Goalie,Goalie
+4704,Walter Scheibli,G,0,HAM,86,2,43,0,0,0,24,17,7,9.7,0,0.708,32,FALSE,Goalie,Goalie
+4740,Meowlnir Kittenson,G,0,MIN,86,1,45,0,0,0,18,14,4,5.26,0,0.778,37,FALSE,Goalie,Goalie
+4903,Bishop Van Apeldoorn,G,0,DEN,86,8,391,4,2,0,202,174,28,4.29,0,0.861,58,FALSE,Goalie,Goalie
+4943,Elvar Gil-Galad,G,0,NEW,86,11,668,6,4,1,371,337,34,3.05,2,0.908,77,FALSE,Goalie,Goalie
+4973,Abby Wright-Bach,G,0,EDM,86,19,1149,16,3,0,516,463,53,2.77,1,0.897,70,FALSE,Goalie,Goalie
+5016,Ela Solberg,G,0,DEN,86,4,148,1,2,0,101,86,15,6.05,0,0.851,53,FALSE,Goalie,Goalie
+5140,Jack,G,0,BUF,86,2,66,0,0,0,36,31,5,4.48,0,0.861,54,FALSE,Goalie,Goalie
+5166,Katharina Rosenthal,G,0,PHI,86,23,1278,13,9,0,746,668,78,3.66,0,0.895,71,FALSE,Goalie,Goalie
+5279,Florence-Amelie Mackenzie,G,0,CHI,86,7,428,3,2,2,223,201,22,3.08,1,0.901,73,FALSE,Goalie,Goalie
+5347,Cauliflower Pizza,G,0,ATL,86,3,165,1,2,0,96,80,16,5.8,0,0.833,49,FALSE,Goalie,Goalie
+5383,Victor Bjork-Pejlikka,G,0,SEA,86,18,1112,9,7,2,551,486,65,3.5,1,0.882,66,FALSE,Goalie,Goalie
+5394,Claude L'Castor,G,0,BUF,86,7,350,3,4,0,255,219,36,6.16,0,0.859,57,FALSE,Goalie,Goalie
+5404,Honza Havran,G,0,NOL,86,7,373,3,4,0,205,180,25,4.02,2,0.878,61,FALSE,Goalie,Goalie
+5496,Lurtz Makoare,G,0,NSH,86,1,49,0,0,0,35,33,2,2.43,0,0.943,90,TRUE,Goalie,Goalie
+5576,Tyler Bodega,G,0,MIN,86,13,759,6,6,1,460,407,53,4.18,0,0.885,68,FALSE,Goalie,Goalie
+5653,Travis Coates,G,0,TEX,86,4,239,0,4,0,186,164,22,5.51,0,0.882,65,FALSE,Goalie,Goalie
+5766,Haddie Minch,G,0,NOL,86,2,46,0,0,0,33,30,3,3.86,0,0.909,62,TRUE,Goalie,Goalie

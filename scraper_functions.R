@@ -2,6 +2,14 @@
 ### -------- SCRAPER FUNCTIONS -------- ###
 ###########################################
 
+
+### To do ###
+
+# fix the hard coded paths when append = T
+# in player and goalie stats
+# for playoffs
+
+
 library(tidyverse)
 library(httr)
 library(jsonlite)
@@ -20,10 +28,10 @@ names(save_path_character) <- c("shl", "smjhl")
 ### Update and save new season's worth of data ###
 ##################################################
 
-# season_to_add <- 86
-# league_char <- "shl"
-# league_numeric <- 0
-# directory <- "SHL"
+# season_to_add <- 87
+# league_char <- "smjhl"
+# league_numeric <- 1
+# directory <- "SMJHL"
 # 
 # 
 # bs <- file_boxscores(season_to_add, league = league_char, append = T)
@@ -37,6 +45,10 @@ names(save_path_character) <- c("shl", "smjhl")
 # sch <- index_schedule(season_to_add, league = league_numeric, append = T)
 # stand <- index_standings(season_to_add, league = league_numeric, append = T)
 # meta <- index_meta(season_to_add, league = league_numeric, append = T)
+# 
+# gs_po <- index_goalie_stats(season_to_add, league = league_numeric, type = "playoffs", append = F)
+# ps_po <- index_player_stats(season_to_add, league = league_numeric, type = "playoffs", append = F)
+# sch_po <- index_schedule(season_to_add, league = league_numeric, type = "playoffs", append = F)
 # 
 # 
 # # Check unqiue seasons
@@ -65,7 +77,10 @@ names(save_path_character) <- c("shl", "smjhl")
 # write_csv(sch, paste0("Data/", directory, "/index_schedule.csv"))
 # write_csv(stand, paste0("Data/", directory, "/index_standings.csv"))
 # write_csv(meta, paste0("Data/", directory, "/index_team_meta.csv"))
-
+# 
+# write_csv(gs_po, paste0("Data/", directory, "/Playoffs/index_goalie_stats.csv"))
+# write_csv(ps_po, paste0("Data/", directory, "/Playoffs/index_player_stats.csv"))
+# write_csv(sch_po, paste0("Data/", directory, "/Playoffs/index_schedule.csv"))
 
 ##################
 ### From Index ###

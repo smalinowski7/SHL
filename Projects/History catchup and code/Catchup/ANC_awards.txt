@@ -1,0 +1,126 @@
+S1: Laurifer Trophy
+S1: Linna-Landvik
+S1: Four Star Cup
+S2: Linna-Landvik
+S3: Nour Harrak - Brandon
+S3: Laurifer Trophy
+S3: Linna-Landvik
+S4: Linna-Landvik
+S4: Four Star Cup
+S5: Laurifer Trophy
+S8: Nour Harrak - JumpierPegasus
+S8: Laurifer Trophy
+S8: Linna-Landvik
+S8: Four Star Cup
+S9: Four Star Cup
+S12: Laurifer Trophy
+S13: Laurifer Trophy
+S16: Brandon Holmes - Chico Salmon
+S16: Ideen Fallah - Simeon Mars III
+S16: Quilha Agante - Simeon Mars III
+S16: Raymond Lindsay - Chico Salmon
+S16: Raymond Lindsay - Simeon Mars III
+S16: Roberto Martucci - Chico Salmon
+S17: Cedric Robinson - Kevin Griffin
+S17: Linna-Landvik
+S18: Brandon Holmes - Bronsen Zerchai
+S18: Ideen Fallah - Bronsen Zerchai
+S18: Ron Bolt - Hermione Granger
+S19: Ron Bolt - Niklas Wikstrom
+S20: Quilha Agante - Chuck Goody
+S20: Ron Bolt - Theo Kane
+S25: Roberto Martucci - Luke Fleming
+S25: Ronan O'Keefe - Mirko Antonio Scuderi
+S28: Linna-Landvik
+S30: Ron Bolt - Eduard Selich
+S30: Ronan O'Keefe - Eduard Selich
+S30: Linna-Landvik
+S34: Brandon Holmes - Dani Forsberg
+S35: Roberto Martucci - Dani Forsberg
+S36: Brandon Holmes - Dani Forsberg
+S36: Esa Anrikkanen - Zemgus Nylander
+S36: Ideen Fallah - Dani Forsberg
+S36: Jared Hanson - Dani Forsberg
+S36: Quilha Agante - Oliver Konig
+S36: Raymond Lindsay - Dani Forsberg
+S36: Roberto Martucci - Dionyz Vyskoc
+S36: Ronan O'Keefe - Oliver Konig
+S37: Esa Anrikkanen - Paddy Kane-Rielly
+S38: Nour Harrak - spooked/Sleepy
+S38: Brandon Holmes - Bl?b?r Bananerstr?m
+S38: Brandon Holmes - Blabar Bananerstrom
+S38: Brodie Witzel - Dionyz Vyskoc
+S38: Elias Armia - Mikhail Lokitonov
+S38: Esa Anrikkanen - Mikhail Lokitonov
+S38: Ideen Fallah - Paddy Kane-Rielly
+S38: Jared Hanson - Paddy Kane-Rielly
+S38: Roberto Martucci - Bl?b?r Bananerstr?m
+S38: Roberto Martucci - Blabar Bananerstrom
+S38: Ron Bolt - Dionyz Vyskoc
+S38: Ronan O'Keefe - Dionyz Vyskoc
+S38: Laurifer Trophy
+S38: Linna-Landvik
+S38: Four Star Cup
+S39: Ideen Fallah - Kyler Gill
+S39: Jared Hanson - Kyler Gill
+S39: Quilha Agante - Mikhail Petrikov
+S39: Raymond Lindsay - Kyler Gill
+S39: Roberto Martucci - Kyler Gill
+S39: Ron Bolt - Mikhail Lokitonov
+S41: Cedric Robinson - Benjamin Blue
+S42: Brandon Holmes - Cameron Carter II
+S43: Cedric Robinson - Benjamin Blue
+S44: Elias Armia - Mika Mayfield
+S45: Esa Anrikkanen - Peter Larson
+S46: Nour Harrak - Dangles13/hockeyfan
+S51: Brodie Witzel - Daniel Bischoff
+S51: Cedric Robinson - Ian Venables
+S51: Ideen Fallah - Daniel Bischoff
+S51: Jared Hanson - Daniel Bischoff
+S51: Raymond Lindsay - Daniel Bischoff
+S51: Ron Bolt - Daniel Bischoff
+S51: Linna-Landvik
+S51: Four Star Cup
+S53: Ideen Fallah - Mitchell van der Heijden
+S55: Nour Harrak - Acsolap/golden_apricot
+S55: Cedric Robinson - Scoochie Stratton
+S55: Ideen Fallah - Scoochie Stratton
+S55: Matt Lewis-Flood - Scoochie Stratton
+S55: Matt Lewis-Flood - Chimkin Tendy
+S55: Alexis Metzler - Bork Lazer
+S56: Ron Bolt - TURG TURG
+S57: Brodie Witzel - Chimkin Tendy
+S57: Esa Anrikkanen - Gregory Goode
+S57: Linna-Landvik
+S57: Four Star Cup
+S58: Cedric Robinson - Chimkin Tendy
+S58: Matt Lewis-Flood - Kojo Murata
+S58: Matt Lewis-Flood - Chimkin Tendy
+S58: Linna-Landvik
+S59: Ideen Fallah - Pablo Salvatici
+S59: Jared Hanson - Pablo Salvatici
+S59: Quilha Agante - Gregory Goode
+S59: Raymond Lindsay - Pablo Salvatici
+S59: Ronan O'Keefe - Cole Carter
+S59: Alex Light - Cole Carter
+S59: Linna-Landvik
+S60: Brandon Holmes - Ville Kurri
+S60: Esa Anrikkanen - Towelie 
+S60: Linna-Landvik
+S61: Esa Anrikkanen - Cup Noodle
+S62: Brandon Holmes - Mikhail Novikov
+S62: Linna-Landvik
+S63: Brandon Holmes - Paul Koivu
+S64: Elias Armia - Spack Jarrow
+S71: Brandon Holmes - Georg N'Zola
+S71: Ideen Fallah - Tony Soprano
+S71: Alex Light - Tony Soprano
+S73: Cedric Robinson - Stun Gun
+S73: Ideen Fallah - Stun Gun
+S74: Brandon Holmes - Dan Johnston
+S78: Nour Harrak - Figgy/retuperkele
+S78: Roberto Martucci - Chris McZehrl III
+S78: Alex Light - Chris McZehrl III
+S78: Alexis Metzler - Dieter Frühstück
+S79: Ronan O'Keefe - Hughes Incorporated
+S80: Alexis Metzler - Dieter Frühstück

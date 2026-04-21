@@ -631,14 +631,15 @@ smjhl_profile_summary <- function(team_id,
 
 
 
-w_perc <- function(w,l,otl,sol) {
+w_perc <- function(record) {
   
-  gp = w+l+otl+sol
-  total_l <- otl + sol
-  total_record <- paste0(w, "-", l, "-", total_l)
-  w_perc <- w/gp
+  record_split <- strsplit(record, split = "-")
+  w <- as.numeric(record_split[[1]][1])
+  l <- as.numeric(record_split[[1]][2])
+  otl <- as.numeric(record_split[[1]][3])
   
-  return(list(w_perc, total_record))
+  w_perc = w/(w+l+otl)
+  return(w_perc)
 }
 
 

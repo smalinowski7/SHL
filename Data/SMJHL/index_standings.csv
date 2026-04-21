@@ -477,3 +477,35 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 14,17,Great Falls Grizzlies,Great Falls,GFG,66,17,49,0,34,0.258,17,177,329,-152,12,21,0,5,28,0,0,0,86
 15,7,Detroit Falcons,Detroit,DET,66,15,47,4,34,0.258,15,189,350,-161,11,20,2,4,27,2,0,1,86
 16,8,St. Louis Scarecrows,St. Louis,STL,66,13,49,4,30,0.227,13,176,394,-218,10,22,1,3,27,3,0,1,86
+1,15,Quebec City Citadelles,Quebec City,QCC,64,51,12,1,103,0.805,49,427,198,229,28,3,1,23,9,0,2,1,87
+2,4,Newfoundland Berserkers,Newfoundland,NL,64,44,16,4,92,0.719,42,359,240,119,24,7,1,20,9,3,2,1,87
+3,18,Ottawa Highlanders,Ottawa,OTT,64,44,19,1,89,0.695,43,298,212,86,27,4,1,17,15,0,1,0,87
+4,16,Thunder Bay Walleye,Thunder Bay,TBW,64,39,23,2,80,0.625,38,286,207,79,20,12,0,19,11,2,1,2,87
+5,14,Nevada Battleborn,Nevada,NBB,64,39,23,2,80,0.625,37,296,247,49,24,6,2,15,17,0,2,1,87
+6,1,Kelowna Knights,Kelowna,KEL,64,39,23,2,80,0.625,37,289,272,17,24,7,1,15,16,1,2,0,87
+7,19,San Diego Tidal,San Diego,SDT,64,35,23,6,76,0.594,34,293,214,79,21,9,3,14,14,3,1,4,87
+8,5,Yukon Malamutes,Yukon,YUM,64,35,25,4,74,0.578,34,296,250,46,22,10,0,13,15,4,1,2,87
+9,0,Anchorage Armada,Anchorage,ANC,64,35,26,3,73,0.57,29,240,243,-3,21,10,1,14,16,2,6,3,87
+10,2,Maine Timber,Maine,MET,64,33,28,3,69,0.539,32,227,225,2,22,9,1,11,19,2,1,2,87
+11,9,Carolina Kraken,Carolina,CAR,64,29,29,6,64,0.5,29,326,333,-7,17,11,4,12,18,2,0,3,87
+12,8,St. Louis Scarecrows,St. Louis,STL,64,24,36,4,52,0.406,23,202,269,-67,16,13,2,8,23,2,1,2,87
+13,6,Colorado Raptors,Colorado,COL,64,23,40,1,47,0.367,21,202,312,-110,15,16,1,8,24,0,2,1,87
+14,7,Detroit Falcons,Detroit,DET,64,16,43,5,37,0.289,13,197,344,-147,13,17,2,3,26,3,3,2,87
+15,3,Vancouver Whalers,Vancouver,VAN,64,13,47,4,30,0.234,12,245,430,-185,8,23,1,5,24,3,1,2,87
+16,17,Great Falls Grizzlies,Great Falls,GFG,64,13,49,2,28,0.219,12,154,341,-187,9,22,1,4,27,1,1,1,87
+1,15,Quebec City Citadelles,Quebec City,QCC,64,51,12,1,103,0.805,49,427,198,229,28,3,1,23,9,0,2,1,87
+2,4,Newfoundland Berserkers,Newfoundland,NL,64,44,16,4,92,0.719,42,359,240,119,24,7,1,20,9,3,2,1,87
+3,18,Ottawa Highlanders,Ottawa,OTT,64,44,19,1,89,0.695,43,298,212,86,27,4,1,17,15,0,1,0,87
+4,16,Thunder Bay Walleye,Thunder Bay,TBW,64,39,23,2,80,0.625,38,286,207,79,20,12,0,19,11,2,1,2,87
+5,14,Nevada Battleborn,Nevada,NBB,64,39,23,2,80,0.625,37,296,247,49,24,6,2,15,17,0,2,1,87
+6,1,Kelowna Knights,Kelowna,KEL,64,39,23,2,80,0.625,37,289,272,17,24,7,1,15,16,1,2,0,87
+7,19,San Diego Tidal,San Diego,SDT,64,35,23,6,76,0.594,34,293,214,79,21,9,3,14,14,3,1,4,87
+8,5,Yukon Malamutes,Yukon,YUM,64,35,25,4,74,0.578,34,296,250,46,22,10,0,13,15,4,1,2,87
+9,0,Anchorage Armada,Anchorage,ANC,64,35,26,3,73,0.57,29,240,243,-3,21,10,1,14,16,2,6,3,87
+10,2,Maine Timber,Maine,MET,64,33,28,3,69,0.539,32,227,225,2,22,9,1,11,19,2,1,2,87
+11,9,Carolina Kraken,Carolina,CAR,64,29,29,6,64,0.5,29,326,333,-7,17,11,4,12,18,2,0,3,87
+12,8,St. Louis Scarecrows,St. Louis,STL,64,24,36,4,52,0.406,23,202,269,-67,16,13,2,8,23,2,1,2,87
+13,6,Colorado Raptors,Colorado,COL,64,23,40,1,47,0.367,21,202,312,-110,15,16,1,8,24,0,2,1,87
+14,7,Detroit Falcons,Detroit,DET,64,16,43,5,37,0.289,13,197,344,-147,13,17,2,3,26,3,3,2,87
+15,3,Vancouver Whalers,Vancouver,VAN,64,13,47,4,30,0.234,12,245,430,-185,8,23,1,5,24,3,1,2,87
+16,17,Great Falls Grizzlies,Great Falls,GFG,64,13,49,2,28,0.219,12,154,341,-187,9,22,1,4,27,1,1,1,87

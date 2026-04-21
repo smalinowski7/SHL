@@ -687,3 +687,34 @@ id,name,position,league,team,season,gamesPlayed,minutes,wins,losses,ot,shotsAgai
 4189,HFFO The Bald,G,1,YUM,85,1,48,0,0,0,25,22,3,3.7,0,0.88,60,TRUE,Goalie,Goalie
 4213,STL EBUG,G,1,STL,85,4,94,0,0,0,53,44,9,5.69,0,0.83,48,TRUE,Goalie,Goalie
 4309,Zaheer Zilliams,G,1,NL,85,2,67,0,1,0,40,33,7,6.24,0,0.825,46,TRUE,Goalie,Goalie
+2635,Buggy D. Backup,G,1,NBB,86,6,338,4,1,0,173,154,19,3.36,0,0.89,70,FALSE,Goalie,Goalie
+2736,Robert Krohn,G,1,SDT,86,4,129,1,1,0,62,50,12,5.55,0,0.806,44,FALSE,Goalie,Goalie
+2894,angel anne kowalczyk,G,1,STL,86,3,22,0,0,0,22,18,4,9.99,0,0.818,46,FALSE,Goalie,Goalie
+2900,Jayden McMorris,G,1,COL,86,3,86,0,1,1,49,43,6,4.15,0,0.878,56,TRUE,Goalie,Goalie
+2923,Mark Michaels,G,1,VAN,86,1,52,0,0,0,19,16,3,3.43,0,0.842,49,FALSE,Goalie,Goalie
+2967,Svatoslav Cech,G,1,MET,86,3,54,0,0,0,21,16,5,5.54,0,0.762,42,FALSE,Goalie,Goalie
+3094,Puck Norris,G,1,QCC,86,19,1150,11,7,1,555,487,68,3.54,1,0.877,63,FALSE,Goalie,Goalie
+3141,Antoine Fuhringer,G,1,YUM,86,3,104,0,2,0,53,45,8,4.59,0,0.849,50,FALSE,Goalie,Goalie
+3287,Petrov Semenov,G,1,ANC,86,1,41,0,0,0,18,15,3,4.35,0,0.833,50,FALSE,Goalie,Goalie
+3316,Bazooka Joe,G,1,SDT,86,18,1011,13,4,0,440,393,47,2.79,3,0.893,67,FALSE,Goalie,Goalie
+3318,Kevin Broadway,G,1,STL,86,4,217,0,4,0,153,127,26,7.17,0,0.83,47,TRUE,Goalie,Goalie
+3363,Remy Lebeau,G,1,QCC,86,1,12,0,0,0,5,5,0,0,0,0.999,56,FALSE,Goalie,Goalie
+3378,Lord Humongous,G,1,KEL,86,10,598,6,4,0,286,249,37,3.71,0,0.871,62,FALSE,Goalie,Goalie
+3421,Campanella and Giovanni,G,1,NBB,86,6,315,2,4,0,141,121,20,3.8,1,0.858,57,FALSE,Goalie,Goalie
+3464,Yung P. Ush,G,1,TBW,86,3,160,0,2,0,105,92,13,4.86,0,0.876,65,TRUE,Goalie,Goalie
+3497,Colton,G,1,CAR,86,7,407,3,4,0,222,191,31,4.57,0,0.86,59,FALSE,Goalie,Goalie
+3510,Dexter Harrison III,G,1,DET,86,5,293,1,4,0,240,209,31,6.33,0,0.871,69,TRUE,Goalie,Goalie
+3595,Viktor von Stauffenberg,G,1,OTT,86,15,860,9,5,1,429,377,52,3.63,1,0.879,64,FALSE,Goalie,Goalie
+3658,Dalinar Kholin,G,1,MET,86,11,602,4,7,0,324,278,46,4.58,1,0.858,58,TRUE,Goalie,Goalie
+3716,Dominik Turek,G,1,ANC,86,6,318,2,4,0,195,167,28,5.27,0,0.856,58,FALSE,Goalie,Goalie
+3758,Kellan Chamberlain,G,1,GFG,86,5,262,1,4,0,192,165,27,6.18,0,0.859,59,TRUE,Goalie,Goalie
+3825,Abigail Goetze,G,1,COL,86,4,163,0,2,0,117,97,20,7.35,0,0.829,47,TRUE,Goalie,Goalie
+3864,Galumphous Seal,G,1,OTT,86,1,51,0,0,0,19,17,2,2.34,0,0.895,62,FALSE,Goalie,Goalie
+3878,Evgeniy Toshich,G,1,DET,86,1,6,0,0,0,10,10,0,0,0,0.999,65,FALSE,Goalie,Goalie
+3916,Niklas Lundberg,G,1,VAN,86,23,1354,16,7,0,585,515,70,3.1,2,0.88,64,TRUE,Goalie,Goalie
+3961,Montgomery Scholz,G,1,TBW,86,2,77,0,2,0,51,42,9,7,0,0.824,46,TRUE,Goalie,Goalie
+4007,Hanna Soderberg-Motyla,G,1,YUM,86,12,616,5,5,0,377,330,47,4.57,0,0.875,63,TRUE,Goalie,Goalie
+4023,Cedric Robinson Jr.,G,1,CAR,86,1,12,0,0,0,5,4,1,4.77,0,0.8,46,FALSE,Goalie,Goalie
+4026,Dakota Glover Jr,G,1,NL,86,1,58,0,1,0,33,27,6,6.14,0,0.818,44,FALSE,Goalie,Goalie
+4309,Zaheer Zilliams,G,1,NL,86,6,363,3,2,1,151,131,20,3.3,1,0.868,63,FALSE,Goalie,Goalie
+4453,Samthemancub,G,1,GFG,86,3,37,0,0,0,29,23,6,9.54,0,0.793,43,FALSE,Goalie,Goalie
