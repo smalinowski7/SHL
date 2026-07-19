@@ -1,0 +1,38 @@
+[align=center]
+:shl: :shl: :shl: :shl: :shl: :shl: :shl:
+[size=x-large][b][u]S87 All-Star Teams[/u][/b][/size]
+:shl: :shl: :shl: :shl: :shl: :shl: :shl:
+
+
+[size=large][b]1st Team All-SHL[/b][/size]
+F - Tip Toasty :wolfpack:
+F - Dejana Kaptina :stampede:
+F - Jefferson Steelflex :argonauts:
+D - Barcus Juneau :forge:
+D - Hip Hurts :blizzard:
+G - Victor Bjork-Pejlikka :argonauts:
+
+[size=large][b]2nd Team All-SHL[/b][/size]
+F - Kim Chaewon :steelhawks:
+F - Swedish Chef :steelhawks:
+F - Alexa Johansen :blizzard:
+D - Demir Bellona :inferno:
+D - Roquefort Cotswold :argonauts:
+G - Elvar Gil-Galad :wolfpack:
+
+[size=large][b]3rd Team All-SHL[/b][/size]
+F - Elaina Beneski :stampede:
+F - Leo Carlsson :glacier guardians:
+F - Gwendolyn Telenn :blizzard:
+D - Journey Man :stampede:
+D - Oliver Cornwall :wolfpack:
+G - Abby Wright-Bach :blizzard:
+
+[size=large][b]Rookie Team All-SHL[/b][/size]
+F - Norm McDangles :panthers:
+F - Slammy Davis Jr. :panthers:
+F - Johann Selich :renegades:
+D - Lava Lemur :aurora:
+D - Spiky Sal O'Leary :argonauts:
+G - Campanella and Giovanni :pride:
+[/align]

@@ -28,10 +28,10 @@ names(save_path_character) <- c("shl", "smjhl")
 ### Update and save new season's worth of data ###
 ##################################################
 
-# season_to_add <- 87
-# league_char <- "smjhl"
-# league_numeric <- 1
-# directory <- "SMJHL"
+# season_to_add <- 88
+# league_char <- "shl"
+# league_numeric <- 0
+# directory <- "SHL"
 # 
 # 
 # bs <- file_boxscores(season_to_add, league = league_char, append = T)
@@ -46,10 +46,19 @@ names(save_path_character) <- c("shl", "smjhl")
 # stand <- index_standings(season_to_add, league = league_numeric, append = T)
 # meta <- index_meta(season_to_add, league = league_numeric, append = T)
 # 
-# gs_po <- index_goalie_stats(season_to_add, league = league_numeric, type = "playoffs", append = F)
-# ps_po <- index_player_stats(season_to_add, league = league_numeric, type = "playoffs", append = F)
-# sch_po <- index_schedule(season_to_add, league = league_numeric, type = "playoffs", append = F)
+# # Some day I will include playoffs in the scraper functions
+# # For now, these are the only ones I use so they're hard-coded in
+# gs_po_new <- index_goalie_stats(season_to_add, league = league_numeric, type = "playoffs", append = T)
+# ps_po_new <- index_player_stats(season_to_add, league = league_numeric, type = "playoffs", append = T)
+# sch_po_new <- index_schedule(season_to_add, league = league_numeric, type = "playoffs", append = T)
 # 
+# gs_po_old <- read_csv(paste0("Data/", directory, "/Playoffs/index_goalie_stats.csv"))
+# ps_po_old <-read_csv(paste0("Data/", directory, "/Playoffs/index_player_stats.csv"))
+# sch_po_old <-read_csv(paste0("Data/", directory, "/Playoffs/index_schedule.csv"))
+# 
+# gs_po <- rbind(gs_po_old, gs_po_new)
+# ps_po <- rbind(ps_po_old, ps_po_new)
+# sch_po <- rbind(sch_po_old, sch_po_new)
 # 
 # # Check unqiue seasons
 # unique(bs$season)
@@ -63,6 +72,9 @@ names(save_path_character) <- c("shl", "smjhl")
 # unique(sch$season)
 # unique(stand$season)
 # unique(meta$season)
+# unique(gs_po$season)
+# unique(ps_po$season)
+# unique(sch_po$season)
 # 
 # 
 # # Save
@@ -81,6 +93,11 @@ names(save_path_character) <- c("shl", "smjhl")
 # write_csv(gs_po, paste0("Data/", directory, "/Playoffs/index_goalie_stats.csv"))
 # write_csv(ps_po, paste0("Data/", directory, "/Playoffs/index_player_stats.csv"))
 # write_csv(sch_po, paste0("Data/", directory, "/Playoffs/index_schedule.csv"))
+
+
+
+
+
 
 ##################
 ### From Index ###

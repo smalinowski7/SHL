@@ -699,3 +699,27 @@ id,season,league,conference,division,name,abbreviation,location,nameDetails_firs
 23,87,0,0,NA,Nashville Sound,NSH,Nashville,Nashville,Sound,#062133,#c32922,#ecdcc5,31,31,2,3,2,66,269,286,0.5
 24,87,0,1,NA,Denver Glacier Guardians,DEN,Denver,Denver,Glacier Guardians,#5a0c1e,#f3a238,#91d0ef,44,18,1,1,3,92,342,216,0.697
 25,87,0,1,NA,Madison Valkyries,MAD,Madison,Madison,Valkyries,#4b014b,#008b8b,#c0c0c0,31,31,3,1,1,66,245,283,0.5
+0,88,0,0,NA,Buffalo Stampede,BUF,Buffalo,Buffalo,Stampede,#164833,#f6bf11,#ffffff,47,16,2,2,1,97,355,234,0.735
+1,88,0,1,NA,Chicago Syndicate,CHI,Chicago,Chicago,Syndicate,#1a1a18,#d9ad00,#ffffff,22,39,4,4,1,49,195,303,0.371
+2,88,0,0,NA,Hamilton Steelhawks,HAM,Hamilton,Hamilton,Steelhawks,#243b50,#bab9b9,#ffffff,42,22,2,1,0,86,326,232,0.652
+3,88,0,0,NA,Toronto North Stars,TOR,Toronto,Toronto,North Stars,#2c4ca4,#1c3168,#ffffff,41,20,3,2,2,87,321,256,0.659
+4,88,0,0,NA,Manhattan Rage,MAN,Manhattan,Manhattan,Rage,#97181b,#1a1a18,#ffffff,8,54,2,0,2,20,136,400,0.152
+5,88,0,0,NA,New England Wolfpack,NEW,New England,New England,Wolfpack,#008236,#6d6e72,#ffffff,45,18,1,1,2,93,339,209,0.705
+6,88,0,0,NA,Tampa Bay Barracuda,TBB,Tampa Bay,Tampa Bay,Barracuda,#0ad2d2,#f499c2,#ffffff,12,53,0,3,1,25,163,361,0.189
+7,88,0,0,NA,Baltimore Platoon,BAP,Baltimore,Baltimore,Platoon,#08102c,#6b1616,#ffffff,30,33,2,0,1,63,245,286,0.477
+8,88,0,1,NA,Calgary Dragons,CGY,Calgary,Calgary,Dragons,#a40000,#797979,#ffffff,33,32,1,1,0,67,234,254,0.508
+9,88,0,1,NA,Edmonton Blizzard,EDM,Edmonton,Edmonton,Blizzard,#091e40,#249cc4,#ffffff,45,19,2,0,0,92,345,209,0.697
+10,88,0,1,NA,Minnesota Monarchs,MIN,Minnesota,Minnesota,Monarchs,#0e3b1e,#322460,#ffffff,51,15,0,0,0,102,357,206,0.773
+11,88,0,1,NA,Winnipeg Aurora,WPG,Winnipeg,Winnipeg,Aurora,#0e2e2d,#2ef9b4,#ffffff,19,43,2,0,2,42,188,316,0.318
+12,88,0,1,NA,San Francisco Pride,SFP,San Francisco,San Francisco,Pride,#360854,#d4af37,#ffffff,13,49,2,1,2,30,179,395,0.227
+13,88,0,1,NA,Los Angeles Panthers,LAP,Los Angeles,Los Angeles,Panthers,#006a7a,#eb7d0b,#ffffff,28,34,2,1,2,60,248,276,0.455
+14,88,0,1,NA,New Orleans Specters,NOL,New Orleans,New Orleans,Specters,#860efd,#1a1a18,#ffffff,31,30,4,2,1,67,257,294,0.508
+15,88,0,1,NA,Texas Renegades,TEX,Texas,Texas,Renegades,#1a1a18,#606060,#ffffff,39,25,0,1,2,80,295,233,0.606
+18,88,0,0,NA,Atlanta Inferno,ATL,Atlanta,Atlanta,Inferno,#be1e2d,#f26522,#ffffff,44,19,1,1,2,91,370,254,0.689
+19,88,0,1,NA,Seattle Argonauts,SEA,Seattle,Seattle,Argonauts,#192e58,#c5942c,#ffffff,52,12,2,0,0,106,379,211,0.803
+20,88,0,0,NA,Montreal Patriotes,MTL,Montreal,Montreal,Patriotes,#773141,#ffb612,#ffffff,10,50,3,1,3,26,173,355,0.197
+21,88,0,0,NA,Philadelphia Forge,PHI,Philadelphia,Philadelphia,Forge,#e88900,#a00400,#ffffff,39,23,3,0,1,82,335,231,0.621
+22,88,0,0,NA,Cincinnati Six,CIN,Cincinnati,Cincinnati,Six,#dedede,#c70f2e,#86bde0,18,44,3,2,1,40,230,418,0.303
+23,88,0,0,NA,Nashville Sound,NSH,Nashville,Nashville,Sound,#062133,#c32922,#ecdcc5,41,23,2,0,0,84,344,270,0.636
+24,88,0,1,NA,Denver Glacier Guardians,DEN,Denver,Denver,Glacier Guardians,#5a0c1e,#f3a238,#91d0ef,51,14,1,2,0,103,370,205,0.78
+25,88,0,1,NA,Madison Valkyries,MAD,Madison,Madison,Valkyries,#4b014b,#008b8b,#c0c0c0,31,31,2,3,2,66,287,263,0.5

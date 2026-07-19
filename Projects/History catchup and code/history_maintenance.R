@@ -3,7 +3,67 @@
 ##############
 
 
+#############
+### Notes ###
+#############
+
 # Playoff results are hard coded to start at S68 - season when most of that section was stopped
+
+
+#############
+### To do ###
+#############
+
+# Team profile standings, paste S(season#) first
+# Team profile Awards, paste S(season#) first
+# Add stops/warnings if the manually downloaded historical standings .csv isn't up to date
+
+#############
+### Usage ###
+#############
+
+# To update team profile pages #
+################################
+### Get team records and GM records from 
+### Get season and playoffs standings from team standings
+### Get player awards from team awards
+### Get draft list from Draft list
+
+# To update cup winner pages #
+##############################
+### Get rosters from Cup Rosters
+### Get awards from Cup awards
+
+# To update Team general history #
+##################################
+### Get from Team general
+
+# To update all-stars #
+#######################
+### Get from All stars/League
+
+# 
+# team_cup_roster(team_abbr = "SEA",
+#                 cup_season =  88,
+#                 league_numeric = 0)
+# team_cup_awards(team_abbr = "SEA",
+#                 season = 88,
+#                 league_numeric = 0)
+# 
+# team_profile_standings(season_numeric = 88,
+#                        league_numeric = 1)
+# team_profile_awards(league_numeric = 0,
+#                     season_numeric = 87)
+# draft_season_summary(league = "SMJHL",
+#                      season = 88)
+# 
+# team_summary_page(league_numeric = 0,
+#                   season_numeric = 87)
+# 
+# shl_all_stars(87)
+# 
+# smjhl_all_stars(87)
+
 
 library(tidyverse)
 library(httr)
@@ -99,6 +159,10 @@ j_ratings <- rbind(j_player_ratings, j_goalie_ratings)
 shl_team_stats_all_time <- read_csv("Projects/History catchup and code/shl_all_time_results.csv")
 smjhl_team_stats_all_time <- read_csv("Projects/History catchup and code/smjhl_all_time_results.csv")
 
+# Load team season-by-season results
+shl_season_results <- read_csv("Projects/History catchup and code/shl_season_results.csv")
+smjhl_season_results <- read_csv("Projects/History catchup and code/smjhl_season_results.csv")
+
 
 # Load draft data
 draft_url <- GET("https://portal.simulationhockey.com/api/v1/history/draft")
@@ -181,6 +245,7 @@ for (i in unique(team_abb_map_j$id)) {
            win = 1*(score > opp_score))
   po_list_j[[i+1]] <- temp_df
 }
+
 po_sch_formatted_j <- do.call(rbind, po_list_j) 
 po_sch_sum_j <- po_sch_formatted_j %>%
   arrange(date) %>%
@@ -551,7 +616,7 @@ team_profile_records <- function(season, league_numeric) {
 team_profile_standings <- function(season_numeric, league_numeric) {
   
   # season_numeric <- 87
-  # league_numeric <- 0
+  # league_numeric <- 1
   
   if (league_numeric == 0) {
     
@@ -714,8 +779,16 @@ team_profile_awards <- function(league_numeric, season_numeric) {
     arrange(abbreviation) %>%
     mutate(label_with_team = paste0(abbreviation, ": ", label))
   
-  write_lines(standings_output, paste0("Projects/History catchup and code/Team awards/", combined_awards$label, "_team_awards.txt"))
-  write_lines(standings_output, paste0("Projects/History catchup and code/Team awards/", combined_awards$label_with_team, "_team_awards_with_team.txt"))
+  label <- c(
+    combined_awards$label,
+    "",
+    "",
+    combined_awards$label_with_team
+  )
+  
+  # write_lines(combined_awards$label, paste0("Projects/History catchup and code/Team awards/", "S", season_numeric, "_", league_char, "_team_awards.txt"))
+  # write_lines(combined_awards$label_with_team, paste0("Projects/History catchup and code/Team awards/", "S", season_numeric, "_", league_char, "_team_awards_with_team.txt"))
+  write_lines(label, paste0("Projects/History catchup and code/Team awards/", "S", season_numeric, "_", league_char, "_team_awards.txt"))
   
   
 }
@@ -727,30 +800,87 @@ team_profile_awards <- function(league_numeric, season_numeric) {
 
 team_summary_page <- function(league_numeric, season_numeric) {
   
+  # season_numeric <- 87
+  # league_numeric <- 0
+  
+  if (league_numeric == 0) {
+    
+    
+    award_levels <- c("Presidents Trophy",
+                      "Mathias Chouinard",
+                      "Cole Reinhart",
+                      "Challenge Cup")
+    team_meta <- team_meta %>%
+      filter(season == max(season))
+    team_names <- team_abb_map
+    league_char <- "SHL"
+    season_results <- shl_season_results
+    reg_award <- "Presidents Trophy"
+    cup <- "Challenge Cup"
+    
+    
+  } else {
+    
+    
+    award_levels <- c("Laurifer Trophy",
+                      "King-Kurczewski",
+                      "Linna-Landvik",
+                      "Four Star Cup")
+    team_meta <- team_meta_j %>%
+      filter(season == max(season))
+    team_names <- team_abb_map_j
+    league_char <- "SMJHL"
+    season_results <- smjhl_season_results
+    reg_award <- "Laurifer Trophy"
+    cup <- "Four Star Cup"
+  
+    }
+  
   
   pres <- team_awards_df %>%
-    filter(achievementName == "Presidents Trophy") %>%
+    filter(achievementName == reg_award) %>%
     select(teamID, achievementName) %>%
     group_by(teamID) %>%
-    summarise(n = n())
+    summarise(pres = n())
+  
   
   cup <- team_awards_df %>%
-    filter(achievementName == "Challenge Cup") %>%
+    filter(achievementName == cup) %>%
     select(teamID, achievementName) %>%
     group_by(teamID) %>%
-    summarise(n = n())
-  
-  reg_season <- h1 %>%
-    mutate(p_perc = points/(2*gamesPlayed)) %>%
-    mutate(otl = overtimeLosses + shootoutLosses) %>%
-    select(id, name, nickname, wins, losses, otl, points, p_perc) %>%
-    mutate(p_perc = round(p_perc, 3)) %>%
-    left_join(pres, by = c("id" = "teamID"))
+    summarise(cup = n())
   
   
+  reg_season <- season_results %>%
+    group_by(id) %>%
+    summarise(wins = sum(wins),
+              losses = sum(losses),
+              otl = sum(overtimeLosses + shootoutLosses),
+              points = sum(points),
+              gp = sum(gamesPlayed),
+              perc = points/(2*gp)) %>%
+    mutate(p_perc = round(perc, 3)) %>%
+    left_join(pres, by = c("id" = "teamID")) %>%
+    mutate(pres = ifelse(is.na(pres), 0, pres))  %>%
+    left_join(team_meta, by = c("id")) %>%
+    mutate(team_name = tolower(nameDetails_second)) %>%
+    mutate(team_name = case_when(team_name == "north stars" ~ "stars",
+                                 team_name == "glacier guardians" ~ "glacierguardians",
+                                 TRUE ~ team_name),
+           label = paste0(":", team_name, 
+                          ": ", abbreviation, ": ",
+                          wins, "-", losses, "-", otl, " | ",
+                          points, " | ",
+                          p_perc, " | ",
+                          pres)) %>%
+    arrange(abbreviation)
+  
+
   
   
-  po <- h2 %>%
+  
+  
+  po <- season_results %>%
     mutate(playoffResult_sum = case_when(playoffResult == "Missed" ~ "Missed",
                                          TRUE ~ "Made")) %>%
     group_by(id) %>%
@@ -759,40 +889,38 @@ team_summary_page <- function(league_numeric, season_numeric) {
               losses = sum(playoffLosses, na.rm = T),
               made = sum(playoffResult_sum == "Made"),
               missed = sum(playoffResult_sum == "Missed")) %>%
-    left_join(cup, by = c("id" = "teamID"))
+    left_join(cup, by = c("id" = "teamID")) %>%
+    mutate(cup = ifelse(is.na(cup), 0, cup))  %>%
+    left_join(team_meta, by = c("id")) %>%
+    mutate(team_name = tolower(nameDetails_second)) %>%
+    mutate(team_name = case_when(team_name == "north stars" ~ "stars",
+                                 team_name == "glacier guardians" ~ "glacierguardians",
+                                 TRUE ~ team_name),
+           label = paste0(":", team_name, 
+                          ": ", abbreviation, ": ",
+                          wins, "-", losses, " | ",
+                          made,"-", missed, " | ",
+                          cup)) %>%
+    arrange(abbreviation)
+                          
+
   
   
   
-  h2 %>%
-    mutate(yaxis = case_when(playoffResult == "Missed" ~ -1,
-                             TRUE ~ 1)) %>%
-    group_by(id) %>%
-    mutate(name = paste0(first(name), " ", first(nickname))) %>%
-    ggplot(aes(x = season, y = yaxis, fill = factor(yaxis))) +
-    geom_col(show.legend = F,
-             col = "black",
-             width = .75) +
-    facet_wrap(.~name) 
   
-  
-  
-  
-  
-  streaks <- h2 %>%
+  made_streaks <- season_results %>%
     arrange(season) %>%
-    mutate(streak_stat = ifelse(playoffResult != "Missed", 0, 1)) %>%
+    mutate(streak_stat = ifelse(playoffResult != "Missed", 1, 0)) %>%
     group_by(id) %>%
-    mutate(name = paste0(last(name), " ", last(nickname))) %>%
     mutate(steak_id = cumsum(c(1, diff(streak_stat) != 0))) %>% 
     ungroup()
   
-  stat_streaks <- streaks %>%
+  made_stat_streaks <- made_streaks %>%
     filter(streak_stat == 1) %>%
     group_by(id, steak_id) %>%
     summarise(
       season_start = min(season),
       season_end = max(season),
-      team = paste0(unique(name), collapse = ","),
       streak_length = n()
       
     ) %>%
@@ -800,7 +928,97 @@ team_summary_page <- function(league_numeric, season_numeric) {
     arrange(desc(streak_length)) %>%
     mutate(rank = row_number()) %>%
     group_by(id) %>%
-    filter(streak_length == max(streak_length))
+    filter(streak_length == max(streak_length)) %>%
+    
+    mutate(season_end = case_when(season_end == season_numeric ~ "present",
+                                  TRUE ~ paste0("S", season_end)),
+           season_start = paste0("S", season_start),
+           range_character = paste0(season_start, "-", season_end)) %>%
+    group_by(id) %>%
+    summarise(length = streak_length[1],
+              full_range = paste0(range_character, collapse = ", ")) %>%
+    mutate(full_range = paste0("(", full_range, ")")) %>%
+    right_join(team_meta, by = c("id")) %>%
+    mutate(team_name = tolower(nameDetails_second)) %>%
+    mutate(team_name = case_when(team_name == "north stars" ~ "stars",
+                                 team_name == "glacier guardians" ~ "glacierguardians",
+                                 TRUE ~ team_name),
+           label = paste0(":", team_name, 
+                          ": ", abbreviation, ": ",
+                          length, " seasons ",
+                          full_range)) %>%
+    arrange(abbreviation)
+                          
+                          
+
+  
+  missed_streaks <- season_results %>%
+    arrange(season) %>%
+    mutate(streak_stat = ifelse(playoffResult == "Missed", 1, 0)) %>%
+    group_by(id) %>%
+    mutate(steak_id = cumsum(c(1, diff(streak_stat) != 0))) %>% 
+    ungroup()
+  
+  missed_stat_streaks <- missed_streaks %>%
+    filter(streak_stat == 1) %>%
+    group_by(id, steak_id) %>%
+    summarise(
+      season_start = min(season),
+      season_end = max(season),
+      streak_length = n()
+      
+    ) %>%
+    ungroup() %>%
+    arrange(desc(streak_length)) %>%
+    mutate(rank = row_number()) %>%
+    group_by(id) %>%
+    filter(streak_length == max(streak_length)) %>%
+    
+    mutate(season_end = case_when(season_end == season_numeric ~ "present",
+                                  TRUE ~ paste0("S", season_end)),
+           season_start = paste0("S", season_start),
+           range_character = paste0(season_start, "-", season_end)) %>%
+    group_by(id) %>%
+    summarise(length = streak_length[1],
+              full_range = paste0(range_character, collapse = ", ")) %>%
+    mutate(full_range = paste0("(", full_range, ")")) %>%
+    right_join(team_meta, by = c("id")) %>%
+    mutate(team_name = tolower(nameDetails_second)) %>%
+    mutate(team_name = case_when(team_name == "north stars" ~ "stars",
+                                 team_name == "glacier guardians" ~ "glacierguardians",
+                                 TRUE ~ team_name),
+           label = paste0(":", team_name, 
+                          ": ", abbreviation, ": ",
+                          length, " seasons ",
+                          full_range)) %>%
+    
+    mutate(label = case_when(is.na(length) ~ "N/A",
+                             TRUE ~ label)) %>%
+    arrange(abbreviation)
+  
+  
+  output <- c(
+    "reg season",
+    "",
+    reg_season$label,
+    "",
+    "",
+    "playoffs",
+    "",
+    po$label,
+    "",
+    "",
+    "Made streak",
+    "",
+    made_stat_streaks$label,
+    "",
+    "",
+    "Missed streak",
+    "",
+    missed_stat_streaks$label
+  )
+  
+  write_lines(output, paste0("Projects/History catchup and code/Team general/", league_char, "_general_history.txt"))
   
 }
 

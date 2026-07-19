@@ -28,27 +28,27 @@ WPG: 19-42-5 (11th in Western, 20th in League)
 
 Playoffs
 
-ATL: Did not qualify
+ATL: Lost in Round 2 against New England Wolfpack (4-1)
 BAP: Did not qualify
-BUF: Did not qualify
+BUF: Lost in Round 2 against Philadelphia Forge (4-1)
 CGY: Did not qualify
-CHI: Did not qualify
-CIN: Did not qualify
-DEN: Did not qualify
-EDM: Did not qualify
-HAM: Did not qualify
+CHI: Lost in Round 1 against Seattle Argonauts (4-0)
+CIN: Lost in Round 1 against New England Wolfpack (4-0)
+DEN: Lost in Round 1 against Texas Renegades (4-3)
+EDM: Lost in Conference Finals against Seattle Argonauts (4-1)
+HAM: Lost in Round 1 against Atlanta Inferno (4-1)
 LAP: Did not qualify
-MAD: Did not qualify
+MAD: Lost in Round 1 against Edmonton Blizzard (4-1)
 MAN: Did not qualify
-MIN: Did not qualify
+MIN: Lost in Round 2 against Edmonton Blizzard (4-0)
 MTL: Did not qualify
-NEW: Did not qualify
-NOL: Did not qualify
-NSH: Did not qualify
-PHI: Did not qualify
-SEA: Did not qualify
+NEW: Lost in Challenge Cup against Seattle Argonauts (4-1)
+NOL: Lost in Round 1 against Minnesota Monarchs (4-1)
+NSH: Lost in Round 1 against Philadelphia Forge (4-0)
+PHI: Lost in Conference Finals against New England Wolfpack (4-2)
+SEA: Won Challenge Cup against New England Wolfpack (4-1)
 SFP: Did not qualify
 TBB: Did not qualify
-TEX: Did not qualify
-TOR: Did not qualify
+TEX: Lost in Round 2 against Seattle Argonauts (4-1)
+TOR: Lost in Round 1 against Buffalo Stampede (4-0)
 WPG: Did not qualify

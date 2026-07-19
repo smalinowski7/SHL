@@ -699,3 +699,27 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 22,12,San Francisco Pride,San Francisco,SFP,66,16,48,2,34,0.258,15,178,346,-168,10,21,2,6,27,0,1,2,87
 23,6,Tampa Bay Barracuda,Tampa Bay,TBB,66,13,50,3,29,0.22,11,169,378,-209,10,20,3,3,30,0,2,1,87
 24,20,Montreal Patriotes,Montreal,MTL,66,10,54,2,22,0.167,9,154,391,-237,7,26,0,3,28,2,1,1,87
+1,19,Seattle Argonauts,Seattle,SEA,66,52,12,2,106,0.803,52,379,211,168,28,4,1,24,8,1,0,0,88
+2,24,Denver Glacier Guardians,Denver,DEN,66,51,14,1,103,0.78,49,370,205,165,26,6,1,25,8,0,2,0,88
+3,10,Minnesota Monarchs,Minnesota,MIN,66,51,15,0,102,0.773,51,357,206,151,28,5,0,23,10,0,0,0,88
+4,0,Buffalo Stampede,Buffalo,BUF,66,47,16,3,97,0.735,45,355,234,121,24,9,0,23,7,3,2,1,88
+5,5,New England Wolfpack,New England,NEW,66,45,18,3,93,0.705,44,339,209,130,26,5,2,19,13,1,1,2,88
+6,9,Edmonton Blizzard,Edmonton,EDM,66,45,19,2,92,0.697,45,345,209,136,25,8,0,20,11,2,0,0,88
+7,18,Atlanta Inferno,Atlanta,ATL,66,44,19,3,91,0.689,43,370,254,116,23,8,2,21,11,1,1,2,88
+8,3,Toronto North Stars,Toronto,TOR,66,41,20,5,87,0.659,39,321,256,65,25,6,2,16,14,3,2,2,88
+9,2,Hamilton Steelhawks,Hamilton,HAM,66,42,22,2,86,0.652,41,326,232,94,22,10,1,20,12,1,1,0,88
+10,23,Nashville Sound,Nashville,NSH,66,41,23,2,84,0.636,41,344,270,74,25,7,1,16,16,1,0,0,88
+11,21,Philadelphia Forge,Philadelphia,PHI,66,39,23,4,82,0.621,39,335,231,104,22,8,3,17,15,1,0,1,88
+12,15,Texas Renegades,Texas,TEX,66,39,25,2,80,0.606,38,295,233,62,21,11,1,18,14,1,1,2,88
+13,8,Calgary Dragons,Calgary,CGY,66,33,32,1,67,0.508,32,234,254,-20,21,12,0,12,20,1,1,0,88
+14,14,New Orleans Specters,New Orleans,NOL,66,31,30,5,67,0.508,29,257,294,-37,17,13,3,14,17,2,2,1,88
+15,25,Madison Valkyries,Madison,MAD,66,31,31,4,66,0.5,28,287,263,24,15,15,3,16,16,1,3,2,88
+16,7,Baltimore Platoon,Baltimore,BAP,66,30,33,3,63,0.477,30,245,286,-41,23,8,2,7,25,1,0,1,88
+17,13,Los Angeles Panthers,Los Angeles,LAP,66,28,34,4,60,0.455,27,248,276,-28,17,13,3,11,21,1,1,2,88
+18,1,Chicago Syndicate,Chicago,CHI,66,22,39,5,49,0.371,18,195,303,-108,14,15,4,8,24,1,4,1,88
+19,11,Winnipeg Aurora,Winnipeg,WPG,66,19,43,4,42,0.318,19,188,316,-128,9,22,2,10,21,2,0,2,88
+20,22,Cincinnati Six,Cincinnati,CIN,66,18,44,4,40,0.303,16,230,418,-188,11,20,2,7,24,2,2,1,88
+21,12,San Francisco Pride,San Francisco,SFP,66,13,49,4,30,0.227,12,179,395,-216,10,20,3,3,29,1,1,2,88
+22,20,Montreal Patriotes,Montreal,MTL,66,10,50,6,26,0.197,9,173,355,-182,7,25,1,3,25,5,1,3,88
+23,6,Tampa Bay Barracuda,Tampa Bay,TBB,66,12,53,1,25,0.189,9,163,361,-198,6,26,1,6,27,0,3,1,88
+24,4,Manhattan Rage,Manhattan,MAN,66,8,54,4,20,0.152,8,136,400,-264,6,25,2,2,29,2,0,2,88

@@ -1,0 +1,78 @@
+reg season
+
+:armada: ANC: 2067-1875-316 | 4450 | 0.523 | 7
+:kraken: CAR: 2191-1726-339 | 4721 | 0.555 | 7
+:raptors: COL: 1820-1531-295 | 3935 | 0.54 | 1
+:falcons: DET: 2156-1774-329 | 4641 | 0.545 | 14
+:grizzlies: GFG: 761-927-94 | 1616 | 0.453 | 0
+:knights: KEL: 2089-1837-332 | 4510 | 0.53 | 10
+:timber: MET: 1874-1501-265 | 4013 | 0.551 | 8
+:battleborn: NBB: 1095-921-130 | 2320 | 0.541 | 1
+:berserkers: NL: 1516-973-157 | 3189 | 0.603 | 4
+:highlanders: OTT: 406-340-46 | 858 | 0.542 | 0
+:citadelles: QCC: 1289-741-116 | 2694 | 0.628 | 10
+:tidal: SDT: 363-379-50 | 776 | 0.49 | 0
+:scarecrows: STL: 1921-1979-320 | 4162 | 0.493 | 9
+:walleye: TBW: 821-839-122 | 1764 | 0.495 | 0
+:whalers: VAN: 2146-1803-309 | 4601 | 0.54 | 14
+:malamutes: YUM: 1248-1220-178 | 2674 | 0.505 | 0
+
+
+playoffs
+
+:armada: ANC: 311-345 | 72-6 | 7
+:kraken: CAR: 415-384 | 73-5 | 10
+:raptors: COL: 228-283 | 59-4 | 2
+:falcons: DET: 316-361 | 74-4 | 8
+:grizzlies: GFG: 63-110 | 23-4 | 0
+:knights: KEL: 415-363 | 70-8 | 12
+:timber: MET: 307-277 | 52-11 | 6
+:battleborn: NBB: 131-148 | 32-1 | 1
+:berserkers: NL: 257-216 | 42-1 | 6
+:highlanders: OTT: 64-61 | 12-0 | 0
+:citadelles: QCC: 259-169 | 32-1 | 7
+:tidal: SDT: 59-60 | 12-0 | 0
+:scarecrows: STL: 352-362 | 72-6 | 10
+:walleye: TBW: 68-115 | 25-2 | 0
+:whalers: VAN: 373-341 | 70-8 | 14
+:malamutes: YUM: 200-223 | 43-0 | 2
+
+
+Made streak
+
+:armada: ANC: 22 seasons (S66-present)
+:kraken: CAR: 26 seasons (S10-S35)
+:raptors: COL: 30 seasons (S39-S68)
+:falcons: DET: 26 seasons (S36-S61)
+:grizzlies: GFG: 12 seasons (S76-present)
+:knights: KEL: 26 seasons (S10-S35)
+:timber: MET: 26 seasons (S62-present)
+:battleborn: NBB: 26 seasons (S62-present)
+:berserkers: NL: 22 seasons (S45-S66)
+:highlanders: OTT: 12 seasons (S76-present)
+:citadelles: QCC: 16 seasons (S55-S70, S72-present)
+:tidal: SDT: 12 seasons (S76-present)
+:scarecrows: STL: 22 seasons (S10-S31)
+:walleye: TBW: 17 seasons (S71-present)
+:whalers: VAN: 23 seasons (S10-S32)
+:malamutes: YUM: 43 seasons (S45-present)
+
+
+Missed streak
+
+:armada: ANC: 2 seasons (S40-S41)
+:kraken: CAR: 1 seasons (S36-S36, S39-S39, S65-S65, S67-S67, S74-S74)
+:raptors: COL: 1 seasons (S32-S32, S38-S38, S69-S69, S73-S73)
+:falcons: DET: 1 seasons (S35-S35, S62-S62, S66-S66, S72-S72)
+:grizzlies: GFG: 1 seasons (S64-S64, S68-S68, S72-S72, S75-S75)
+:knights: KEL: 2 seasons (S36-S37)
+:timber: MET: 4 seasons (S41-S44)
+:battleborn: NBB: 1 seasons (S61-S61)
+:berserkers: NL: 1 seasons (S67-S67)
+N/A
+:citadelles: QCC: 1 seasons (S71-S71)
+N/A
+:scarecrows: STL: 2 seasons (S32-S33)
+:walleye: TBW: 1 seasons (S62-S62, S70-S70)
+:whalers: VAN: 2 seasons (S33-S34, S53-S54)
+N/A

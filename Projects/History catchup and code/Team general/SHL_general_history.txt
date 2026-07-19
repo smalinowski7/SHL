@@ -1,0 +1,110 @@
+reg season
+
+:inferno: ATL: 1287-690-119 | 2693 | 0.642 | 2
+:platoon: BAP: 2411-2036-371 | 5193 | 0.539 | 9
+:stampede: BUF: 2012-1376-258 | 4282 | 0.587 | 4
+:dragons: CGY: 2499-1933-386 | 5384 | 0.559 | 7
+:syndicate: CHI: 1521-932-143 | 3185 | 0.613 | 2
+:six: CIN: 152-162-16 | 320 | 0.485 | 0
+:glacierguardians: DEN: 204-110-16 | 424 | 0.642 | 0
+:blizzard: EDM: 2576-1842-360 | 5512 | 0.577 | 14
+:steelhawks: HAM: 2546-1885-387 | 5483 | 0.569 | 9
+:panthers: LAP: 2366-1918-374 | 5106 | 0.548 | 6
+:valkyries: MAD: 135-172-23 | 293 | 0.444 | 0
+:rage: MAN: 2064-2372-342 | 4470 | 0.468 | 0
+:monarchs: MIN: 1949-2376-333 | 4231 | 0.454 | 2
+:patriotes: MTL: 693-1065-90 | 1476 | 0.399 | 0
+:wolfpack: NEW: 2313-1765-326 | 4952 | 0.562 | 7
+:specters: NOL: 1330-1099-167 | 2827 | 0.544 | 1
+:sound: NSH: 158-158-14 | 330 | 0.5 | 0
+:forge: PHI: 1147-577-124 | 2418 | 0.654 | 2
+:argonauts: SEA: 1075-892-129 | 2279 | 0.544 | 3
+:pride: SFP: 1554-1831-261 | 3369 | 0.462 | 5
+:barracuda: TBB: 2199-2197-422 | 4820 | 0.5 | 1
+:renegades: TEX: 2334-1753-317 | 4988 | 0.566 | 3
+:stars: TOR: 2200-2229-389 | 4789 | 0.497 | 2
+:aurora: WPG: 2415-2011-392 | 5222 | 0.542 | 8
+
+
+playoffs
+
+:inferno: ATL: 209-169 | 32-0 | 3
+:platoon: BAP: 273-296 | 58-29 | 5
+:stampede: BUF: 270-234 | 47-16 | 5
+:dragons: CGY: 305-319 | 66-21 | 8
+:syndicate: CHI: 192-167 | 34-8 | 2
+:six: CIN: 1-16 | 4-1 | 0
+:glacierguardians: DEN: 13-20 | 5-0 | 0
+:blizzard: EDM: 407-320 | 63-23 | 12
+:steelhawks: HAM: 389-346 | 66-21 | 9
+:panthers: LAP: 264-274 | 56-27 | 5
+:valkyries: MAD: 1-16 | 4-1 | 0
+:rage: MAN: 205-220 | 44-42 | 4
+:monarchs: MIN: 176-223 | 43-40 | 3
+:patriotes: MTL: 47-57 | 12-16 | 0
+:wolfpack: NEW: 302-300 | 53-25 | 7
+:specters: NOL: 156-190 | 37-5 | 1
+:sound: NSH: 2-12 | 3-2 | 0
+:forge: PHI: 185-151 | 28-0 | 1
+:argonauts: SEA: 162-129 | 24-8 | 3
+:pride: SFP: 153-149 | 28-35 | 4
+:barracuda: TBB: 235-288 | 54-33 | 1
+:renegades: TEX: 260-268 | 56-22 | 6
+:stars: TOR: 184-242 | 53-34 | 1
+:aurora: WPG: 327-312 | 58-29 | 7
+
+
+Made streak
+
+:inferno: ATL: 32 seasons (S56-present)
+:platoon: BAP: 12 seasons (S70-S81)
+:stampede: BUF: 37 seasons (S46-S82)
+:dragons: CGY: 18 seasons (S46-S63)
+:syndicate: CHI: 19 seasons (S59-S77)
+:six: CIN: 3 seasons (S85-present)
+:glacierguardians: DEN: 5 seasons (S83-present)
+:blizzard: EDM: 22 seasons (S44-S65)
+:steelhawks: HAM: 17 seasons (S50-S66)
+:panthers: LAP: 13 seasons (S56-S68)
+:valkyries: MAD: 2 seasons (S83-S84, S86-present)
+:rage: MAN: 10 seasons (S49-S58)
+:monarchs: MIN: 7 seasons (S73-S79)
+:patriotes: MTL: 7 seasons (S66-S72)
+:wolfpack: NEW: 21 seasons (S67-present)
+:specters: NOL: 25 seasons (S63-present)
+:sound: NSH: 3 seasons (S85-present)
+:forge: PHI: 28 seasons (S60-present)
+:argonauts: SEA: 14 seasons (S59-S72)
+:pride: SFP: 11 seasons (S71-S81)
+:barracuda: TBB: 14 seasons (S71-S84)
+:renegades: TEX: 16 seasons (S68-S83)
+:stars: TOR: 9 seasons (S60-S68)
+:aurora: WPG: 21 seasons (S64-S84)
+
+
+Missed streak
+
+N/A
+:platoon: BAP: 8 seasons (S50-S57)
+:stampede: BUF: 8 seasons (S25-S32)
+:dragons: CGY: 5 seasons (S71-S75)
+:syndicate: CHI: 3 seasons (S48-S50)
+:six: CIN: 1 seasons (S84-S84)
+N/A
+:blizzard: EDM: 6 seasons (S76-S81)
+:steelhawks: HAM: 8 seasons (S30-S37)
+:panthers: LAP: 7 seasons (S25-S31)
+:valkyries: MAD: 1 seasons (S85-S85)
+:rage: MAN: 7 seasons (S39-S45)
+:monarchs: MIN: 13 seasons (S47-S59)
+:patriotes: MTL: 8 seasons (S73-S80)
+:wolfpack: NEW: 4 seasons (S10-S13)
+:specters: NOL: 5 seasons (S58-S62)
+:sound: NSH: 2 seasons (S83-S84)
+N/A
+:argonauts: SEA: 5 seasons (S73-S77)
+:pride: SFP: 9 seasons (S25-S33)
+:barracuda: TBB: 7 seasons (S11-S17, S52-S58)
+:renegades: TEX: 7 seasons (S48-S54)
+:stars: TOR: 6 seasons (S38-S43)
+:aurora: WPG: 5 seasons (S29-S33, S59-S63)
