@@ -54,7 +54,7 @@
 #                        league_numeric = 1)
 # team_profile_awards(league_numeric = 0,
 #                     season_numeric = 87)
-# draft_season_summary(league = "SMJHL",
+# draft_season_summary(league = "SHL",
 #                      season = 88)
 # 
 # team_summary_page(league_numeric = 0,
