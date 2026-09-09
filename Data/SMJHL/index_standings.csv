@@ -509,3 +509,19 @@ position,id,name,location,abbreviation,gp,wins,losses,OTL,points,winPercent,ROW,
 14,9,Carolina Kraken,Carolina,CAR,66,23,40,3,49,0.371,21,254,366,-112,19,12,2,4,28,1,2,2,88
 15,17,Great Falls Grizzlies,Great Falls,GFG,66,16,46,4,36,0.273,15,161,326,-165,9,20,4,7,26,0,1,1,88
 16,8,St. Louis Scarecrows,St. Louis,STL,66,16,48,2,34,0.258,15,170,361,-191,12,21,0,4,27,2,1,2,88
+1,0,Anchorage Armada,Anchorage,ANC,66,48,15,3,99,0.75,46,401,211,190,27,4,2,21,11,1,2,2,89
+2,16,Thunder Bay Walleye,Thunder Bay,TBW,66,48,17,1,97,0.735,46,316,228,88,25,7,1,23,10,0,2,1,89
+3,19,San Diego Tidal,San Diego,SDT,66,46,17,3,95,0.72,44,359,236,123,25,8,0,21,9,3,2,3,89
+4,14,Nevada Battleborn,Nevada,NBB,66,45,19,2,92,0.697,43,326,224,102,26,6,1,19,13,1,2,1,89
+5,18,Ottawa Highlanders,Ottawa,OTT,66,42,22,2,86,0.652,40,346,250,96,22,9,2,20,13,0,2,1,89
+6,7,Detroit Falcons,Detroit,DET,66,41,21,4,86,0.652,39,348,251,97,24,8,1,17,13,3,2,1,89
+7,6,Colorado Raptors,Colorado,COL,66,39,22,5,83,0.629,37,309,282,27,21,11,1,18,11,4,2,1,89
+8,5,Yukon Malamutes,Yukon,YUM,66,35,20,11,81,0.614,33,296,239,57,18,12,3,17,8,8,2,5,89
+9,4,Newfoundland Berserkers,Newfoundland,NL,66,34,26,6,74,0.561,34,313,298,15,21,10,2,13,16,4,0,1,89
+10,3,Vancouver Whalers,Vancouver,VAN,66,30,30,6,66,0.5,28,310,336,-26,18,12,3,12,18,3,2,3,89
+11,8,St. Louis Scarecrows,St. Louis,STL,66,25,34,7,57,0.432,22,246,313,-67,17,12,4,8,22,3,3,5,89
+12,1,Kelowna Knights,Kelowna,KEL,66,27,37,2,56,0.424,24,247,307,-60,13,20,0,14,17,2,3,2,89
+13,2,Maine Timber,Maine,MET,66,21,39,6,48,0.364,17,228,341,-113,12,19,2,9,20,4,4,3,89
+14,17,Great Falls Grizzlies,Great Falls,GFG,66,16,42,8,40,0.303,15,176,335,-159,7,20,6,9,22,2,1,4,89
+15,15,Quebec City Citadelles,Quebec City,QCC,66,18,45,3,39,0.295,16,145,315,-170,8,24,1,10,21,2,2,0,89
+16,9,Carolina Kraken,Carolina,CAR,66,13,47,6,32,0.242,10,177,377,-200,9,19,5,4,28,1,3,1,89

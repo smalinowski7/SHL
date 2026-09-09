@@ -28,10 +28,10 @@ names(save_path_character) <- c("shl", "smjhl")
 ### Update and save new season's worth of data ###
 ##################################################
 
-# season_to_add <- 88
-# league_char <- "shl"
-# league_numeric <- 0
-# directory <- "SHL"
+# season_to_add <- 89
+# league_char <- "smjhl"
+# league_numeric <- 1
+# directory <- "SMJHL"
 # 
 # 
 # bs <- file_boxscores(season_to_add, league = league_char, append = T)
