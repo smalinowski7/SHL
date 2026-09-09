@@ -54,8 +54,11 @@
 #                        league_numeric = 1)
 # team_profile_awards(league_numeric = 1,
 #                     season_numeric = 87)
+<<<<<<< HEAD
 # team_profile_records(season = 88, 
 #                      league_numeric = 1)
+=======
+>>>>>>> f3f0c2f794f5b52edadceaa39de1d0b4d6d9a948
 # draft_season_summary(league = "SHL",
 #                      season = 88)
 # 
