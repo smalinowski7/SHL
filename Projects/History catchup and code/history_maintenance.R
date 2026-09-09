@@ -52,9 +52,11 @@
 # 
 # team_profile_standings(season_numeric = 88,
 #                        league_numeric = 1)
-# team_profile_awards(league_numeric = 0,
+# team_profile_awards(league_numeric = 1,
 #                     season_numeric = 87)
-# draft_season_summary(league = "SMJHL",
+# team_profile_records(season = 88, 
+#                      league_numeric = 1)
+# draft_season_summary(league = "SHL",
 #                      season = 88)
 # 
 # team_summary_page(league_numeric = 0,
@@ -663,7 +665,10 @@ team_profile_standings <- function(season_numeric, league_numeric) {
                                  lg_rank == 22 ~ "22nd",
                                  lg_rank == 23 ~ "23rd",
                                  TRUE ~ paste0(lg_rank, "th"))) %>%
-    mutate(conference = ifelse(conference == 1, "Western", "Eastern")) %>%
+    mutate(conference = case_when((league_numeric == 0 & conference == 1) ~ "Western", 
+                                  (league_numeric == 0 & conference == 0) ~ "Eastern",
+                                  (league_numeric == 1 & conference == 0) ~ "Northern",
+                                  (league_numeric == 1 & conference == 1) ~ "Southern")) %>%
     mutate(label = paste0(abbreviation, ": ", wins, "-", losses, "-", OTL, " (", conf_suffix, " in ", conference, ", ", lg_suffix, " in League)")) %>%
     arrange(abbreviation)
   
