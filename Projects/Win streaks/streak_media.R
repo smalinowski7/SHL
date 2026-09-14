@@ -1,11 +1,70 @@
 source("scraper_functions.R")
-
+library(tidyverse)
 
 myrleid <- function(x) {
   rl <- rle(x)$lengths
   rep(seq_along(rl), times = rl)
 }
 
+
+
+# Load the team info and the schedule
+meta <- read_csv("Data/SHL/index_team_meta.csv")
+compiled_schedule <- read_csv("Data/SHL/index_schedule.csv")
+
+
+#add the home/away team information to the compiled schedule
+compiled_schedule_annotated <- compiled_schedule %>%
+  left_join(select(meta, id, abbreviation, season), 
+            by = c("awayTeam" = "id", "season")) %>%
+  rename("away.team" = abbreviation) %>%
+  
+  left_join(select(meta, id, abbreviation, season), 
+            by = c("homeTeam" = "id", "season")) %>%
+  rename("home.team" = abbreviation) %>%
+  
+  #format the date to be an actual date and sort from oldest to newest
+  mutate(date = as.Date(date, format = "%Y-%m-%d")) %>%
+  arrange(date)
+
+
+#format the schedule to a tidy version
+schedule_list_tidy <- list()
+for (teams in meta$abbreviation) {
+  
+  #filter out each team from the schedule to create an individual dataframe
+  temp_schedule <- compiled_schedule_annotated %>%
+    filter(away.team == teams | home.team == teams) %>%
+    mutate(team = teams,
+           opponent = case_when(away.team == teams ~ home.team,
+                                home.team == teams ~ away.team))
+  schedule_list_tidy[[teams]] <- temp_schedule
+}
+compiled_schedule_annotated_tidy <- do.call(rbind, schedule_list_tidy)
+
+
+
+#format the OT column
+formatted_schedule <- compiled_schedule_annotated_tidy %>%
+  mutate(OT = case_when(overtime == "1" ~ TRUE,
+                        shootout == "1" ~ TRUE,
+                        TRUE ~ FALSE),
+         Points = case_when(team == away.team & awayScore > homeScore ~ 2,
+                            team == away.team & awayScore < homeScore & OT == TRUE ~ 1,
+                            team == home.team & homeScore > awayScore ~ 2,
+                            team == home.team & homeScore < awayScore & OT == TRUE ~ 1,
+                            TRUE ~ 0)) %>%
+  group_by(team) %>%
+  mutate(gamenum = as.numeric(row_number()),
+         cumulative_points = cumsum(Points)) %>% 
+  mutate(score_differential = case_when(team == away.team ~ awayScore - homeScore,
+                                        team == home.team ~ homeScore - awayScore))
+
+
+
+
+
+### Find team win streaks
 streaks <- formatted_schedule %>%
   mutate(win = ifelse(score_differential > 0, TRUE, FALSE)) %>%
   group_by(team, season) %>%

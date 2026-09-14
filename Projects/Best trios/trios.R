@@ -22,11 +22,11 @@ last <- function(x) { return( x[length(x)] ) }
 
 # Load the files
 ### Either with an appended scrape, or directly from .csv if it is up-to-date
-team_meta <- index_meta(seasons = 89)
-schedule <- index_schedule(89, append = T)
-combined_player_stats <- index_player_stats(89, append = T)
-combined_goalie_stats <- index_goalie_stats(89, append = T)
-combined_boxscores_all <- file_scoring_summary(seasons = 89, append = T)
+team_meta <- read_csv("Data/SHL/index_team_meta.csv")
+schedule <- read_csv("Data/SHL/index_schedule.csv")
+combined_player_stats <- read_csv("Data/SHL/index_player_stats.csv")
+combined_goalie_stats <- read_csv("Data/SHL/index_goalie_stats.csv")
+combined_boxscores_all <- read_csv("Data/SHL/file_scoring_summary.csv")
 
 
 
@@ -97,7 +97,7 @@ formatted_boxscores <- combined_boxscores %>%
   group_by(goal_id) %>%
   arrange(name) %>%
   mutate(trio = paste(name, collapse = " | ")) %>%
-  left_join(select(team_meta, id, abbreviation), by = c("TeamId" = "id"))
+  left_join(select(team_meta, id, abbreviation, season), by = c("TeamId" = "id", "season"))
 
 
 
@@ -109,13 +109,16 @@ num_team <- formatted_boxscores %>%
   mutate(n_teams = n_distinct(abbreviation),
          total = sum(team_goals)) 
 
+
+
+
+
+
 top20 <- num_team %>%
   group_by(trio) %>%
   summarise(n = total[1]) %>%
   arrange(desc(n)) %>%
   filter(row_number() <= 20)
-
-
 
 
 # top 20 plot

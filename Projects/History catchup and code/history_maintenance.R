@@ -43,31 +43,30 @@
 ### Get from All stars/League
 
 # 
-# team_cup_roster(team_abbr = "SEA",
-#                 cup_season =  88,
-#                 league_numeric = 0)
-# team_cup_awards(team_abbr = "SEA",
+# team_cup_roster(team_abbr = "SDT",
+#                 cup_season =  89,
+#                 league_numeric = 1)
+# team_cup_awards(team_abbr = "ANC",
 #                 season = 88,
-#                 league_numeric = 0)
+#                 league_numeric = 1)
 # 
-# team_profile_standings(season_numeric = 88,
+# team_profile_standings(season_numeric = 89,
 #                        league_numeric = 1)
 # team_profile_awards(league_numeric = 1,
-#                     season_numeric = 87)
-<<<<<<< HEAD
-# team_profile_records(season = 88, 
+#                     season_numeric = 88)
+# 
+# team_profile_records(season = 89,
 #                      league_numeric = 1)
-=======
->>>>>>> f3f0c2f794f5b52edadceaa39de1d0b4d6d9a948
-# draft_season_summary(league = "SHL",
-#                      season = 88)
 # 
-# team_summary_page(league_numeric = 0,
-#                   season_numeric = 87)
+# draft_season_summary(league = "SMJHL",
+#                      season = 89)
+#
+# team_summary_page(league_numeric = 1,
+#                   season_numeric = 88)
 # 
-# shl_all_stars(87)
+# shl_all_stars(88)
 # 
-# smjhl_all_stars(87)
+# smjhl_all_stars(88)
 
 
 library(tidyverse)
@@ -163,10 +162,6 @@ j_ratings <- rbind(j_player_ratings, j_goalie_ratings)
 # Load team all time stats
 shl_team_stats_all_time <- read_csv("Projects/History catchup and code/shl_all_time_results.csv")
 smjhl_team_stats_all_time <- read_csv("Projects/History catchup and code/smjhl_all_time_results.csv")
-
-# Load team season-by-season results
-shl_season_results <- read_csv("Projects/History catchup and code/shl_season_results.csv")
-smjhl_season_results <- read_csv("Projects/History catchup and code/smjhl_season_results.csv")
 
 
 # Load draft data
@@ -822,7 +817,7 @@ team_summary_page <- function(league_numeric, season_numeric) {
       filter(season == max(season))
     team_names <- team_abb_map
     league_char <- "SHL"
-    season_results <- shl_season_results
+    season_results <- shl_team_stats_all_time
     reg_award <- "Presidents Trophy"
     cup <- "Challenge Cup"
     
@@ -838,7 +833,7 @@ team_summary_page <- function(league_numeric, season_numeric) {
       filter(season == max(season))
     team_names <- team_abb_map_j
     league_char <- "SMJHL"
-    season_results <- smjhl_season_results
+    season_results <- smjhl_team_stats_all_time
     reg_award <- "Laurifer Trophy"
     cup <- "Four Star Cup"
   

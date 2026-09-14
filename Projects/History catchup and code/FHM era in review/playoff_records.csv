@@ -1,0 +1,159 @@
+team,opponent,win,loss,pct,total_wins
+New England Wolfpack,Atlanta Inferno,0,2,0,25
+New England Wolfpack,Baltimore Platoon,0,1,0,25
+New England Wolfpack,Buffalo Stampede,5,1,0.8333333333333334,25
+New England Wolfpack,Hamilton Steelhawks,3,1,0.75,25
+New England Wolfpack,Los Angeles Panthers,0,1,0,25
+New England Wolfpack,Montreal Patriotes,4,0,1,25
+New England Wolfpack,Philadelphia Forge,5,2,0.7142857142857143,25
+New England Wolfpack,Tampa Bay Barracuda,3,1,0.75,25
+New England Wolfpack,Texas Renegades,1,0,1,25
+New England Wolfpack,Toronto North Stars,2,2,0.5,25
+New England Wolfpack,Winnipeg Aurora,2,1,0.6666666666666666,25
+Philadelphia Forge,Atlanta Inferno,7,1,0.875,24
+Philadelphia Forge,Baltimore Platoon,2,1,0.6666666666666666,24
+Philadelphia Forge,Buffalo Stampede,1,2,0.3333333333333333,24
+Philadelphia Forge,Edmonton Blizzard,0,1,0,24
+Philadelphia Forge,Hamilton Steelhawks,3,0,1,24
+Philadelphia Forge,Manhattan Rage,3,2,0.6,24
+Philadelphia Forge,New England Wolfpack,2,5,0.2857142857142857,24
+Philadelphia Forge,San Francisco Pride,0,1,0,24
+Philadelphia Forge,Tampa Bay Barracuda,4,1,0.8,24
+Philadelphia Forge,Toronto North Stars,1,1,0.5,24
+Philadelphia Forge,Winnipeg Aurora,1,0,1,24
+Winnipeg Aurora,Buffalo Stampede,0,1,0,23
+Winnipeg Aurora,Chicago Syndicate,5,1,0.8333333333333334,23
+Winnipeg Aurora,Edmonton Blizzard,3,1,0.75,23
+Winnipeg Aurora,Minnesota Monarchs,3,0,1,23
+Winnipeg Aurora,New England Wolfpack,1,2,0.3333333333333333,23
+Winnipeg Aurora,New Orleans Specters,4,2,0.6666666666666666,23
+Winnipeg Aurora,Philadelphia Forge,0,1,0,23
+Winnipeg Aurora,San Francisco Pride,2,5,0.2857142857142857,23
+Winnipeg Aurora,Seattle Argonauts,2,1,0.6666666666666666,23
+Winnipeg Aurora,Texas Renegades,3,1,0.75,23
+San Francisco Pride,Baltimore Platoon,1,0,1,21
+San Francisco Pride,Calgary Dragons,3,0,1,21
+San Francisco Pride,Chicago Syndicate,1,0,1,21
+San Francisco Pride,Edmonton Blizzard,1,0,1,21
+San Francisco Pride,Los Angeles Panthers,3,4,0.42857142857142855,21
+San Francisco Pride,New Orleans Specters,1,0,1,21
+San Francisco Pride,Philadelphia Forge,1,0,1,21
+San Francisco Pride,Seattle Argonauts,1,2,0.3333333333333333,21
+San Francisco Pride,Tampa Bay Barracuda,2,0,1,21
+San Francisco Pride,Texas Renegades,2,1,0.6666666666666666,21
+San Francisco Pride,Winnipeg Aurora,5,2,0.7142857142857143,21
+Atlanta Inferno,Baltimore Platoon,6,3,0.6666666666666666,17
+Atlanta Inferno,Buffalo Stampede,2,0,1,17
+Atlanta Inferno,Hamilton Steelhawks,1,0,1,17
+Atlanta Inferno,Manhattan Rage,0,2,0,17
+Atlanta Inferno,New England Wolfpack,2,0,1,17
+Atlanta Inferno,Philadelphia Forge,1,7,0.125,17
+Atlanta Inferno,Seattle Argonauts,1,0,1,17
+Atlanta Inferno,Tampa Bay Barracuda,3,3,0.5,17
+Atlanta Inferno,Toronto North Stars,1,0,1,17
+Seattle Argonauts,Atlanta Inferno,0,1,0,16
+Seattle Argonauts,Calgary Dragons,4,1,0.8,16
+Seattle Argonauts,Chicago Syndicate,2,0,1,16
+Seattle Argonauts,Edmonton Blizzard,1,1,0.5,16
+Seattle Argonauts,Los Angeles Panthers,2,2,0.5,16
+Seattle Argonauts,Manhattan Rage,2,0,1,16
+Seattle Argonauts,San Francisco Pride,2,1,0.6666666666666666,16
+Seattle Argonauts,Texas Renegades,2,1,0.6666666666666666,16
+Seattle Argonauts,Winnipeg Aurora,1,2,0.3333333333333333,16
+Los Angeles Panthers,Calgary Dragons,3,2,0.6,15
+Los Angeles Panthers,Edmonton Blizzard,1,3,0.25,15
+Los Angeles Panthers,New England Wolfpack,1,0,1,15
+Los Angeles Panthers,New Orleans Specters,0,2,0,15
+Los Angeles Panthers,San Francisco Pride,4,3,0.5714285714285714,15
+Los Angeles Panthers,Seattle Argonauts,2,2,0.5,15
+Los Angeles Panthers,Tampa Bay Barracuda,1,0,1,15
+Los Angeles Panthers,Texas Renegades,3,0,1,15
+Buffalo Stampede,Atlanta Inferno,0,2,0,13
+Buffalo Stampede,Baltimore Platoon,1,1,0.5,13
+Buffalo Stampede,Hamilton Steelhawks,0,3,0,13
+Buffalo Stampede,Manhattan Rage,1,1,0.5,13
+Buffalo Stampede,Montreal Patriotes,2,2,0.5,13
+Buffalo Stampede,New England Wolfpack,1,5,0.16666666666666666,13
+Buffalo Stampede,Philadelphia Forge,2,1,0.6666666666666666,13
+Buffalo Stampede,Toronto North Stars,5,0,1,13
+Buffalo Stampede,Winnipeg Aurora,1,0,1,13
+Texas Renegades,Chicago Syndicate,3,3,0.5,13
+Texas Renegades,Edmonton Blizzard,0,1,0,13
+Texas Renegades,Los Angeles Panthers,0,3,0,13
+Texas Renegades,Minnesota Monarchs,3,0,1,13
+Texas Renegades,New England Wolfpack,0,1,0,13
+Texas Renegades,New Orleans Specters,4,0,1,13
+Texas Renegades,San Francisco Pride,1,2,0.3333333333333333,13
+Texas Renegades,Seattle Argonauts,1,2,0.3333333333333333,13
+Texas Renegades,Winnipeg Aurora,1,3,0.25,13
+Edmonton Blizzard,Calgary Dragons,1,2,0.3333333333333333,11
+Edmonton Blizzard,Los Angeles Panthers,3,1,0.75,11
+Edmonton Blizzard,Minnesota Monarchs,2,0,1,11
+Edmonton Blizzard,New Orleans Specters,1,0,1,11
+Edmonton Blizzard,Philadelphia Forge,1,0,1,11
+Edmonton Blizzard,San Francisco Pride,0,1,0,11
+Edmonton Blizzard,Seattle Argonauts,1,1,0.5,11
+Edmonton Blizzard,Texas Renegades,1,0,1,11
+Edmonton Blizzard,Winnipeg Aurora,1,3,0.25,11
+Tampa Bay Barracuda,Atlanta Inferno,3,3,0.5,11
+Tampa Bay Barracuda,Baltimore Platoon,2,0,1,11
+Tampa Bay Barracuda,Hamilton Steelhawks,1,0,1,11
+Tampa Bay Barracuda,Los Angeles Panthers,0,1,0,11
+Tampa Bay Barracuda,Manhattan Rage,2,0,1,11
+Tampa Bay Barracuda,New England Wolfpack,1,3,0.25,11
+Tampa Bay Barracuda,Philadelphia Forge,1,4,0.2,11
+Tampa Bay Barracuda,San Francisco Pride,0,2,0,11
+Tampa Bay Barracuda,Toronto North Stars,1,1,0.5,11
+Chicago Syndicate,New Orleans Specters,4,3,0.5714285714285714,8
+Chicago Syndicate,San Francisco Pride,0,1,0,8
+Chicago Syndicate,Seattle Argonauts,0,2,0,8
+Chicago Syndicate,Texas Renegades,3,3,0.5,8
+Chicago Syndicate,Winnipeg Aurora,1,5,0.16666666666666666,8
+New Orleans Specters,Chicago Syndicate,3,4,0.42857142857142855,8
+New Orleans Specters,Edmonton Blizzard,0,1,0,8
+New Orleans Specters,Los Angeles Panthers,2,0,1,8
+New Orleans Specters,Minnesota Monarchs,1,2,0.3333333333333333,8
+New Orleans Specters,San Francisco Pride,0,1,0,8
+New Orleans Specters,Texas Renegades,0,4,0,8
+New Orleans Specters,Winnipeg Aurora,2,4,0.3333333333333333,8
+Baltimore Platoon,Atlanta Inferno,3,6,0.3333333333333333,7
+Baltimore Platoon,Buffalo Stampede,1,1,0.5,7
+Baltimore Platoon,Hamilton Steelhawks,1,0,1,7
+Baltimore Platoon,Montreal Patriotes,0,1,0,7
+Baltimore Platoon,New England Wolfpack,1,0,1,7
+Baltimore Platoon,Philadelphia Forge,1,2,0.3333333333333333,7
+Baltimore Platoon,San Francisco Pride,0,1,0,7
+Baltimore Platoon,Tampa Bay Barracuda,0,2,0,7
+Manhattan Rage,Atlanta Inferno,2,0,1,6
+Manhattan Rage,Buffalo Stampede,1,1,0.5,6
+Manhattan Rage,Montreal Patriotes,1,0,1,6
+Manhattan Rage,Philadelphia Forge,2,3,0.4,6
+Manhattan Rage,Seattle Argonauts,0,2,0,6
+Manhattan Rage,Tampa Bay Barracuda,0,2,0,6
+Montreal Patriotes,Baltimore Platoon,1,0,1,6
+Montreal Patriotes,Buffalo Stampede,2,2,0.5,6
+Montreal Patriotes,Hamilton Steelhawks,2,0,1,6
+Montreal Patriotes,Manhattan Rage,0,1,0,6
+Montreal Patriotes,New England Wolfpack,0,4,0,6
+Montreal Patriotes,Toronto North Stars,1,1,0.5,6
+Calgary Dragons,Edmonton Blizzard,2,1,0.6666666666666666,5
+Calgary Dragons,Los Angeles Panthers,2,3,0.4,5
+Calgary Dragons,San Francisco Pride,0,3,0,5
+Calgary Dragons,Seattle Argonauts,1,4,0.2,5
+Toronto North Stars,Atlanta Inferno,0,1,0,5
+Toronto North Stars,Buffalo Stampede,0,5,0,5
+Toronto North Stars,Montreal Patriotes,1,1,0.5,5
+Toronto North Stars,New England Wolfpack,2,2,0.5,5
+Toronto North Stars,Philadelphia Forge,1,1,0.5,5
+Toronto North Stars,Tampa Bay Barracuda,1,1,0.5,5
+Hamilton Steelhawks,Atlanta Inferno,0,1,0,4
+Hamilton Steelhawks,Baltimore Platoon,0,1,0,4
+Hamilton Steelhawks,Buffalo Stampede,3,0,1,4
+Hamilton Steelhawks,Montreal Patriotes,0,2,0,4
+Hamilton Steelhawks,New England Wolfpack,1,3,0.25,4
+Hamilton Steelhawks,Philadelphia Forge,0,3,0,4
+Hamilton Steelhawks,Tampa Bay Barracuda,0,1,0,4
+Minnesota Monarchs,Edmonton Blizzard,0,2,0,2
+Minnesota Monarchs,New Orleans Specters,2,1,0.6666666666666666,2
+Minnesota Monarchs,Texas Renegades,0,3,0,2
+Minnesota Monarchs,Winnipeg Aurora,0,3,0,2

@@ -1,0 +1,4419 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(httr)
+library(jsonlite)
+library(tidyverse)
+library(lubridate)
+library(ggrepel)
+library(gganimate)
+library(gifski)
+library(egg)
+
+select = dplyr::select 
+```
+
+
+
+```{r}
+seasons <- c(66:81)
+
+
+#Get a list of the team meta data
+team_meta <- GET("https://index.simulationhockey.com/api/v1/teams")
+team_meta <- fromJSON(rawToChar(team_meta$content))
+team_meta <- do.call(data.frame, team_meta)
+
+
+
+#create team color vector
+team_colors <- team_meta$colors.primary
+names(team_colors) <- team_meta$name
+
+team_colors_abr <- team_meta$colors.primary
+names(team_colors_abr) <- team_meta$abbreviation
+
+
+
+#Create small data frames of home/away team placeholders to join into the schedule
+away_team_id <- select(team_meta, id, name, abbreviation)
+colnames(away_team_id) <- c("id", "away.team", "away.abbreviation")
+
+home_team_id <- select(team_meta, id, name, abbreviation)
+colnames(home_team_id) <- c("id", "home.team", "home.abbreviation")
+
+
+
+
+
+#scrape team standings
+standings_list <- list()
+for (i in seasons) {
+  standings <-GET("http://index.simulationhockey.com/api/v1/standings", query = list(season = i))
+  standings <- fromJSON(rawToChar(standings$content))
+  standings <- do.call(data.frame, standings)
+  standings$season <- i
+  standings_list[[i]] <- standings
+}
+
+compiled_standings <- do.call(rbind, standings_list)
+compiled_standings$abbreviation[compiled_standings$abbreviation == "WKP"] <- "BAP"
+
+
+
+
+#Scrape the schedule and merge for all seasons in the league
+schedule_list <- list()
+for (i in seasons) {
+  schedule_url <-GET("http://index.simulationhockey.com/api/v1/schedule", query = list(season = i))
+  schedule_url <- fromJSON(rawToChar(schedule_url$content))
+  schedule_list[[i]] <- schedule_url
+}
+
+compiled_schedule <- do.call(rbind, schedule_list)
+
+
+
+#add the home/away team information to the compiled schedule
+compiled_schedule_annotated <- compiled_schedule %>%
+  left_join(away_team_id, by = c("awayTeam" = "id")) %>%
+  left_join(home_team_id, by = c("homeTeam" = "id")) %>%
+  
+  #format the date to be an actual date and sort from oldest to newest
+  mutate(date = as.Date(date, format = "%Y-%m-%d")) %>%
+  arrange(date)
+
+
+#format the schedule to a tidy version
+schedule_list_tidy <- list()
+for (teams in team_meta$name) {
+  
+  #filter out each team from the schedule to create an individual dataframe
+  temp_schedule <- compiled_schedule_annotated %>%
+    filter(away.team == teams | home.team == teams) %>%
+    mutate(team = teams,
+           opponent = case_when(away.team == teams ~ home.team,
+                                home.team == teams ~ away.team))
+  schedule_list_tidy[[teams]] <- temp_schedule
+}
+compiled_schedule_annotated_tidy <- do.call(rbind, schedule_list_tidy)
+
+
+
+#format the OT column
+formatted_schedule <- compiled_schedule_annotated_tidy %>%
+  mutate(OT = case_when(overtime == "1" ~ TRUE,
+                        shootout == "1" ~ TRUE,
+                        TRUE ~ FALSE),
+         Points = case_when(team == away.team & awayScore > homeScore ~ 2,
+                            team == away.team & awayScore < homeScore & OT == TRUE ~ 1,
+                            team == home.team & homeScore > awayScore ~ 2,
+                            team == home.team & homeScore < awayScore & OT == TRUE ~ 1,
+                            TRUE ~ 0)) %>%
+  group_by(team) %>%
+  mutate(gamenum = as.numeric(row_number()),
+         cumulative_points = cumsum(Points)) %>% 
+  mutate(score_differential = case_when(team == away.team ~ awayScore - homeScore,
+                                         team == home.team ~ homeScore - awayScore))
+
+
+
+#scrape player stats
+player_list <- list()
+for (i in seasons) {
+  player_stats <- GET("http://index.simulationhockey.com/api/v1/players/stats", query = list(season = i))
+  player_stats <- fromJSON(rawToChar(player_stats$content))
+  player_stats <- do.call(data.frame, player_stats)
+  player_list[[i]] <- player_stats
+}
+combined_player_stats <- do.call(rbind, player_list)
+
+#change WKP players to BAP
+combined_player_stats$team[combined_player_stats$team == "WKP"] <- "BAP"
+
+#make positions
+combined_player_stats$pos <- case_when(combined_player_stats$position %in% c("LW", "C", "RW") ~ "Forward",
+                                       combined_player_stats$position %in% c("LD", "RD") ~ "Defense")
+combined_player_stats$pos <- factor(combined_player_stats$pos, levels = c("Forward", "Defense"))
+
+#make fantasy
+combined_player_stats <- combined_player_stats %>%
+  mutate(fantasy = case_when(position %in% c("LW", "C", "RW") ~ 4*goals + 3*assists + .3*shotsOnGoal + .4*hits + .6*shotsBlocked,
+                              position %in% c("LD", "RD") ~ 4*goals + 3*assists + .3*shotsOnGoal + .4*hits + .9*shotsBlocked)) 
+
+
+#scrape goalie stats
+goalie_list <- list()
+for (i in seasons) {
+  goalie_stats <- GET("https://index.simulationhockey.com/api/v1/goalies/stats", query = list(season = i))
+  goalie_stats <- fromJSON(rawToChar(goalie_stats$content))
+  goalie_list[[i]] <- goalie_stats
+}
+combined_goalie_stats <- do.call(rbind, goalie_list)
+
+
+#CHange WKP players to BAP
+combined_goalie_stats$team[combined_goalie_stats$team == "WKP"] <- "BAP"
+
+
+
+#########################################################################################
+#                         REPEAT EVERYTHING FOR PLAYOFFS                                #
+#########################################################################################
+
+
+
+
+
+#Scrape the schedule and merge for all seasons in the league
+schedule_list_playoffs <- list()
+for (i in seasons) {
+  schedule_url_playoffs <-GET("http://index.simulationhockey.com/api/v1/schedule", query = list(season = i, type = "playoffs"))
+  schedule_url_playoffs <- fromJSON(rawToChar(schedule_url_playoffs$content))
+  schedule_list_playoffs[[i]] <- schedule_url_playoffs
+}
+
+compiled_schedule_playoffs <- do.call(rbind, schedule_list_playoffs)
+
+
+
+#add the home/away team information to the compiled schedule
+compiled_schedule_annotated_playoffs <- compiled_schedule_playoffs %>%
+  left_join(away_team_id, by = c("awayTeam" = "id")) %>%
+  left_join(home_team_id, by = c("homeTeam" = "id")) %>%
+  
+  #format the date to be an actual date and sort from oldest to newest
+  mutate(date = as.Date(date, format = "%Y-%m-%d")) %>%
+  arrange(date)
+
+
+#format the schedule to a tidy version
+schedule_list_tidy_playoffs <- list()
+for (teams in team_meta$name) {
+  
+  #filter out each team from the schedule to create an individual dataframe
+  temp_schedule_playoffs <- compiled_schedule_annotated_playoffs %>%
+    filter(away.team == teams | home.team == teams) %>%
+    mutate(team = teams,
+           opponent = case_when(away.team == teams ~ home.team,
+                                home.team == teams ~ away.team))
+  schedule_list_tidy_playoffs[[teams]] <- temp_schedule_playoffs
+}
+compiled_schedule_annotated_tidy_playoffs <- do.call(rbind, schedule_list_tidy_playoffs)
+
+
+
+#format the OT column
+formatted_schedule_playoffs <- compiled_schedule_annotated_tidy_playoffs %>%
+  filter(type == "Playoffs") %>%
+  mutate(OT = case_when(overtime == "1" ~ TRUE,
+                        shootout == "1" ~ TRUE,
+                        TRUE ~ FALSE),
+         Points = case_when(team == away.team & awayScore > homeScore ~ 2,
+                            team == away.team & awayScore < homeScore & OT == TRUE ~ 1,
+                            team == home.team & homeScore > awayScore ~ 2,
+                            team == home.team & homeScore < awayScore & OT == TRUE ~ 1,
+                            TRUE ~ 0)) %>%
+  group_by(team) %>%
+  mutate(gamenum = as.numeric(row_number()),
+         cumulative_points = cumsum(Points)) %>% 
+  mutate(score_differential = case_when(team == away.team ~ awayScore - homeScore,
+                                         team == home.team ~ homeScore - awayScore)) 
+
+
+
+#scrape player stats
+player_list_playoffs <- list()
+for (i in seasons) {
+  player_stats_playoffs <- GET("http://index.simulationhockey.com/api/v1/players/stats", query = list(season = i, type = "playoffs"))
+  player_stats_playoffs <- fromJSON(rawToChar(player_stats_playoffs$content))
+  player_stats_playoffs <- do.call(data.frame, player_stats_playoffs)
+  player_list_playoffs[[i]] <- player_stats_playoffs
+}
+combined_player_stats_playoffs <- do.call(rbind, player_list_playoffs)
+
+#change WKP players to BAP
+combined_player_stats_playoffs$team[combined_player_stats_playoffs$team == "WKP"] <- "BAP"
+combined_player_stats_playoffs$pos <- case_when(combined_player_stats_playoffs$position %in% c("LW", "C", "RW") ~ "Forward",
+                                       combined_player_stats_playoffs$position %in% c("LD", "RD") ~ "Defense")
+combined_player_stats_playoffs$pos <- factor(combined_player_stats_playoffs$pos, levels = c("Forward", "Defense"))
+
+
+#scrape goalie stats
+goalie_list_playoffs <- list()
+for (i in seasons) {
+  goalie_stats_playoffs <- GET("https://index.simulationhockey.com/api/v1/goalies/stats", query = list(season = i, type = "playoffs"))
+  goalie_stats_playoffs <- fromJSON(rawToChar(goalie_stats_playoffs$content))
+  goalie_list_playoffs[[i]] <- goalie_stats_playoffs
+}
+combined_goalie_stats_playoffs <- do.call(rbind, goalie_list_playoffs)
+
+
+#CHange WKP players to BAP
+combined_goalie_stats_playoffs$team[combined_goalie_stats_playoffs$team == "WKP"] <- "BAP"
+```
+
+
+
+
+```{r}
+###########################################################################################
+#                               Team points relative                                      #
+###########################################################################################
+
+
+league_average_points <- sum(formatted_schedule$Points)/nrow(formatted_schedule)
+
+### Establish labels for last point on the graph
+formatted_schedule_labeled <- formatted_schedule %>%
+  group_by(team) %>%
+  mutate(use_label = gamenum == max(gamenum),
+         average_points = gamenum*league_average_points,
+         
+         relative_points = cumulative_points - average_points,
+         label = case_when(use_label == TRUE ~ team,
+                           TRUE ~ NA_character_)) %>%
+  
+  left_join(select(team_meta, name, conference, division), by = c("team" = "name"))
+
+
+  
+
+
+
+# Grouped by division
+ggplot(formatted_schedule_labeled, aes(x = gamenum, y = relative_points, col = team, label = label)) +
+  geom_line(size = 1.25, show.legend = F, alpha = .75) +
+  scale_color_manual(values = team_colors) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  theme_bw(base_size = 16) +
+  theme(strip.background = element_blank(),
+        legend.position = "bottom",
+        panel.grid = element_blank(),
+        strip.text = element_blank()) +
+  facet_grid(conference ~ division) +
+  labs(x = "\nGame number", y = "Points above league average\n", color = NULL) +
+  geom_text_repel(show.legend = FALSE) +
+  geom_vline(xintercept = c(0,66, 132, 198, 264, 330, 396, 462, 528, 594, 660, 726, 792, 858, 924, 990, 1056), linetype = "dashed", alpha = .5) +
+  scale_x_continuous(breaks = (c(0,66, 132, 198, 264, 330, 396, 462, 528, 594, 660, 726, 792, 858, 924, 990, 1056)) - 66, 
+                     labels = c("S65", "S66", "S67", "S68", "S69", "S70", "S71", "S72", "S73", "S74", "S75", "S76", "S77", "S78", "S79", "S80", "S81"))
+
+ggsave("standings_division.jpg", width = 13, height = 8.5, dpi = 300)
+
+
+
+
+# All teams merged
+ggplot(formatted_schedule_labeled, aes(x = gamenum, y = relative_points, col = team, label = label)) +
+  geom_line(size = 1.25, show.legend = F, alpha = .75) +
+  scale_color_manual(values = team_colors) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  theme_bw(base_size = 16) +
+  theme(strip.background = element_blank(),
+        legend.position = "bottom",
+        panel.grid = element_blank()) +
+  labs(x = "\nGame number", y = "Points above league average\n", color = NULL) +
+  geom_text_repel(show.legend = FALSE) +
+  geom_vline(xintercept = c(0,66, 132, 198, 264, 330, 396, 462, 528, 594, 660, 726, 792, 858, 924, 990, 1056), linetype = "dashed", alpha = .5) +
+  scale_x_continuous(breaks = (c(0,66, 132, 198, 264, 330, 396, 462, 528, 594, 660, 726, 792, 858, 924, 990, 1056)) - 66, 
+                     labels = c("S65", "S66", "S67", "S68", "S69", "S70", "S71", "S72", "S73", "S74", "S75", "S76", "S77", "S78", "S79", "S80", "S81"))
+ggsave("standings_league.jpg", width = 13, height = 8.5, dpi = 300)
+
+
+
+
+
+
+
+
+#version with expansion teams starting at game 0
+#format the OT column
+formatted_schedule2 <- compiled_schedule_annotated_tidy %>%
+  mutate(OT = case_when(overtime == "1" ~ TRUE,
+                        shootout == "1" ~ TRUE,
+                        TRUE ~ FALSE),
+         Points = case_when(team == away.team & awayScore > homeScore ~ 2,
+                            team == away.team & awayScore < homeScore & OT == TRUE ~ 1,
+                            team == home.team & homeScore > awayScore ~ 2,
+                            team == home.team & homeScore < awayScore & OT == TRUE ~ 1,
+                            TRUE ~ 0)) %>%
+  group_by(team, season) %>%
+  mutate(gamenum = as.numeric(row_number()),
+         cumulative_points = cumsum(Points)) %>% 
+  mutate(score_differential = case_when(team == away.team ~ awayScore - homeScore,
+                                         team == home.team ~ homeScore - awayScore))
+
+
+### Establish labels for last point on the graph
+formatted_schedule_labeled2 <- formatted_schedule2 %>%
+  left_join(select(team_meta, name, abbreviation), by = c("team" = "name")) %>%
+  group_by(team) %>%
+  mutate(use_label = gamenum == max(gamenum),
+         average_points = gamenum*league_average_points,
+         
+         relative_points = cumulative_points - average_points,
+         label = case_when(use_label == TRUE ~ abbreviation,
+                           TRUE ~ NA_character_)) 
+  
+
+
+ggplot(formatted_schedule_labeled2, aes(x = gamenum, y = relative_points, col = team, label = label)) +
+  geom_line(size = 1.25, show.legend = F, alpha = .75) +
+  scale_color_manual(values = team_colors) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  theme_bw(base_size = 16) +
+  theme(strip.background = element_blank(),
+        legend.position = "bottom",
+        panel.grid = element_blank()) +
+  facet_wrap(.~ season, nrow = 4) +
+  labs(x = "\nNumber of FHM seasons", y = "Points above league average\n", color = NULL) +
+  geom_text_repel(show.legend = FALSE, force =1, hjust = 1, direction = "y", nudge_x = 10, size = 3)
+ggsave("standings_season.jpg", width = 13, height = 14, dpi = 300)
+
+```
+
+
+
+
+```{r}
+#####################################################################
+#                       Goal differential chart                     #
+#####################################################################
+
+ggplot(formatted_schedule, aes(x = gamenum, y = score_differential, fill = score_differential)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(.~ team, ncol = 3) +
+  scale_fill_gradient2(low = "red", mid = "grey80", high = "springgreen4", midpoint = 0) +
+  theme_bw(base_size = 16) +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 16)) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(x = "\nGame number", y = "Goal differential\n")
+ggsave("goal_diff.jpg", width = 14, height = 11, dpi = 300)
+```
+
+
+
+
+```{r}
+
+team_gf <- compiled_standings %>%
+  group_by(id) %>%
+  summarise(team = abbreviation[which(season == max(seasons))], gf = sum(goalsFor)/sum(gp)) %>%
+  arrange(desc(gf)) %>%
+  mutate(team = factor(team, levels = team))
+  
+
+team_ga <- compiled_standings %>%
+  group_by(id) %>%
+  summarise(team = abbreviation[which(season == max(seasons))], ga = sum(goalsAgainst)/sum(gp)) %>%
+  arrange(desc(ga)) %>%
+  mutate(team = factor(team, levels = team))
+
+
+
+scoring <- left_join(team_gf, team_ga)
+
+
+
+
+gf <- ggplot(team_gf, aes(x = fct_rev(team), y = gf, fill = team)) +
+  geom_col(position = "stack", show.legend = F) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  theme_bw(base_size = 16) +
+  theme(axis.ticks.x = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.grid.major.y = element_blank()) +
+  scale_fill_manual(values = team_colors_abr) +
+  labs(x = NULL, y = "Goals per game") +
+  coord_flip()
+
+
+
+ga <- ggplot(team_ga, aes(x = fct_rev(team), y = ga, fill = team)) +
+  geom_col(alpha = .8, show.legend = F) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  theme_bw(base_size = 16) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
+        axis.ticks.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.major.y = element_blank()) +
+  scale_fill_manual(values = team_colors_abr) +
+  labs(y = "Team GAA\n", x = NULL) 
+  
+
+
+
+p1 <- ggplot(scoring, aes(x = ga, y = gf, fill = team, label = team)) +
+  geom_point(show.legend = F, size = 3,
+             shape = 21, 
+             col = "black") +
+  theme_bw(base_size = 16) +
+  scale_fill_manual(values = team_colors_abr) +
+  geom_text_repel(show.legend = F) +
+  #geom_hline(yintercept = median(scoring$goals), linetype = "dashed") +
+  #geom_vline(xintercept = median(scoring$GA), linetype = "dashed") +
+  labs(y = "Goals per game\n", x = "Team GAA")
+  
+
+
+
+test <- grid.arrange(ga, p1, gf,
+             widths = c(2,1,1,.1),
+             layout_matrix = rbind(c(1,1,NA, NA),
+                                   c(2,2,3, NA),
+                                   c(2,2,3, NA)))
+ggsave(plot = test, filename = "regular_season_scoring.jpg", width = 7.25, height = 6.5, dpi = 300)
+
+write_csv(scoring, "scoring.csv")
+```
+
+
+
+
+
+```{r}
+#####################################################################
+#                       Animated team corsi chart                   #
+#####################################################################
+
+team_corsi_animated <- combined_player_stats %>%
+  mutate(CF_game = advancedStats.CF/gamesPlayed,
+         CA_game = advancedStats.CA/gamesPlayed) %>%
+  group_by(team, season) %>%
+  summarise(CF = sum(CF_game)/5,
+            CA = sum(CA_game)/5)
+
+
+league_average_corsi <- combined_player_stats %>%
+  mutate(CF_game = advancedStats.CF/gamesPlayed,
+         CA_game = advancedStats.CA/gamesPlayed) %>%
+  group_by(season) %>%
+  mutate(num_teams = length(unique(team)),
+         team_games = num_teams*5,
+         CF_game = CF_game/team_games,
+         CA_game = CA_game/team_games) %>%
+  summarise(CF = sum(CF_game),
+            CA = sum(CA_game))
+
+
+save_pct_season <- combined_goalie_stats %>% 
+  group_by(team, season) %>%
+  summarise(sav = sum(saves)/sum(shotsAgainst))
+
+
+sht_cf_season <- combined_player_stats %>%
+  group_by(team, season) %>%
+  summarise(sht = sum(goals)/sum(shotsOnGoal),
+            cf = sum(advancedStats.CF)/(sum(advancedStats.CF) + sum(advancedStats.CA)))
+
+
+team_pdo <- left_join(save_pct_season, sht_cf_season) %>%
+  mutate(PDO = 100*(sav + sht)) %>%
+  select(team, season, PDO)
+
+
+team_corsi_animated <- left_join(team_corsi_animated, team_pdo)
+  
+
+
+corsi_static <- ggplot(team_corsi_animated, aes(x = CF, y = CA, label = team)) +
+  geom_point(aes(fill = PDO), 
+             show.legend = F, 
+             size = 4,
+             col = "black",
+             shape = 21) +
+  scale_fill_gradient2(high = "red", mid = "grey75", low = "blue", midpoint = 100) +
+  geom_text_repel(seed = 69, max.overlaps = 1000, show.legend = F, box.padding = 1.0) +
+  theme_bw(base_size = 16) +
+  geom_hline(data = league_average_corsi, aes(yintercept = CA), linetype = "dashed") +
+  geom_vline(data = league_average_corsi, aes(xintercept = CF), linetype = "dashed") +
+  labs(x = "CF (per game)", y = "CA (per game)")
+
+
+anim = corsi_static + transition_states(season, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = 'SHL corsi breakdown : {closest_state}',
+       subtitle  =  "By season")
+
+
+
+animate(anim, 200, fps = 30,  duration = length(seasons)*1.5, width = 750, height = 500,
+        renderer = gifski_renderer("corsi_chart.gif"))
+
+
+write_csv(team_corsi_animated, "team_corsi.csv")
+```
+
+
+
+
+```{r}
+#####################################################################
+#                       Animated CF vs. PDO chart                   #
+#####################################################################
+
+save_pct_season <- combined_goalie_stats %>% 
+  group_by(team, season) %>%
+  summarise(sav = sum(saves)/sum(shotsAgainst))
+
+
+sht_cf_season <- combined_player_stats %>%
+  group_by(team, season) %>%
+  summarise(sht = sum(goals)/sum(shotsOnGoal),
+            cf = sum(advancedStats.CF)/(sum(advancedStats.CF) + sum(advancedStats.CA)))
+
+
+cf_pdo_animated <- left_join(save_pct_season, sht_cf_season) %>%
+  mutate(PDO = 100*(sav + sht))
+
+
+
+cf_pdo_static <- ggplot(cf_pdo_animated, aes(x = cf, y = PDO, fill = team, label = team)) +
+  geom_point(show.legend = F, size = 4,
+             shape = 21,
+             col = "black") +
+  scale_fill_manual(values = team_colors_abr) +
+  geom_text_repel(seed = 69, box.padding = 1.0, show.legend = F, max.overlaps = 1000) +
+  theme_bw(base_size = 16) +
+  theme(panel.grid.minor = element_blank()) +
+  geom_hline(yintercept = 100, linetype = "dashed") +
+  geom_vline(xintercept = .5, linetype = "dashed") +
+  annotate("text", label = "Lucky", x =.2, y = 102) +
+  annotate("text", label = "Bad", x =.2, y = 97.5) +
+  annotate("text", label = "Good", x =.65, y = 102) +
+  annotate("text", label = "Unlucky", x =.65, y = 97.5) +
+  labs(x = "CF (per game)")
+  
+  
+anim = cf_pdo_static + transition_states(season, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = 'SHL CF vs. PDOs : {closest_state}',
+       subtitle  =  "By season")
+
+
+
+animate(anim, 200, fps = 30,  duration = length(seasons)*1.5, width = 750, height = 500,
+        renderer = gifski_renderer("CF_pdo.gif"))
+
+write_csv(cf_pdo_animated, "cf_vs_pdo.csv")
+
+```
+
+
+
+```{r}
+#####################################################################
+#                              GF vs GA                             #
+#####################################################################
+
+
+team_scoring <- compiled_standings %>%
+  mutate(gf_game = goalsFor/gp,
+         ga_game = goalsAgainst/gp)
+
+league_average_scoring <- compiled_standings %>%
+  group_by(season) %>%
+  summarise(gf = sum(goalsFor)/sum(gp),
+            ga = sum(goalsAgainst)/sum(gp))
+
+
+goals_static <- ggplot(team_scoring, aes(x = gf_game, y = ga_game, fill = abbreviation, label = abbreviation)) +
+  geom_point(show.legend = F, 
+             size = 4,
+             shape = 21,
+             col = "black") +
+  scale_fill_manual(values = team_colors_abr) +
+  geom_text_repel(seed = 69, box.padding = 1.0, show.legend = F, max.overlaps = 1000) +
+  theme_bw(base_size = 16) +
+  geom_hline(data = league_average_scoring, aes(yintercept = ga), linetype = "dashed") +
+  geom_vline(data = league_average_scoring, aes(xintercept = gf), linetype = "dashed") +
+  labs(x = "Goals for (per game)", y = "Goals against (per game)")
+
+
+anim = goals_static + transition_states(season, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = 'SHL team scoring breakdown : {closest_state}',
+       subtitle  =  "By season")
+
+
+
+animate(anim, 200, fps = 30,  duration = length(seasons)*1.5, width = 750, height = 500,
+        renderer = gifski_renderer("scoring.gif"))
+
+write_csv(team_scoring, "team_scoring.csv")
+```
+
+
+
+
+
+
+
+```{r}
+#####################################################################
+#                         Inter-team records                        #
+#####################################################################
+
+inter_team_record <- formatted_schedule %>%
+  mutate(win = Points == 2,
+         loss = Points == 0,
+         otl = Points == 1) %>%
+  group_by(team, opponent) %>%
+  summarise(win = sum(win),
+            loss = sum(loss),
+            otl = sum(otl),
+            diff = sum(score_differential),
+            diff_game = diff/(win+loss+otl)) %>%
+  mutate(point_total = 2*(win+loss+otl),
+         p_pct = (2*win + otl)/point_total) %>%
+  arrange(team, desc(p_pct))
+
+
+#create dummy team vs. team NA dataframe for heatmap graph
+dummy_record_df <- data.frame(team = team_meta$name,
+                              opponent = team_meta$name,
+                              p_pct = NA)
+
+
+team_record_heatmap <- bind_rows(inter_team_record, dummy_record_df) 
+team_record_heatmap <- team_record_heatmap %>%
+  group_by(team) %>%
+  mutate(tot_points = 2*sum(win, na.rm = T) + sum(otl, na.rm = T),
+         points_avial = 2*(sum(win, na.rm = T) + sum(loss, na.rm = T) + sum(otl, na.rm = T)),
+         best_team = tot_points/points_avial) %>%
+  ungroup() %>%
+  arrange(desc(best_team)) %>%
+  mutate(team = factor(team, levels = unique(team)),
+         opponent = factor(opponent, levels = unique(team)))
+
+ggplot(team_record_heatmap, aes(y = fct_rev(team), x = (opponent), fill = p_pct)) +
+  geom_tile(col = "black") +
+  scale_fill_gradient2(high = "red", mid = "white", low = "blue", midpoint = .5, na.value = "black") +
+  scale_x_discrete(position = "top") +
+  coord_equal() +
+  labs(x = NULL, y = NULL, fill = "Points percentage") +
+  theme(axis.title.x = element_blank(), 
+        axis.text.x.top = element_text(angle = 90, hjust = 0, vjust = .5), 
+        plot.caption = element_text(size = 14, hjust = 0.5)) 
+ggsave("team_heatmap.jpg", width = 8, height = 6, dpi = 300)
+
+write_csv(team_record_heatmap, "team_records.csv")
+    
+```
+
+
+
+
+
+
+```{r}
+#####################################################
+#                overall team records               #
+#####################################################
+
+
+overall_team_record <- formatted_schedule %>%
+  mutate(win = Points == 2,
+         loss = Points == 0,
+         otl = Points == 1) %>%
+  group_by(team) %>%
+  summarise(win = sum(win),
+            loss = sum(loss),
+            otl = sum(otl),
+            goal_diff = sum(score_differential)) %>%
+  mutate(p_pct = (2*win + otl)/(2*(win+loss+otl))) %>%
+  arrange(desc(p_pct))
+
+write_csv(overall_team_record, "team_record.csv")
+
+
+
+```
+
+
+
+
+```{r}
+########################## Shootout records #######################
+
+shootout_record <- compiled_standings %>%
+  group_by(abbreviation) %>%
+  summarise(sow = sum(shootout.wins),
+            sol = sum(shootout.losses),
+            so_perc = sow/(sow+sol)) %>%
+  arrange(desc(so_perc))
+
+write_csv(shootout_record, "shootout_record.csv")
+```
+
+
+
+################################################################################
+#                 Cumulative career FHM leaders                                #
+################################################################################
+
+
+
+
+
+```{r}
+
+#####################################################################
+#                         team points over time                      #
+#####################################################################
+
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_points <- combined_player_stats %>% 
+  arrange(season) %>%
+  group_by(id, pos) %>%
+  mutate(cum_points = cumsum(points),
+         label = as.character(cum_points)) %>%
+  arrange(desc(cum_points)) %>%
+  ungroup()
+
+
+#iterate through all the seasons to build top 10 per season list
+points_list <- list()
+for (i in max(cum_points$season):min(cum_points$season)) {
+ 
+   temp_points <- cum_points %>%
+    filter(season <= i) %>%
+    group_by(pos, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(cum_points == max(cum_points)) %>%
+    group_by(pos) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  points_list[[i]] <- temp_points
+}
+
+  
+
+points_over_time <- do.call(rbind, points_list)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+points_insert_df <- data.frame(season_label = 65,
+                               cum_points = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL",
+                               
+                               #same with pos
+                               pos = "Forward")
+
+#create a dummy df for two seasons later to hold the final results
+points_insert_after1 <- filter(points_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+points_insert_after2 <- filter(points_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+
+#bind top 10 lists with dummy df
+points_over_time <- bind_rows(points_over_time, points_insert_df, points_insert_after1, points_insert_after2) %>%
+  arrange(season_label) %>%
+  mutate(pos = factor(pos, levels = c("Forward", "Defense")))
+
+
+static_points <- ggplot(points_over_time, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_points/2,
+                height = cum_points,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_points,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  facet_wrap(.~ pos) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14.5, "cm"),
+        panel.spacing = unit(12.5, "cm"),
+        strip.text = element_text(size = 30)) +
+  scale_fill_manual(values = team_colors_abr)
+
+
+
+#animate active skaters 
+
+anim_active = static_points + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career points leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM points")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons)+2)*1.5, width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("C://Users/Seth/Desktop/cumpoints.gif", sep = "")))
+
+
+write_csv(points_over_time, "top10_points.csv")
+```
+
+
+
+
+
+
+```{r}
+
+#####################################################################
+#                         team goals over time                      #
+#####################################################################
+
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_goals <- combined_player_stats %>% 
+  arrange(season) %>%
+  group_by(id, pos) %>%
+  mutate(cum_goals = cumsum(goals),
+         label = as.character(cum_goals)) %>%
+  arrange(desc(cum_goals)) %>%
+  ungroup()
+
+
+#iterate through all the seasons to build top 10 per season list
+goals_list <- list()
+for (i in max(cum_goals$season):min(cum_goals$season)) {
+ 
+   temp_goals <- cum_goals %>%
+    filter(season <= i) %>%
+    group_by(pos, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(cum_goals == max(cum_goals)) %>%
+    group_by(pos) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  goals_list[[i]] <- temp_goals
+}
+
+  
+
+goals_over_time <- do.call(rbind, goals_list)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+goals_insert_df <- data.frame(season_label = 65,
+                               cum_goals = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL",
+                               
+                               #same with pos
+                               pos = "Forward")
+
+
+#create a dummy df for two seasons later to hold the final results
+goals_insert_after1 <- filter(goals_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+goals_insert_after2 <- filter(goals_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+
+#bind top 10 lists with dummy df
+goals_over_time <- bind_rows(goals_over_time, goals_insert_df, goals_insert_after1, goals_insert_after2) %>%
+  arrange(season_label) %>%
+  mutate(pos = factor(pos, levels = c("Forward", "Defense")))
+
+
+static_goals <- ggplot(goals_over_time, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_goals/2,
+                height = cum_goals,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_goals,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  facet_wrap(.~ pos) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14.5, "cm"),
+        panel.spacing = unit(12.5, "cm"),
+        strip.text = element_text(size = 30)) +
+  scale_fill_manual(values = team_colors_abr)
+
+
+
+#animate active skaters 
+
+anim_active = static_goals + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career goals leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM goals")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons) + 2)*1.5, width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("C://Users/Seth/Desktop/cumgoals.gif", sep = "")))
+
+write_csv(goals_over_time, "top10_goals.csv")
+```
+
+
+
+
+
+
+```{r}
+
+#####################################################################
+#                         team assists over time                    #
+#####################################################################
+
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_assists <- combined_player_stats %>% 
+  arrange(season) %>%
+  group_by(id, pos) %>%
+  mutate(cum_assists = cumsum(assists),
+         label = as.character(cum_assists)) %>%
+  arrange(desc(cum_assists)) %>%
+  ungroup()
+
+
+#iterate through all the seasons to build top 10 per season list
+assists_list <- list()
+for (i in max(cum_assists$season):min(cum_assists$season)) {
+ 
+   temp_assists <- cum_assists %>%
+    filter(season <= i) %>%
+    group_by(pos, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(cum_assists == max(cum_assists)) %>%
+    group_by(pos) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  assists_list[[i]] <- temp_assists
+}
+
+  
+
+assists_over_time <- do.call(rbind, assists_list)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+assists_insert_df <- data.frame(season_label = 65,
+                               cum_assists = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL",
+                               
+                               #same with pos
+                               pos = "Forward")
+
+
+#create a dummy df for two seasons later to hold the final results
+assists_insert_after1 <- filter(assists_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+assists_insert_after2 <- filter(assists_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+
+#bind top 10 lists with dummy df
+assists_over_time <- bind_rows(assists_over_time, assists_insert_df, assists_insert_after1, assists_insert_after2) %>%
+  arrange(season_label) %>%
+  mutate(pos = factor(pos, levels = c("Forward", "Defense")))
+
+
+static_assists <- ggplot(assists_over_time, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_assists/2,
+                height = cum_assists,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_assists,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  facet_wrap(.~ pos) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14.5, "cm"),
+        panel.spacing = unit(12.5, "cm"),
+        strip.text = element_text(size = 30)) +
+  scale_fill_manual(values = team_colors_abr)
+
+
+
+#animate active skaters 
+
+anim_active = static_assists + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career assists leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM assists")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons) + 2)*1.5, width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("C://Users/Seth/Desktop/cumassists.gif", sep = "")))
+
+
+write_csv(assists_over_time, "top10_assists.csv")
+```
+
+
+
+
+
+```{r}
+
+#####################################################################
+#                         team hits over time                       #
+#####################################################################
+
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_hits <- combined_player_stats %>% 
+  arrange(season) %>%
+  group_by(id, pos) %>%
+  mutate(cum_hits = cumsum(hits),
+         label = as.character(cum_hits)) %>%
+  arrange(desc(cum_hits)) %>%
+  ungroup()
+
+
+#iterate through all the seasons to build top 10 per season list
+hits_list <- list()
+for (i in max(cum_hits$season):min(cum_hits$season)) {
+ 
+   temp_hits <- cum_hits %>%
+    filter(season <= i) %>%
+    group_by(pos, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(cum_hits == max(cum_hits)) %>%
+    group_by(pos) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  hits_list[[i]] <- temp_hits
+}
+
+  
+
+hits_over_time <- do.call(rbind, hits_list)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+hits_insert_df <- data.frame(season_label = 65,
+                               cum_hits = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL",
+                               
+                               #same with pos
+                               pos = "Forward")
+
+
+#create a dummy df for two seasons later to hold the final results
+hits_insert_after1 <- filter(hits_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+hits_insert_after2 <- filter(hits_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+
+#bind top 10 lists with dummy df
+hits_over_time <- bind_rows(hits_over_time, hits_insert_df, hits_insert_after1, hits_insert_after2) %>%
+  arrange(season_label) %>%
+  mutate(pos = factor(pos, levels = c("Forward", "Defense")))
+
+
+static_hits <- ggplot(hits_over_time, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_hits/2,
+                height = cum_hits,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_hits,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  facet_wrap(.~ pos) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14.5, "cm"),
+        panel.spacing = unit(12.5, "cm"),
+        strip.text = element_text(size = 30)) +
+  scale_fill_manual(values = team_colors_abr)
+
+
+
+#animate active skaters 
+
+anim_active = static_hits + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career hits leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM hits")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons) +2)*1.5, width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("C://Users/Seth/Desktop/cumhits.gif", sep = "")))
+
+write_csv(hits_over_time, "top10_hits.csv")
+
+```
+
+
+```{r}
+
+#####################################################################
+#                         team takeaways over time                  #
+#####################################################################
+
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_takeaways <- combined_player_stats %>% 
+  arrange(season) %>%
+  group_by(id, pos) %>%
+  mutate(cum_takeaways = cumsum(takeaways),
+         label = as.character(cum_takeaways)) %>%
+  arrange(desc(cum_takeaways)) %>%
+  ungroup()
+
+
+#iterate through all the seasons to build top 10 per season list
+takeaways_list <- list()
+for (i in max(cum_takeaways$season):min(cum_takeaways$season)) {
+ 
+   temp_takeaways <- cum_takeaways %>%
+    filter(season <= i) %>%
+    group_by(pos, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(cum_takeaways == max(cum_takeaways)) %>%
+    group_by(pos) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  takeaways_list[[i]] <- temp_takeaways
+}
+
+  
+
+takeaways_over_time <- do.call(rbind, takeaways_list)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+takeaways_insert_df <- data.frame(season_label = 65,
+                               cum_takeaways = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL",
+                               
+                               #same with pos
+                               pos = "Forward")
+
+
+#create a dummy df for two seasons later to hold the final results
+takeaways_insert_after1 <- filter(takeaways_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+takeaways_insert_after2 <- filter(takeaways_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+
+#bind top 10 lists with dummy df
+takeaways_over_time <- bind_rows(takeaways_over_time, takeaways_insert_df, takeaways_insert_after1, takeaways_insert_after2) %>%
+  arrange(season_label) %>%
+  mutate(pos = factor(pos, levels = c("Forward", "Defense")))
+
+
+static_takeaways <- ggplot(takeaways_over_time, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_takeaways/2,
+                height = cum_takeaways,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_takeaways,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  facet_wrap(.~ pos) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14.5, "cm"),
+        panel.spacing = unit(12.5, "cm"),
+        strip.text = element_text(size = 30)) +
+  scale_fill_manual(values = team_colors_abr)
+
+
+
+#animate active skaters 
+
+anim_active = static_takeaways + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career takeaways leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM takeaways")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons) +2)*1.5, width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("C://Users/Seth/Desktop/cumtakeaways.gif", sep = "")))
+
+
+write_csv(takeaways_over_time, "top10_takeaways.csv")
+```
+
+
+
+
+```{r}
+
+#####################################################################
+#                         player SB over time                      #
+#####################################################################
+
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_shotsBlocked <- combined_player_stats %>% 
+  arrange(season) %>%
+  group_by(id, pos) %>%
+  mutate(cum_shotsBlocked = cumsum(shotsBlocked),
+         label = as.character(cum_shotsBlocked)) %>%
+  arrange(desc(cum_shotsBlocked)) %>%
+  ungroup()
+
+
+#iterate through all the seasons to build top 10 per season list
+shotsBlocked_list <- list()
+for (i in max(cum_shotsBlocked$season):min(cum_shotsBlocked$season)) {
+ 
+   temp_shotsBlocked <- cum_shotsBlocked %>%
+    filter(season <= i) %>%
+    group_by(pos, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(cum_shotsBlocked == max(cum_shotsBlocked)) %>%
+    group_by(pos) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  shotsBlocked_list[[i]] <- temp_shotsBlocked
+}
+
+  
+
+shotsBlocked_over_time <- do.call(rbind, shotsBlocked_list)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+shotsBlocked_insert_df <- data.frame(season_label = 65,
+                               cum_shotsBlocked = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL",
+                               
+                               #same with pos
+                               pos = "Forward")
+
+
+#create a dummy df for two seasons later to hold the final results
+sb_insert_after1 <- filter(shotsBlocked_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+sb_insert_after2 <- filter(shotsBlocked_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+
+#bind top 10 lists with dummy df
+shotsBlocked_over_time <- bind_rows(shotsBlocked_over_time, shotsBlocked_insert_df, sb_insert_after1, sb_insert_after2) %>%
+  arrange(season_label) %>%
+  mutate(pos = factor(pos, levels = c("Forward", "Defense")))
+
+
+static_shotsBlocked <- ggplot(shotsBlocked_over_time, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_shotsBlocked/2,
+                height = cum_shotsBlocked,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_shotsBlocked,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  facet_wrap(.~ pos) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14.5, "cm"),
+        panel.spacing = unit(12.5, "cm"),
+        strip.text = element_text(size = 30)) +
+  scale_fill_manual(values = team_colors_abr)
+
+
+
+#animate active skaters 
+
+anim_active = static_shotsBlocked + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career SB leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM SB")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons) +2)*1.5, width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("C://Users/Seth/Desktop/cumSB.gif", sep = "")))
+
+
+write_csv(shotsBlocked_over_time, "top10_SB.csv")
+```
+
+
+
+
+
+```{r}
+
+#####################################################################
+#                         player fantasy over time                 #
+#####################################################################
+
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_fantasy <- combined_player_stats %>% 
+  arrange(season) %>%
+  group_by(id, pos) %>%
+  mutate(cum_fantasy = cumsum(fantasy),
+         label = as.character(cum_fantasy)) %>%
+  arrange(desc(cum_fantasy)) %>%
+  ungroup()
+
+
+#iterate through all the seasons to build top 10 per season list
+fantasy_list <- list()
+for (i in max(cum_fantasy$season):min(cum_fantasy$season)) {
+ 
+   temp_fantasy <- cum_fantasy %>%
+    filter(season <= i) %>%
+    group_by(pos, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(cum_fantasy == max(cum_fantasy)) %>%
+    group_by(pos) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  fantasy_list[[i]] <- temp_fantasy
+}
+
+  
+
+fantasy_over_time <- do.call(rbind, fantasy_list)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+fantasy_insert_df <- data.frame(season_label = 65,
+                               cum_fantasy = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL",
+                               
+                               #same with pos
+                               pos = "Forward")
+
+
+#create a dummy df for two seasons later to hold the final results
+fantasy_insert_after1 <- filter(fantasy_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+fantasy_insert_after2 <- filter(fantasy_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+
+#bind top 10 lists with dummy df
+fantasy_over_time <- bind_rows(fantasy_over_time, fantasy_insert_df, fantasy_insert_after1, fantasy_insert_after2) %>%
+  arrange(season_label) %>%
+  mutate(pos = factor(pos, levels = c("Forward", "Defense")))
+
+
+static_fantasy <- ggplot(fantasy_over_time, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_fantasy/2,
+                height = cum_fantasy,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_fantasy,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  facet_wrap(.~ pos) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14.5, "cm"),
+        panel.spacing = unit(12.5, "cm"),
+        strip.text = element_text(size = 30)) +
+  scale_fill_manual(values = team_colors_abr)
+
+
+
+#animate active skaters 
+
+anim_active = static_fantasy + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career fantasy leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM fantasy")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons) +2)*1.5, width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("C://Users/Seth/Desktop/cumfantasy.gif", sep = "")))
+
+
+write_csv(fantasy_over_time, "top10_fantasy.csv")
+```
+
+
+
+```{r}
+
+#####################################################################
+#                         goalie sv% over time                      #
+#####################################################################
+
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_savePct <- combined_goalie_stats %>%
+  arrange(season) %>%
+  group_by(id) %>%
+  mutate(cumGP = sum(gamesPlayed),
+         cumsaves = cumsum(saves),
+         cumSA = cumsum(shotsAgainst),
+         cum_savePct = cumsaves/cumSA,
+         label = as.character(round(cum_savePct, 3))) %>%
+  filter(gamesPlayed >= 25) %>%
+  filter(cumGP > 50) %>%
+  arrange(desc(cum_savePct)) %>%
+  ungroup()
+
+
+
+#iterate through all the seasons to build top 10 per season list
+savePct_list <- list()
+for (i in max(cum_savePct$season):min(cum_savePct$season)) {
+ 
+   temp_savePct <- cum_savePct %>%
+    filter(season <= i) %>%
+    group_by(position, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(season == max(season)) %>%
+    group_by(position) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  savePct_list[[i]] <- temp_savePct
+}
+
+  
+
+savePct_over_time <- do.call(rbind, savePct_list)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+savePct_insert_df <- data.frame(season = 52,
+                               cum_savePct = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL")
+
+
+#create a dummy df for two seasons later to hold the final results
+svpct_insert_after1 <- filter(savePct_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+svpct_insert_after2 <- filter(savePct_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+
+#bind top 10 lists with dummy df
+savePct_over_time <- bind_rows(savePct_over_time, savePct_insert_df, svpct_insert_after1, svpct_insert_after2) 
+
+static_savePct <- ggplot(savePct_over_time, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_savePct/2,
+                height = cum_savePct,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_savePct,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14, "cm")) +
+  scale_fill_manual(values = team_colors_abr) 
+
+
+#animate active skaters 
+
+anim_active = static_savePct + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career save % leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM save %")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons) +2)*1.5, width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("C://Users/Seth/Desktop/cumsavePct.gif", sep = "")))
+
+
+write_csv(savePct_over_time, "top10_savePct.csv")
+```
+
+
+
+
+
+
+
+```{r}
+
+#####################################################################
+#                        goalie saves over time                     #
+#####################################################################
+
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_saves <- combined_goalie_stats %>%
+  arrange(season) %>%
+  group_by(id) %>%
+  mutate(cum_saves = cumsum(saves),
+         label = as.character(cum_saves)) %>%
+  arrange(desc(cum_saves)) %>%
+  ungroup()
+
+
+
+#iterate through all the seasons to build top 10 per season list
+saves_list <- list()
+for (i in max(cum_saves$season):min(cum_saves$season)) {
+ 
+   temp_saves <- cum_saves %>%
+    filter(season <= i) %>%
+    group_by(position, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(season == max(season)) %>%
+    group_by(position) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  saves_list[[i]] <- temp_saves
+}
+
+  
+
+saves_over_time <- do.call(rbind, saves_list)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+saves_insert_df <- data.frame(season_label = 65,
+                               cum_saves = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL")
+
+
+#create a dummy df for two seasons later to hold the final results
+saves_insert_after1 <- filter(saves_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+saves_insert_after2 <- filter(saves_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+
+#bind top 10 lists with dummy df
+saves_over_time <- bind_rows(saves_over_time, saves_insert_df, saves_insert_after1, saves_insert_after2) 
+
+static_saves <- ggplot(saves_over_time, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_saves/2,
+                height = cum_saves,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_saves,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14, "cm")) +
+  scale_fill_manual(values = team_colors_abr)
+
+
+
+#animate active skaters 
+
+anim_active = static_saves + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career saves leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM saves")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons)+2)*1.5, width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("C://Users/Seth/Desktop/cumsaves.gif", sep = "")))
+
+
+write_csv(saves_over_time, "top10_saves.csv")
+```
+
+
+
+```{r}
+
+#####################################################################
+#                        goalie wins over time                     #
+#####################################################################
+
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_wins <- combined_goalie_stats %>%
+  arrange(season) %>%
+  group_by(id) %>%
+  mutate(cum_wins = cumsum(wins),
+         label = as.character(cum_wins)) %>%
+  arrange(desc(cum_wins)) %>%
+  ungroup()
+
+
+
+#iterate through all the seasons to build top 10 per season list
+wins_list <- list()
+for (i in max(cum_wins$season):min(cum_wins$season)) {
+ 
+   temp_wins <- cum_wins %>%
+    filter(season <= i) %>%
+    group_by(position, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(season == max(season)) %>%
+    group_by(position) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  wins_list[[i]] <- temp_wins
+}
+
+  
+
+wins_over_time <- do.call(rbind, wins_list)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+wins_insert_df <- data.frame(season_label = 65,
+                               cum_wins = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL")
+
+
+#create a dummy df for two seasons later to hold the final results
+wins_insert_after1 <- filter(wins_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+wins_insert_after2 <- filter(wins_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+
+#bind top 10 lists with dummy df
+wins_over_time <- bind_rows(wins_over_time, wins_insert_df, wins_insert_after1, wins_insert_after2) 
+
+static_wins <- ggplot(wins_over_time, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_wins/2,
+                height = cum_wins,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_wins,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14, "cm")) +
+  scale_fill_manual(values = team_colors_abr)
+
+
+
+#animate active skaters 
+
+anim_active = static_wins + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career wins leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM wins")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons)+2)*1.5, width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("C://Users/Seth/Desktop/cumwins.gif", sep = "")))
+
+
+write_csv(wins_over_time, "top10_wins.csv")
+```
+
+
+
+
+
+```{r}
+
+#####################################################################
+#                        goalie shutouts over time                     #
+#####################################################################
+
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_shutouts <- combined_goalie_stats %>%
+  arrange(season) %>%
+  group_by(id) %>%
+  mutate(cum_shutouts = cumsum(shutouts),
+         label = as.character(cum_shutouts)) %>%
+  arrange(desc(cum_shutouts)) %>%
+  ungroup()
+
+
+
+#iterate through all the seasons to build top 10 per season list
+shutouts_list <- list()
+for (i in max(cum_shutouts$season):min(cum_shutouts$season)) {
+ 
+   temp_shutouts <- cum_shutouts %>%
+    filter(season <= i) %>%
+    group_by(position, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(season == max(season)) %>%
+    group_by(position) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  shutouts_list[[i]] <- temp_shutouts
+}
+
+  
+
+shutouts_over_time <- do.call(rbind, shutouts_list)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+shutouts_insert_df <- data.frame(season_label = 65,
+                               cum_shutouts = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL")
+
+
+#create a dummy df for two seasons later to hold the final results
+shutouts_insert_after1 <- filter(shutouts_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+shutouts_insert_after2 <- filter(shutouts_over_time, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+
+#bind top 10 lists with dummy df
+shutouts_over_time <- bind_rows(shutouts_over_time, shutouts_insert_df, shutouts_insert_after1, shutouts_insert_after2) 
+
+static_shutouts <- ggplot(shutouts_over_time, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_shutouts/2,
+                height = cum_shutouts,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_shutouts,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14, "cm")) +
+  scale_fill_manual(values = team_colors_abr)
+
+
+
+#animate active skaters 
+
+anim_active = static_shutouts + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career shutouts leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM shutouts")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons)+2)*1.5, width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("C://Users/Seth/Desktop/cumshutouts.gif", sep = "")))
+
+
+write_csv(shutouts_over_time, "top10_shutouts.csv")
+```
+
+
+
+##################################################################################
+#                         TOP 10 single season leader                            #
+##################################################################################
+
+
+
+
+
+
+
+
+```{r}
+################################################
+#            Top 10 single season point        #
+################################################
+
+
+top_10_points <- combined_player_stats %>%
+  #filter GP
+  filter(gamesPlayed >= 30) %>%
+  #normalize to a 66 game season
+  mutate(points_season = 66*points/gamesPlayed) %>%
+  arrange(desc(points_season)) %>%
+  group_by(pos) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         points_label = paste("(", round(points_season, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_points <- min(top_10_points$points_season)
+max_points <- max(top_10_points$points_season)
+
+#plot
+ggplot(top_10_points, aes(x = fct_rev(label), y = points_season, fill = team, label = points_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE, col = "black") +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  facet_wrap(.~ pos, scales = "free_y") +
+  theme_bw(base_size = 14) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season points", x = NULL) +
+  coord_flip(ylim = c(min_points-10, max_points+20))
+ggsave("season_points.jpg", width = 8, height = 8.5, dpi = 300)
+```
+
+
+
+
+
+```{r}
+################################################
+#            Top 10 single season goals        #
+################################################
+
+
+top_10_goals <- combined_player_stats %>%
+  #filter GP
+  filter(gamesPlayed >= 30) %>%
+  #normalize to a 66 game season
+  mutate(goals_season = 66*goals/gamesPlayed) %>%
+  arrange(desc(goals_season)) %>%
+  group_by(pos) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         goals_label = paste("(", round(goals_season, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_goals <- min(top_10_goals$goals_season)
+max_goals <- max(top_10_goals$goals_season)
+
+#plot
+ggplot(top_10_goals, aes(x = fct_rev(label), y = goals_season, fill = team, label = goals_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE, col = "black") +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  facet_wrap(.~ pos, scales = "free_y") +
+  theme_bw(base_size = 14) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season goals", x = NULL) +
+  coord_flip(ylim = c(min_goals-5, max_goals+11))
+ggsave("season_goals.jpg", width = 8, height = 8.5, dpi = 300)
+
+```
+
+
+
+
+```{r}
+################################################
+#            Top 10 single season assists      #
+################################################
+
+
+top_10_assists <- combined_player_stats %>%
+  #filter GP
+  filter(gamesPlayed >= 30) %>%
+  #normalize to a 66 game season
+  mutate(assists_season = 66*assists/gamesPlayed) %>%
+  arrange(desc(assists_season)) %>%
+  group_by(pos) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         assists_label = paste("(", round(assists_season, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_assists <- min(top_10_assists$assists_season)
+max_assists <- max(top_10_assists$assists_season)
+
+#plot
+ggplot(top_10_assists, aes(x = fct_rev(label), y = assists_season, fill = team, label = assists_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE, col = "black") +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  facet_wrap(.~ pos, scales = "free_y") +
+  theme_bw(base_size = 14) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season assists", x = NULL) +
+  coord_flip(ylim = c(min_assists-5, max_assists+9))
+ggsave("season_assists.jpg", width = 8, height = 8.5, dpi = 300)
+
+```
+
+
+
+
+
+```{r}
+################################################
+#            Top 10 single season hits         #
+################################################
+
+
+top_10_hits <- combined_player_stats %>%
+  #filter GP
+  filter(gamesPlayed >= 30) %>%
+  #normalize to a 66 game season
+  mutate(hits_season = 66*hits/gamesPlayed) %>%
+  arrange(desc(hits_season)) %>%
+  group_by(pos) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         hits_label = paste("(", round(hits_season, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_hits <- min(top_10_hits$hits_season)
+max_hits <- max(top_10_hits$hits_season)
+
+#plot
+ggplot(top_10_hits, aes(x = fct_rev(label), y = hits_season, fill = team, label = hits_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE, col = "black") +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  facet_wrap(.~ pos, scales = "free_y") +
+  theme_bw(base_size = 14) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season hits", x = NULL) +
+  coord_flip(ylim = c(min_hits-25, max_hits+100))
+ggsave("season_hit.jpg", width = 8, height = 8.5, dpi = 300)
+
+```
+
+
+
+
+```{r}
+################################################
+#            Top 10 single season takeaways    #
+################################################
+
+
+top_10_takeaways <- combined_player_stats %>%
+  #filter GP
+  filter(gamesPlayed >= 30) %>%
+  #normalize to a 66 game season
+  mutate(takeaways_season = 66*takeaways/gamesPlayed) %>%
+  arrange(desc(takeaways_season)) %>%
+  group_by(pos) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         takeaways_label = paste("(", round(takeaways_season, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_takeaways <- min(top_10_takeaways$takeaways_season)
+max_takeaways <- max(top_10_takeaways$takeaways_season)
+
+#plot
+ggplot(top_10_takeaways, aes(x = fct_rev(label), y = takeaways_season, fill = team, label = takeaways_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE, col = "black") +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  facet_wrap(.~ pos, scales = "free_y") +
+  theme_bw(base_size = 14) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season takeaways", x = NULL) +
+  coord_flip(ylim = c(min_takeaways-10, max_takeaways+13))
+ggsave("season_takeaways.jpg", width = 8, height = 8.5, dpi = 300)
+
+```
+
+
+
+
+
+```{r}
+################################################
+#      Top 10 single season shotsBlocked       #
+################################################
+
+
+top_10_shotsBlocked <- combined_player_stats %>%
+  #filter GP
+  filter(gamesPlayed >= 30) %>%
+  #normalize to a 66 game season
+  mutate(shotsBlocked_season = 66*shotsBlocked/gamesPlayed) %>%
+  arrange(desc(shotsBlocked_season)) %>%
+  group_by(pos) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         shotsBlocked_label = paste("(", round(shotsBlocked_season, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_shotsBlocked <- min(top_10_shotsBlocked$shotsBlocked_season)
+max_shotsBlocked <- max(top_10_shotsBlocked$shotsBlocked_season)
+
+#plot
+ggplot(top_10_shotsBlocked, aes(x = fct_rev(label), y = shotsBlocked_season, fill = team, label = shotsBlocked_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE, col = "black") +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  facet_wrap(.~ pos, scales = "free_y") +
+  theme_bw(base_size = 14) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season SB", x = NULL) +
+  coord_flip(ylim = c(min_shotsBlocked-25, max_shotsBlocked+95))
+ggsave("season_SB.jpg", width = 8, height = 8.5, dpi = 300)
+
+```
+
+
+
+
+```{r}
+################################################
+#            Top 10 single season fantasy        #
+################################################
+
+
+top_10_fantasy <- combined_player_stats %>%
+  #filter GP
+  filter(gamesPlayed >= 30) %>%
+  #normalize to a 66 game season
+  mutate(fantasy_season = 66*fantasy/gamesPlayed) %>%
+  arrange(desc(fantasy_season)) %>%
+  group_by(pos) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         fantasy_label = paste("(", round(fantasy_season, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_fantasy <- min(top_10_fantasy$fantasy_season)
+max_fantasy <- max(top_10_fantasy$fantasy_season)
+
+#plot
+ggplot(top_10_fantasy, aes(x = fct_rev(label), y = fantasy_season, fill = team, label = fantasy_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE, col = "black") +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  facet_wrap(.~ pos, scales = "free_y") +
+  theme_bw(base_size = 14) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season fantasy", x = NULL) +
+  coord_flip(ylim = c(min_fantasy-10, max_fantasy+35))
+ggsave("season_fantasy.jpg", width = 8, height = 8.5, dpi = 300)
+
+```
+
+
+```{r}
+################################################
+#               Franchise leaders              #
+################################################
+
+
+#points
+franchise_p_leaders <- combined_player_stats %>%
+  group_by(name, pos, team) %>%
+  summarise(points = sum(points)) %>%
+  arrange(team, pos, desc(points)) %>%
+  group_by(team, pos) %>%
+  mutate(rank = row_number()) %>%
+  filter(rank <= 5) %>%
+  mutate(name_order = paste0(name, team),
+         name_order = factor(name_order, levels = name_order)) 
+
+
+ggplot(franchise_p_leaders, aes(x = name_order, y = points, fill = team)) +
+  geom_col(col = "black") +
+  theme_bw(base_size = 16) +
+  theme(axis.text.x = element_text(angle = 90, vjust =.25, hjust =1, size = 10),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        legend.position = "top") +
+  scale_fill_manual(values = team_colors_abr) +
+  facet_wrap(.~ pos, scales = "free_x", nrow = 2) +
+  scale_x_discrete(breaks = franchise_p_leaders$name_order,
+                   labels = franchise_p_leaders$name,
+                   expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x = NULL, y = "Points", fill = NULL) +
+  guides(fill = guide_legend(nrow = 1))
+ggsave("franchise_points_leaders.jpg", width = 23, height = 14, dpi = 300)
+
+
+
+
+# goals
+franchise_g_leaders <- combined_player_stats %>%
+  group_by(name, pos, team) %>%
+  summarise(goals = sum(goals)) %>%
+  arrange(team, pos, desc(goals)) %>%
+  group_by(team, pos) %>%
+  mutate(rank = row_number()) %>%
+  filter(rank <= 5) %>%
+  mutate(name_order = paste0(name, team),
+         name_order = factor(name_order, levels = name_order)) 
+
+
+ggplot(franchise_g_leaders, aes(x = name_order, y = goals, fill = team)) +
+  geom_col(col = "black") +
+  theme_bw(base_size = 16) +
+  theme(axis.text.x = element_text(angle = 90, vjust =.25, hjust =1, size = 10),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        legend.position = "top") +
+  scale_fill_manual(values = team_colors_abr) +
+  facet_wrap(.~ pos, scales = "free_x", nrow = 2) +
+  scale_x_discrete(breaks = franchise_g_leaders$name_order,
+                   labels = franchise_g_leaders$name,
+                   expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x = NULL, y = "Goals", fill = NULL) +
+  guides(fill = guide_legend(nrow = 1))
+ggsave("franchise_goals_leaders.jpg", width = 23, height = 14, dpi = 300)
+
+
+
+```
+
+
+
+
+
+```{r}
+################################################
+#      Top 10 single season savePct            #
+################################################
+
+
+top_10_savePct <- combined_goalie_stats %>%
+  
+  #convert savePct to numberic
+  mutate(savePct = as.numeric(as.character(savePct))) %>%
+
+  #filter out for GP for goalies
+  filter(gamesPlayed >= 30) %>%
+  arrange(desc(savePct)) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         savePct_label = paste("(", round(savePct, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_savePct <- min(top_10_savePct$savePct)
+max_savePct <- max(top_10_savePct$savePct)
+
+#plot
+ggplot(top_10_savePct, aes(x = fct_rev(label), y = savePct, fill = team, label = savePct_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE, col = "black") +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  theme_bw(base_size = 14) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season save %", x = NULL) +
+  coord_flip(ylim = c(.913, .925))
+ggsave("season_savepct.jpg", width = 6, height = 8.5, dpi = 300)
+
+```
+
+
+
+
+
+```{r}
+################################################
+#      Top 10 single season saves            #
+################################################
+
+
+top_10_saves <- combined_goalie_stats %>%
+  
+  #convert saves to numberic
+  mutate(saves = as.numeric(as.character(saves))) %>%
+
+  #filter out for GP for goalies
+  filter(gamesPlayed >= 30) %>%
+  arrange(desc(saves)) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         saves_label = paste("(", round(saves, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_saves <- min(top_10_saves$saves)
+max_saves <- max(top_10_saves$saves)
+
+#plot
+ggplot(top_10_saves, aes(x = fct_rev(label), y = saves, fill = team, label = saves_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE, col = "black") +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  theme_bw(base_size = 14) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season saves", x = NULL) +
+  coord_flip(ylim = c(min_saves-10, max_saves+75))
+ggsave("season_saves.jpg", width = 6, height = 8.5, dpi = 300)
+
+```
+
+
+
+
+
+
+```{r}
+################################################
+#      Top 10 single season wins            #
+################################################
+
+
+top_10_wins <- combined_goalie_stats %>%
+  
+  #convert wins to numberic
+  mutate(wins = as.numeric(as.character(wins))) %>%
+
+  #filter out for GP for goalies
+  filter(gamesPlayed >= 30) %>%
+  arrange(desc(wins)) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         wins_label = paste("(", round(wins, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_wins <- min(top_10_wins$wins)
+max_wins <- max(top_10_wins$wins)
+
+#plot
+ggplot(top_10_wins, aes(x = fct_rev(label), y = wins, fill = team, label = wins_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE, col = "black") +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  theme_bw(base_size = 14) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season wins", x = NULL) +
+  coord_flip(ylim = c(min_wins-1, max_wins+1))
+ggsave("season_wins.jpg", width = 6, height = 8.5, dpi = 300)
+
+```
+
+
+
+
+```{r}
+################################################
+#      Top 10 single season shutouts            #
+################################################
+
+
+top_10_shutouts <- combined_goalie_stats %>%
+  
+  #convert shutouts to numberic
+  mutate(shutouts = as.numeric(as.character(shutouts))) %>%
+
+  #filter out for GP for goalies
+  filter(gamesPlayed >= 30) %>%
+  arrange(desc(shutouts)) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         shutouts_label = paste("(", round(shutouts, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_shutouts <- min(top_10_shutouts$shutouts)
+max_shutouts <- max(top_10_shutouts$shutouts)
+
+#plot
+ggplot(top_10_shutouts, aes(x = fct_rev(label), y = shutouts, fill = team, label = shutouts_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE, col = "black") +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  theme_bw(base_size = 14) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season shutouts", x = NULL) +
+  coord_flip(ylim = c(min_shutouts-1, max_shutouts+1))
+ggsave("season_so.jpg", width = 6, height = 8.5, dpi = 300)
+
+```
+
+
+
+
+
+
+
+
+
+#################################################################################
+#                                 Playoffs                                      #
+#################################################################################
+
+
+
+```{r}
+playoff_team_gf <- combined_player_stats_playoffs %>%
+  group_by(team) %>%
+  summarise(gf = 15*sum(goals)/sum(gamesPlayed)) %>%
+  arrange(desc(gf)) %>%
+  mutate(team = factor(team, levels = team))
+  
+
+playoff_team_ga <- combined_goalie_stats_playoffs %>%
+  group_by(team) %>%
+  summarise(mp = sum(minutes)/60,
+            ga = sum(goalsAgainst)/mp) %>%
+  arrange(desc(ga)) %>%
+  mutate(team = factor(team, levels = team))
+
+
+
+playoff_scoring <- left_join(playoff_team_gf, playoff_team_ga)
+
+
+
+
+gf <- ggplot(playoff_team_gf, aes(x = fct_rev(team), y = gf, fill = team)) +
+  geom_col(position = "stack", show.legend = F) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  theme_bw(base_size = 16) +
+  theme(axis.ticks.x = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.grid.major.y = element_blank()) +
+  scale_fill_manual(values = team_colors_abr) +
+  labs(x = NULL, y = "Playoff goals per game") +
+  coord_flip()
+
+
+
+ga <- ggplot(playoff_team_ga, aes(x = fct_rev(team), y = ga, fill = team)) +
+  geom_col(alpha = .8, show.legend = F) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  theme_bw(base_size = 16) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
+        axis.ticks.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.major.y = element_blank()) +
+  scale_fill_manual(values = team_colors_abr) +
+  labs(y = "Playoff team GAA\n", x = NULL) 
+  
+
+
+
+p1 <- ggplot(playoff_scoring, aes(x = ga, y = gf, col = team, label = team)) +
+  geom_point(show.legend = F, size = 3) +
+  theme_bw(base_size = 16) +
+  scale_color_manual(values = team_colors_abr) +
+  geom_text_repel(show.legend = F) +
+  #geom_hline(yintercept = median(scoring$goals), linetype = "dashed") +
+  #geom_vline(xintercept = median(scoring$GA), linetype = "dashed") +
+  labs(y = "Goals per game\n", x = "Team GAA")
+  
+
+
+
+plot_po <- grid.arrange(ga, p1, gf,
+             widths = c(2,1,1,.1),
+             layout_matrix = rbind(c(1,1,NA, NA),
+                                   c(2,2,3, NA),
+                                   c(2,2,3, NA)))
+ggsave(plot = plot_po, filename = "po_season_scoring.jpg", width = 10, height = 7.5, dpi = 300)
+
+
+write_csv(playoff_scoring, "playoff_scoring.csv")
+```
+
+
+
+
+```{r}
+############################################################
+#                   Playoff series matchups                #
+############################################################
+
+inter_team_record_playoffs <- formatted_schedule_playoffs %>%
+  mutate(win = Points == 2,
+         loss = Points == 0,
+         otl = Points == 1) %>%
+  group_by(team, season, opponent) %>%
+  summarise(win = sum(win)) %>% 
+  mutate(series_win = win == 4) %>%
+  group_by(team, opponent) %>%
+  summarise(win = sum(series_win),
+            loss = sum(!series_win),
+            pct = win/(win +loss)) %>%
+  group_by(team) %>%
+  mutate(total_wins = sum(win)) %>%
+  arrange(desc(total_wins)) %>%
+  ungroup() %>%
+  mutate(team = factor(team, levels = unique(team)),
+         opponent = factor(opponent, levels = unique(team)))
+  
+  
+  
+ggplot(inter_team_record_playoffs, aes(y = fct_rev(team), x = opponent, fill = factor(win))) + 
+  geom_tile(col = "black") +
+  scale_fill_brewer(palette = "Set7") +
+  scale_x_discrete(position = "top", expand = c(0,0)) +
+  coord_equal() +
+  labs(x = NULL, y = NULL, fill = "Series wins") +
+  theme(panel.grid = element_blank(),
+        axis.title.x = element_blank(), 
+        axis.text.x.top = element_text(angle = 90, hjust = 0, vjust = .5), 
+        plot.caption = element_text(size = 14, hjust = 0.5),
+        panel.border = element_rect(color = "black", fill = NA)) +
+  scale_y_discrete(expand = c(0,0)) 
+
+
+write_csv(inter_team_record_playoffs, "playoff_records.csv")
+```
+
+
+################################## playoff leaders ##########################
+
+
+```{r}
+
+#####################################################################
+#                         skater PO points over time                #
+#####################################################################
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_points_playoffs <- combined_player_stats_playoffs %>% 
+  arrange(season) %>%
+  group_by(id, pos) %>%
+  mutate(cum_points = cumsum(points),
+         label = as.character(cum_points)) %>%
+  arrange(desc(cum_points)) %>%
+  ungroup()
+
+
+#iterate through all the seasons to build top 10 per season list
+points_list_playoffs <- list()
+for (i in max(cum_points_playoffs$season):min(cum_points_playoffs$season)) {
+ 
+   temp_points_playoffs <- cum_points_playoffs %>%
+    filter(season <= i) %>%
+    group_by(pos, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(cum_points == max(cum_points) & season == max(season)) %>%
+    group_by(pos) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  points_list_playoffs[[i]] <- temp_points_playoffs
+}
+
+  
+
+points_over_time_playoffs <- do.call(rbind, points_list_playoffs)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+points_insert_df_playoffs <- data.frame(season_label = 65,
+                               cum_points = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL",
+                               
+                               #same with pos
+                               pos = "Forward")
+
+#create a dummy df for two seasons later to hold the final results
+points_insert_after1_po <- filter(points_over_time_playoffs, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+points_insert_after2_po <- filter(points_over_time_playoffs, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+
+#bind top 10 lists with dummy df
+points_over_time_playoffs <- bind_rows(points_over_time_playoffs, points_insert_df_playoffs, points_insert_after1_po, points_insert_after2_po) %>%
+  arrange(season_label) %>%
+  mutate(pos = factor(pos, levels = c("Forward", "Defense")))
+
+
+static_points_playoffs <- ggplot(points_over_time_playoffs, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_points/2,
+                height = cum_points,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_points,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  facet_wrap(.~ pos) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14.5, "cm"),
+        panel.spacing = unit(12.5, "cm"),
+        strip.text = element_text(size = 30)) +
+  scale_fill_manual(values = team_colors_abr)
+
+
+
+#animate active skaters 
+
+anim_active = static_points_playoffs + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career playoff points leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM playoff points")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons)+2)*1.5, width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("cum_po_points.gif", sep = "")))
+
+write_csv(points_over_time_playoffs, "playoff_top10_points.csv")
+
+```
+
+
+
+```{r}
+
+#####################################################################
+#                         skater PO assists over time                #
+#####################################################################
+
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_assists_playoffs <- combined_player_stats_playoffs %>% 
+  arrange(season) %>%
+  group_by(id, pos) %>%
+  mutate(cum_assists = cumsum(assists),
+         label = as.character(cum_assists)) %>%
+  arrange(desc(cum_assists)) %>%
+  ungroup()
+
+
+#iterate through all the seasons to build top 10 per season list
+assists_list_playoffs <- list()
+for (i in max(cum_assists_playoffs$season):min(cum_assists_playoffs$season)) {
+ 
+   temp_assists_playoffs <- cum_assists_playoffs %>%
+    filter(season <= i) %>%
+    group_by(pos, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(cum_assists == max(cum_assists) & season == max(season)) %>%
+    group_by(pos) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  assists_list_playoffs[[i]] <- temp_assists_playoffs
+}
+
+  
+
+assists_over_time_playoffs <- do.call(rbind, assists_list_playoffs)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+assists_insert_df_playoffs <- data.frame(season_label = 65,
+                               cum_assists = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL",
+                               
+                               #same with pos
+                               pos = "Forward")
+
+#create a dummy df for two seasons later to hold the final results
+assists_insert_after1_po <- filter(assists_over_time_playoffs, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+assissts_insert_after2_po <- filter(assists_over_time_playoffs, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+
+#bind top 10 lists with dummy df
+assists_over_time_playoffs <- bind_rows(assists_over_time_playoffs, assists_insert_df_playoffs, assists_insert_after1_po, assissts_insert_after2_po) %>%
+  arrange(season_label) %>%
+  mutate(pos = factor(pos, levels = c("Forward", "Defense")))
+
+
+static_assists_playoffs <- ggplot(assists_over_time_playoffs, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_assists/2,
+                height = cum_assists,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_assists,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  facet_wrap(.~ pos) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14.5, "cm"),
+        panel.spacing = unit(12.5, "cm"),
+        strip.text = element_text(size = 30)) +
+  scale_fill_manual(values = team_colors_abr)
+
+
+
+#animate active skaters 
+
+anim_active = static_assists_playoffs + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career playoff assists leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM playoff assists")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons)+2)*1.5, width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("cum_po_assists.gif", sep = "")))
+
+
+write_csv(assists_over_time_playoffs, "playoff_top10_assists.csv")
+
+```
+
+
+```{r}
+
+#####################################################################
+#                         skater PO goals over time                #
+#####################################################################
+
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_goals_playoffs <- combined_player_stats_playoffs %>% 
+  arrange(season) %>%
+  group_by(id, pos) %>%
+  mutate(cum_goals = cumsum(goals),
+         label = as.character(cum_goals)) %>%
+  arrange(desc(cum_goals)) %>%
+  ungroup()
+
+
+#iterate through all the seasons to build top 10 per season list
+goals_list_playoffs <- list()
+for (i in max(cum_goals_playoffs$season):min(cum_goals_playoffs$season)) {
+ 
+   temp_goals_playoffs <- cum_goals_playoffs %>%
+    filter(season <= i) %>%
+    group_by(pos, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(cum_goals == max(cum_goals) & season == max(season)) %>%
+    group_by(pos) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  goals_list_playoffs[[i]] <- temp_goals_playoffs
+}
+
+  
+
+goals_over_time_playoffs <- do.call(rbind, goals_list_playoffs)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+goals_insert_df_playoffs <- data.frame(season_label = 65,
+                               cum_goals = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL",
+                               
+                               #same with pos
+                               pos = "Forward")
+
+
+
+#create a dummy df for two seasons later to hold the final results
+goals_insert_after1_po <- filter(goals_over_time_playoffs, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+goals_insert_after2_po <- filter(goals_over_time_playoffs, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+
+#bind top 10 lists with dummy df
+goals_over_time_playoffs <- bind_rows(goals_over_time_playoffs, goals_insert_df_playoffs, goals_insert_after1_po, goals_insert_after2_po) %>%
+  arrange(season_label) %>%
+  mutate(pos = factor(pos, levels = c("Forward", "Defense")))
+
+
+static_goals_playoffs <- ggplot(goals_over_time_playoffs, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_goals/2,
+                height = cum_goals,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_goals,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  facet_wrap(.~ pos) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14.5, "cm"),
+        panel.spacing = unit(12.5, "cm"),
+        strip.text = element_text(size = 30)) +
+  scale_fill_manual(values = team_colors_abr)
+
+
+
+#animate active skaters 
+
+anim_active = static_goals_playoffs + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career playoff goals leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM playoff goals")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons)+2)*1.5, width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("cum_po_goals.gif", sep = "")))
+
+
+write_csv(goals_over_time_playoffs, "playoffs_top10_goals.csv")
+
+
+```
+
+
+```{r}
+
+#####################################################################
+#                         skater PO hits over time                #
+#####################################################################
+
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_hits_playoffs <- combined_player_stats_playoffs %>% 
+  arrange(season) %>%
+  group_by(id, pos) %>%
+  mutate(cum_hits = cumsum(hits),
+         label = as.character(cum_hits)) %>%
+  arrange(desc(cum_hits)) %>%
+  ungroup()
+
+
+#iterate through all the seasons to build top 10 per season list
+hits_list_playoffs <- list()
+for (i in max(cum_hits_playoffs$season):min(cum_hits_playoffs$season)) {
+ 
+   temp_hits_playoffs <- cum_hits_playoffs %>%
+    filter(season <= i) %>%
+    group_by(pos, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(cum_hits == max(cum_hits) & season == max(season)) %>%
+    group_by(pos) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  hits_list_playoffs[[i]] <- temp_hits_playoffs
+}
+
+  
+
+hits_over_time_playoffs <- do.call(rbind, hits_list_playoffs)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+hits_insert_df_playoffs <- data.frame(season_label = 65,
+                               cum_hits = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL",
+                               
+                               #same with pos
+                               pos = "Forward")
+
+
+#create a dummy df for two seasons later to hold the final results
+hits_insert_after1_po <- filter(hits_over_time_playoffs, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+hits_insert_after2_po <- filter(hits_over_time_playoffs, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+
+#bind top 10 lists with dummy df
+hits_over_time_playoffs <- bind_rows(hits_over_time_playoffs, hits_insert_df_playoffs, hits_insert_after1_po, hits_insert_after2_po) %>%
+  arrange(season_label) %>%
+  mutate(pos = factor(pos, levels = c("Forward", "Defense")))
+
+
+static_hits_playoffs <- ggplot(hits_over_time_playoffs, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_hits/2,
+                height = cum_hits,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_hits,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  facet_wrap(.~ pos) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14.5, "cm"),
+        panel.spacing = unit(12.5, "cm"),
+        strip.text = element_text(size = 30)) +
+  scale_fill_manual(values = team_colors_abr)
+
+
+
+#animate active skaters 
+
+anim_active = static_hits_playoffs + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career playoff hits leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM playoff hits")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons)+2)*1.5, width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("cum_po_hits.gif", sep = "")))
+
+
+write_csv(hits_over_time_playoffs, "playoff_top10_hits.csv")
+
+```
+
+
+
+
+
+```{r}
+
+#####################################################################
+#                         skater PO takeaways over time                #
+#####################################################################
+
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_takeaways_playoffs <- combined_player_stats_playoffs %>% 
+  arrange(season) %>%
+  group_by(id, pos) %>%
+  mutate(cum_takeaways = cumsum(takeaways),
+         label = as.character(cum_takeaways)) %>%
+  arrange(desc(cum_takeaways)) %>%
+  ungroup()
+
+
+#iterate through all the seasons to build top 10 per season list
+takeaways_list_playoffs <- list()
+for (i in max(cum_takeaways_playoffs$season):min(cum_takeaways_playoffs$season)) {
+ 
+   temp_takeaways_playoffs <- cum_takeaways_playoffs %>%
+    filter(season <= i) %>%
+    group_by(pos, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(cum_takeaways == max(cum_takeaways) & season == max(season)) %>%
+    group_by(pos) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  takeaways_list_playoffs[[i]] <- temp_takeaways_playoffs
+}
+
+  
+
+takeaways_over_time_playoffs <- do.call(rbind, takeaways_list_playoffs)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+takeaways_insert_df_playoffs <- data.frame(season_label = 65,
+                               cum_takeaways = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL",
+                               
+                               #same with pos
+                               pos = "Forward")
+
+
+#create a dummy df for two seasons later to hold the final results
+takeaways_insert_after1_po <- filter(takeaways_over_time_playoffs, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+takeaways_insert_after2_po <- filter(takeaways_over_time_playoffs, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+
+#bind top 10 lists with dummy df
+takeaways_over_time_playoffs <- bind_rows(takeaways_over_time_playoffs, takeaways_insert_df_playoffs, takeaways_insert_after1_po, takeaways_insert_after2_po) %>%
+  arrange(season_label) %>%
+  mutate(pos = factor(pos, levels = c("Forward", "Defense")))
+
+
+static_takeaways_playoffs <- ggplot(takeaways_over_time_playoffs, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_takeaways/2,
+                height = cum_takeaways,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_takeaways,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  facet_wrap(.~ pos) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14.5, "cm"),
+        panel.spacing = unit(12.5, "cm"),
+        strip.text = element_text(size = 30)) +
+  scale_fill_manual(values = team_colors_abr)
+
+
+
+#animate active skaters 
+
+anim_active = static_takeaways_playoffs + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career playoff takeaways leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM playoff takeaways")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons)*1.5+2), width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("cum_po_takeaways.gif", sep = "")))
+
+
+write_csv(takeaways_over_time_playoffs, "playoff_top10_takeaways.csv")
+```
+
+
+
+
+
+```{r}
+
+#####################################################################
+#                         skater PO shotsBlocked over time                #
+#####################################################################
+
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_shotsBlocked_playoffs <- combined_player_stats_playoffs %>% 
+  arrange(season) %>%
+  group_by(id, pos) %>%
+  mutate(cum_shotsBlocked = cumsum(shotsBlocked),
+         label = as.character(cum_shotsBlocked)) %>%
+  arrange(desc(cum_shotsBlocked)) %>%
+  ungroup()
+
+
+#iterate through all the seasons to build top 10 per season list
+shotsBlocked_list_playoffs <- list()
+for (i in max(cum_shotsBlocked_playoffs$season):min(cum_shotsBlocked_playoffs$season)) {
+ 
+   temp_shotsBlocked_playoffs <- cum_shotsBlocked_playoffs %>%
+    filter(season <= i) %>%
+    group_by(pos, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(cum_shotsBlocked == max(cum_shotsBlocked) & season == max(season)) %>%
+    group_by(pos) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  shotsBlocked_list_playoffs[[i]] <- temp_shotsBlocked_playoffs
+}
+
+  
+
+shotsBlocked_over_time_playoffs <- do.call(rbind, shotsBlocked_list_playoffs)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+shotsBlocked_insert_df_playoffs <- data.frame(season_label = 65,
+                               cum_shotsBlocked = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL",
+                               
+                               #same with pos
+                               pos = "Forward")
+
+
+#create a dummy df for two seasons later to hold the final results
+shotsBlocked_insert_after1_po <- filter(shotsBlocked_over_time_playoffs, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+shotsBlocked_insert_after2_po <- filter(shotsBlocked_over_time_playoffs, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+
+#bind top 10 lists with dummy df
+shotsBlocked_over_time_playoffs <- bind_rows(shotsBlocked_over_time_playoffs, shotsBlocked_insert_df_playoffs, shotsBlocked_insert_after1_po, shotsBlocked_insert_after2_po) %>%
+  arrange(season_label) %>%
+  mutate(pos = factor(pos, levels = c("Forward", "Defense")))
+
+
+static_shotsBlocked_playoffs <- ggplot(shotsBlocked_over_time_playoffs, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_shotsBlocked/2,
+                height = cum_shotsBlocked,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_shotsBlocked,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  facet_wrap(.~ pos) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14.5, "cm"),
+        panel.spacing = unit(12.5, "cm"),
+        strip.text = element_text(size = 30)) +
+  scale_fill_manual(values = team_colors_abr)
+
+
+
+#animate active skaters 
+
+anim_active = static_shotsBlocked_playoffs + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career playoff SB leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM playoff SB")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons)+2)*1.5, width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("cum_po_SB.gif", sep = "")))
+
+write_csv(shotsBlocked_over_time_playoffs, "playoffs_top10_sb.csv")
+
+```
+
+
+
+
+```{r}
+
+#####################################################################
+#                         goalie PO sv% over time                      #
+#####################################################################
+
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_savePct_playoffs <- combined_goalie_stats_playoffs %>%
+  arrange(season) %>%
+  group_by(id) %>%
+  mutate(cumGP = sum(gamesPlayed),
+         cumsaves = cumsum(saves),
+         cumSA = cumsum(shotsAgainst),
+         cum_savePct = cumsaves/cumSA,
+         label = as.character(round(cum_savePct, 3))) %>%
+  filter(gamesPlayed >= 4) %>%
+  filter(cumGP >= 30) %>%
+  arrange(desc(cum_savePct)) %>%
+  ungroup()
+
+
+
+#iterate through all the seasons to build top 10 per season list
+savePct_list_playoffs <- list()
+for (i in max(cum_savePct_playoffs$season):min(cum_savePct_playoffs$season)) {
+ 
+   temp_savePct_playoffs <- cum_savePct_playoffs %>%
+    filter(season <= i) %>%
+    group_by(position, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(season == max(season) & season == max(season)) %>%
+    group_by(position) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  savePct_list_playoffs[[i]] <- temp_savePct_playoffs
+}
+
+  
+
+savePct_over_time_playoffs <- do.call(rbind, savePct_list_playoffs)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+savePct_insert_df_playoffs <- data.frame(season_label = 65,
+                               cum_savePct = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL")
+
+
+#create a dummy df for two seasons later to hold the final results
+savePct_insert_after1_po <- filter(savePct_over_time_playoffs, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+savePct_insert_after2_po <- filter(savePct_over_time_playoffs, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+#bind top 10 lists with dummy df
+savePct_over_time_playoffs <- bind_rows(savePct_over_time_playoffs, savePct_insert_df_playoffs, savePct_insert_after1_po, savePct_insert_after2_po) %>%
+    arrange(season_label)
+
+static_savePct_playoffs <- ggplot(savePct_over_time_playoffs, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_savePct/2,
+                height = cum_savePct,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_savePct,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14, "cm")) +
+  scale_fill_manual(values = team_colors_abr)
+
+
+
+#animate active skaters 
+
+anim_active = static_savePct_playoffs + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career PO save % leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM PO save %")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons)*1.5 +2), width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("cumsavePct_PO.gif", sep = "")))
+
+
+write_csv(savePct_over_time_playoffs, "playoffs_top10_savePct.csv")
+```
+
+
+
+
+
+
+
+
+```{r}
+
+#####################################################################
+#                        goalie saves over time                     #
+#####################################################################
+
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_saves_playoffs <- combined_goalie_stats_playoffs %>%
+  arrange(season) %>%
+  group_by(id) %>%
+  mutate(cum_saves = cumsum(saves),
+         label = as.character(cum_saves)) %>%
+  arrange(desc(cum_saves)) %>%
+  ungroup()
+
+
+
+#iterate through all the seasons to build top 10 per season list
+saves_list_playoffs <- list()
+for (i in max(cum_saves_playoffs$season):min(cum_saves_playoffs$season)) {
+ 
+   temp_saves_playoffs <- cum_saves_playoffs %>%
+    filter(season <= i) %>%
+    group_by(position, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(season == max(season)) %>%
+    group_by(position) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  saves_list_playoffs[[i]] <- temp_saves_playoffs
+}
+
+  
+
+saves_over_time_playoffs <- do.call(rbind, saves_list_playoffs)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+saves_insert_df_playoffs <- data.frame(season_label = 65,
+                               cum_saves = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL")
+
+
+#create a dummy df for two seasons later to hold the final results
+saves_insert_after1_playoffs <- filter(saves_over_time_playoffs, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+saves_insert_after2_playoffs <- filter(saves_over_time_playoffs, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+
+#bind top 10 lists with dummy df
+saves_over_time_playoffs <- bind_rows(saves_over_time_playoffs, saves_insert_df_playoffs, saves_insert_after1_playoffs, saves_insert_after2_playoffs) %>%
+    arrange(season_label)
+
+static_saves <- ggplot(saves_over_time_playoffs, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_saves/2,
+                height = cum_saves,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_saves,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14, "cm")) +
+  scale_fill_manual(values = team_colors_abr)
+
+
+
+#animate active skaters 
+
+anim_active = static_saves + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career PO saves leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM PO saves")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons)+2)*1.5, width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("C://Users/Seth/Desktop/playoffs_cumsaves.gif", sep = "")))
+
+
+write_csv(saves_over_time, "po_top10_saves.csv")
+```
+
+
+
+
+
+```{r}
+
+#####################################################################
+#                        goalie wins over time                     #
+#####################################################################
+
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_wins_playoffs <- combined_goalie_stats_playoffs %>%
+  arrange(season) %>%
+  group_by(id) %>%
+  mutate(cum_wins = cumsum(wins),
+         label = as.character(cum_wins)) %>%
+  arrange(desc(cum_wins)) %>%
+  ungroup()
+
+
+
+#iterate through all the seasons to build top 10 per season list
+wins_list_playoffs <- list()
+for (i in max(cum_wins_playoffs$season):min(cum_wins_playoffs$season)) {
+ 
+   temp_wins_playoffs <- cum_wins_playoffs %>%
+    filter(season <= i) %>%
+    group_by(position, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(season == max(season)) %>%
+    group_by(position) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  wins_list_playoffs[[i]] <- temp_wins_playoffs
+}
+
+  
+
+wins_over_time_playoffs <- do.call(rbind, wins_list_playoffs)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+wins_insert_df_playoffs <- data.frame(season_label = 65,
+                               cum_wins = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL")
+
+
+#create a dummy df for two seasons later to hold the final results
+wins_insert_after1_playoffs <- filter(wins_over_time_playoffs, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+wins_insert_after2_playoffs <- filter(wins_over_time_playoffs, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+
+#bind top 10 lists with dummy df
+wins_over_time_playoffs <- bind_rows(wins_over_time_playoffs, wins_insert_df_playoffs, wins_insert_after1_playoffs, wins_insert_after2_playoffs) %>%
+    arrange(season_label)
+
+static_wins <- ggplot(wins_over_time_playoffs, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_wins/2,
+                height = cum_wins,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_wins,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14, "cm")) +
+  scale_fill_manual(values = team_colors_abr)
+
+
+
+#animate active skaters 
+
+anim_active = static_wins + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career PO wins leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM PO wins")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons)+2)*1.5, width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("C://Users/Seth/Desktop/playoffs_cumwins.gif", sep = "")))
+
+
+write_csv(wins_over_time, "po_top10_wins.csv")
+```
+
+
+
+```{r}
+
+#####################################################################
+#                        goalie shutouts over time                     #
+#####################################################################
+
+
+
+#first calculate every player's cumulative sum BY POSITION
+#position swaps won't count towards their total
+#label cumulative totals as character for the gif
+cum_shutouts_playoffs <- combined_goalie_stats_playoffs %>%
+  arrange(season) %>%
+  group_by(id) %>%
+  mutate(cum_shutouts = cumsum(shutouts),
+         label = as.character(cum_shutouts)) %>%
+  arrange(desc(cum_shutouts)) %>%
+  ungroup()
+
+
+
+#iterate through all the seasons to build top 10 per season list
+shutouts_list_playoffs <- list()
+for (i in max(cum_shutouts_playoffs$season):min(cum_shutouts_playoffs$season)) {
+ 
+   temp_shutouts_playoffs <- cum_shutouts_playoffs %>%
+    filter(season <= i) %>%
+    group_by(position, id) %>%
+     
+     #this line is to make sure that only one player shows up in the top 10 list per season
+    filter(season == max(season)) %>%
+    group_by(position) %>%
+    mutate(rank = row_number(),
+           season_label = i) %>%
+    filter(rank <= 10)
+      
+  shutouts_list_playoffs[[i]] <- temp_shutouts_playoffs
+}
+
+  
+
+shutouts_over_time_playoffs <- do.call(rbind, shutouts_list_playoffs)
+
+
+#create a dummy df for one season earlier than minimum, to start everyone at 0
+shutouts_insert_df_playoffs <- data.frame(season_label = 65,
+                               cum_shutouts = 0,
+                               name = " ",
+                               label = " ",
+                               rank = 1:10,
+                               
+                               #need to create a fake team for color, shouldn't matter in the plot
+                               team = "ATL")
+
+
+#create a dummy df for two seasons later to hold the final results
+shutouts_insert_after1_playoffs <- filter(shutouts_over_time_playoffs, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 1, 10)))
+shutouts_insert_after2_playoffs <- filter(shutouts_over_time_playoffs, season_label == max(season_label)) %>% mutate(season_label = c(rep(max(seasons) + 2, 10)))
+
+
+#bind top 10 lists with dummy df
+shutouts_over_time_playoffs <- bind_rows(shutouts_over_time_playoffs, shutouts_insert_df_playoffs, shutouts_insert_after1_playoffs, shutouts_insert_after2_playoffs) %>%
+    arrange(season_label)
+
+static_shutouts <- ggplot(shutouts_over_time_playoffs, aes(rank, group = name, fill = team)) +
+  geom_tile(aes(y = cum_shutouts/2,
+                height = cum_shutouts,
+                width = 0.9,
+                fill = team), alpha = 0.8, color = "black") +
+  geom_text(aes(y = 0, label = paste(name, " ")), vjust = .5, hjust = 1, size = 10) +
+  geom_text(aes(y= cum_shutouts,label = label, hjust= -.25), size = 10) +
+  coord_flip(clip = "off", expand = FALSE) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_reverse() +
+  guides(color = FALSE, fill = FALSE) +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+        legend.position="none",
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.x = element_line( size=.1, color="grey80" ),
+        panel.grid.minor.x = element_line( size=.1, color="grey80" ),
+        plot.title=element_text(size=38, hjust=0.5, face="bold", colour="black", vjust=-1),
+        plot.subtitle=element_text(size=30, hjust=0.5, face="italic", color="black"),
+        plot.caption =element_text(size=20, hjust=0.5, face="italic", color="black"),
+        plot.background=element_blank(),
+        plot.margin = margin(2, 3, 2, 14, "cm")) +
+  scale_fill_manual(values = team_colors_abr)
+
+
+
+#animate active skaters 
+
+anim_active = static_shutouts + transition_states(season_label, transition_length = 4, state_length = 1) +
+  #view_follow(fixed_x = TRUE)  +
+  labs(title = paste('FHM era career PO shutouts leaders : {closest_state}\n\n', sep = ""),  
+       subtitle  =  "Cumulative FHM PO shutouts")
+
+
+
+animate(anim_active, 200, fps = 30,  duration = (length(seasons)+2)*1.5, width = 1500, height = 1000, 
+        renderer = gifski_renderer(paste("C://Users/Seth/Desktop/playoffs_cumshutouts.gif", sep = "")))
+
+
+write_csv(shutouts_over_time, "po_top10_shutouts.csv")
+```
+
+##################################################################
+
+#                  Playoff season high                         #
+
+#####################################################################
+
+
+
+
+```{r}
+################################################
+#            Top 10 single season point        #
+################################################
+
+
+top_10_points_playoffs <- combined_player_stats_playoffs %>%
+  arrange(desc(points)) %>%
+  group_by(pos) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         points_label = paste("(", round(points, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_points <- min(top_10_points_playoffs$points)
+max_points <- max(top_10_points_playoffs$points)
+
+#plot
+ggplot(top_10_points_playoffs, aes(x = fct_rev(label), y = points, fill = team, label = points_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE, col = "black") +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  facet_wrap(.~ pos, scales = "free_y") +
+  theme_bw(base_size = 14) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season playoff points leaders", x = NULL) +
+  coord_flip(ylim = c(min_points-10, max_points+10))
+ggsave("po_points.jpg", width = 8, height = 8.5, dpi = 300)
+
+```
+
+
+
+
+
+
+
+```{r}
+################################################
+#            Top 10 single season goals        #
+################################################
+
+
+top_10_goals_playoffs <- combined_player_stats_playoffs %>%
+  arrange(desc(goals)) %>%
+  group_by(pos) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         goals_label = paste("(", round(goals, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_goals <- min(top_10_goals_playoffs$goals)
+max_goals <- max(top_10_goals_playoffs$goals)
+
+#plot
+ggplot(top_10_goals_playoffs, aes(x = fct_rev(label), y = goals, fill = team, label = goals_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE, col = "black") +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  facet_wrap(.~ pos, scales = "free_y") +
+  theme_bw(base_size = 14) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season playoff goals leaders", x = NULL) +
+  coord_flip(ylim = c(min_goals-3, max_goals+6))
+ggsave("po_goals.jpg", width = 8, height = 8.5, dpi = 300)
+
+```
+
+
+
+
+
+
+
+```{r}
+################################################
+#            Top 10 single season assists        #
+################################################
+
+
+top_10_assists_playoffs <- combined_player_stats_playoffs %>%
+  arrange(desc(assists)) %>%
+  group_by(pos) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         assists_label = paste("(", round(assists, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_assists <- min(top_10_assists_playoffs$assists)
+max_assists <- max(top_10_assists_playoffs$assists)
+
+#plot
+ggplot(top_10_assists_playoffs, aes(x = fct_rev(label), y = assists, fill = team, label = assists_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE, col = "black") +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  facet_wrap(.~ pos, scales = "free_y") +
+  theme_bw(base_size = 14) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season playoff assists leaders", x = NULL) +
+  coord_flip(ylim = c(min_assists-3, max_assists+5))
+ggsave("po_assists.jpg", width = 8, height = 8.5, dpi = 300)
+
+```
+
+
+
+
+```{r}
+################################################
+#            Top 10 single season hits        #
+################################################
+
+
+top_10_hits_playoffs <- combined_player_stats_playoffs %>%
+  arrange(desc(hits)) %>%
+  group_by(pos) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         hits_label = paste("(", round(hits, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_hits <- min(top_10_hits_playoffs$hits)
+max_hits <- max(top_10_hits_playoffs$hits)
+
+#plot
+ggplot(top_10_hits_playoffs, aes(x = fct_rev(label), y = hits, fill = team, label = hits_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE, col = "black") +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  facet_wrap(.~ pos, scales = "free_y") +
+  theme_bw(base_size = 14) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season playoff hits leaders", x = NULL) +
+  coord_flip(ylim = c(min_hits-3, max_hits+15))
+ggsave("po_hits.jpg", width = 8, height = 8.5, dpi = 300)
+
+```
+
+
+
+```{r}
+################################################
+#            Top 10 single season takeaways        #
+################################################
+
+
+top_10_takeaways_playoffs <- combined_player_stats_playoffs %>%
+  arrange(desc(takeaways)) %>%
+  group_by(pos) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         takeaways_label = paste("(", round(takeaways, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_takeaways <- min(top_10_takeaways_playoffs$takeaways)
+max_takeaways <- max(top_10_takeaways_playoffs$takeaways)
+
+#plot
+ggplot(top_10_takeaways_playoffs, aes(x = fct_rev(label), y = takeaways, fill = team, label = takeaways_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE, col = "black") +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  facet_wrap(.~ pos, scales = "free_y") +
+  theme_bw(base_size = 14) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season playoff takeaways leaders", x = NULL) +
+  coord_flip(ylim = c(min_takeaways-1, max_takeaways+3))
+ggsave("po_takeaways.jpg", width = 8, height = 8.5, dpi = 300)
+
+```
+
+
+
+```{r}
+################################################
+#            Top 10 single season shotsBlocked        #
+################################################
+
+
+top_10_shotsBlocked_playoffs <- combined_player_stats_playoffs %>%
+  arrange(desc(shotsBlocked)) %>%
+  group_by(pos) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         shotsBlocked_label = paste("(", round(shotsBlocked, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_shotsBlocked <- min(top_10_shotsBlocked_playoffs$shotsBlocked)
+max_shotsBlocked <- max(top_10_shotsBlocked_playoffs$shotsBlocked)
+
+#plot
+ggplot(top_10_shotsBlocked_playoffs, aes(x = fct_rev(label), y = shotsBlocked, fill = team, label = shotsBlocked_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE, col = "black") +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  facet_wrap(.~ pos, scales = "free_y") +
+  theme_bw(base_size = 14) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season playoff SB leaders", x = NULL) +
+  coord_flip(ylim = c(min_shotsBlocked-3, max_shotsBlocked+30))
+ggsave("po_sb.jpg", width = 8, height = 8.5, dpi = 300)
+
+```
+
+
+
+```{r}
+################################################
+#      Top 10 single season savePct            #
+################################################
+
+
+top_10_savePct_playoffs <- combined_goalie_stats_playoffs %>%
+  
+  #convert savePct to numberic
+  mutate(savePct = as.numeric(as.character(savePct))) %>%
+
+  #filter out for GP for goalies
+  filter(gamesPlayed >= 6) %>%
+  arrange(desc(savePct)) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         savePct_label = paste("(", round(savePct, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_savePct <- min(top_10_savePct_playoffs$savePct)
+max_savePct <- max(top_10_savePct_playoffs$savePct)
+
+#plot
+ggplot(top_10_savePct_playoffs, aes(x = fct_rev(label), y = savePct, fill = team, label = savePct_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE, col = "black") +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  theme_bw(base_size = 14) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season save %", x = NULL) +
+  coord_flip(ylim = c(.923, .947))
+ggsave("po_savepct.jpg", width = 6, height = 8.5, dpi = 300)
+
+```
+
+
+
+
+
+```{r}
+################################################
+#      Top 10 single season saves            #
+################################################
+
+
+top_10_saves_playoffs <- combined_goalie_stats_playoffs %>%
+  
+  #convert saves to numberic
+  mutate(saves = as.numeric(as.character(saves))) %>%
+
+  #filter out for GP for goalies
+  filter(gamesPlayed >= 4) %>%
+  arrange(desc(saves)) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         saves_label = paste("(", round(saves, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_saves_playoffs <- min(top_10_saves_playoffs$saves)
+max_saves_playoffs <- max(top_10_saves_playoffs$saves)
+
+#plot
+ggplot(top_10_saves_playoffs, aes(x = fct_rev(label), y = saves, fill = team, label = saves_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE, col = "black") +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  theme_bw(base_size = 14) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season saves", x = NULL) +
+  coord_flip(ylim = c(min_saves_playoffs-10, max_saves_playoffs+40))
+ggsave("po_saves.jpg", width = 6, height = 8.5, dpi = 300)
+
+```
+
+
+
+
+
+
+```{r}
+################################################
+#      Top 10 single season wins            #
+################################################
+
+
+top_10_wins_playoffs <- combined_goalie_stats_playoffs %>%
+  
+  #convert wins to numberic
+  mutate(wins = as.numeric(as.character(wins))) %>%
+
+  #filter out for GP for goalies
+  filter(gamesPlayed >= 4) %>%
+  arrange(desc(wins)) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         wins_label = paste("(", round(wins, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_wins_playoffs <- min(top_10_wins_playoffs$wins)
+max_wins_playoffs <- max(top_10_wins_playoffs$wins)
+
+#plot
+ggplot(top_10_wins_playoffs, aes(x = fct_rev(label), y = wins, fill = team, label = wins_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE) +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  theme_bw(base_size = 16) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season wins", x = NULL) +
+  coord_flip(ylim = c(min_wins_playoffs-1, max_wins_playoffs+1))
+```
+
+
+
+
+```{r}
+################################################
+#      Top 10 single season shutouts            #
+################################################
+
+
+top_10_shutouts_playoffs <- combined_goalie_stats_playoffs %>%
+  
+  #convert shutouts to numberic
+  mutate(shutouts = as.numeric(as.character(shutouts))) %>%
+
+  #filter out for GP for goalies
+  filter(gamesPlayed >= 4) %>%
+  arrange(desc(shutouts)) %>%
+  filter(row_number() <= 10) %>%
+  mutate(label = paste(name, " (S", season, ")", sep = ""),
+         label = factor(label, levels = label),
+         shutouts_label = paste("(", round(shutouts, 3), ")", sep =""))
+
+#set min/max vlues for plot axis ranges
+min_shutouts_playoffs <- min(top_10_shutouts_playoffs$shutouts)
+max_shutouts_playoffs <- max(top_10_shutouts_playoffs$shutouts)
+
+#plot
+ggplot(top_10_shutouts_playoffs, aes(x = fct_rev(label), y = shutouts, fill = team, label = shutouts_label)) +
+  geom_col(width = .75, alpha = .75, show.legend = FALSE, col = "black") +
+  geom_text(hjust = -.15, size = 3) +
+  scale_fill_manual(values = team_colors_abr) +
+  theme_bw(base_size = 14) +
+  theme(axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        strip.background = element_blank()) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "\nSingle season shutouts", x = NULL) +
+  coord_flip(ylim = c(min_shutouts_playoffs-1, max_shutouts_playoffs+1))
+ggsave("po_so.jpg", width = 6, height = 8.5, dpi = 300)
+
+```
+
+
+
