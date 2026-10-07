@@ -35,7 +35,7 @@ names(save_path_character) <- c("shl", "smjhl")
 # 
 # 
 # bs <- file_boxscores(season_to_add, league = league_char, append = T)
-# gs <- file_goalie_summary(season_to_add, league = league_char, append = T)
+# gbs <- file_goalie_summary(season_to_add, league = league_char, append = T)
 # lines <- file_team_lines(season_to_add, league = league_char, append = T)
 # ss <- file_scoring_summary(season_to_add, league = league_char, append = T)
 # gr <- index_goalie_ratings(season_to_add, league = league_numeric, append = T)
@@ -62,7 +62,7 @@ names(save_path_character) <- c("shl", "smjhl")
 # 
 # # Check unqiue seasons
 # unique(bs$season)
-# unique(gs$season)
+# unique(gbs$season)
 # unique(lines$season)
 # unique(ss$season)
 # unique(gr$season)
@@ -79,7 +79,7 @@ names(save_path_character) <- c("shl", "smjhl")
 # 
 # # Save
 # write_csv(bs, paste0("Data/", directory, "/file_boxscore.csv"))
-# write_csv(gs, paste0("Data/", directory, "/file_goalie_summary.csv"))
+# write_csv(gbs, paste0("Data/", directory, "/file_goalie_summary.csv"))
 # write_csv(lines, paste0("Data/", directory, "/file_lines.csv"))
 # write_csv(ss, paste0("Data/", directory, "/file_scoring_summary.csv"))
 # write_csv(gr, paste0("Data/", directory, "/index_goalie_ratings.csv"))

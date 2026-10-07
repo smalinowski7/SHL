@@ -160,7 +160,7 @@ ggplot(top20_plot, aes(x = goals, y= fct_rev(trio_label))) +
         axis.line = element_line()) +
   scale_fill_gradient2(high = "#2c7fb8",mid = "#7fcdbb", low = "#edf8b1", midpoint = 30) +
   labs(x = "Goals", y = NULL)
-ggsave("C://Users/Seth/Desktop/trio_top20.jpg", width = 11.5, height = 10, dpi = 300)
+ggsave(here("Projects/Best trios/trio_top20.jpg"), width = 11.5, height = 10, dpi = 300)
 
 
 
@@ -400,7 +400,9 @@ team_opp_formatted <- formatted_boxscores %>%
   left_join(select(team_meta, id, abbreviation), by = c("opp" = "id")) %>%
   select(-opp) %>%
   rename("opp" = "abbreviation.y",
-         "team" = "abbreviation.x")
+         "team" = "abbreviation.x") 
+team_opp_formatted$team[team_opp_formatted$team == "WKP"] <- "BAP"
+team_opp_formatted$opp[team_opp_formatted$opp == "WKP"] <- "BAP"
 
 
 
@@ -444,7 +446,7 @@ ggplot(team_goals, aes(x = n, y = fct_rev(label))) +
   theme_bw(base_size = 14) +
   theme(panel.grid = element_blank()) +
   labs(y = NULL, x = "Goals")
-ggsave("C://Users/Seth/Desktop/opp_goals.jpg", width = 12, height = 14, dpi = 300)
+ggsave(here("Projects/Best trios/opp_goals.jpg"), width = 12, height = 14, dpi = 300)
 
 
 
@@ -484,7 +486,7 @@ ggplot(team_points, aes(x = n, y = fct_rev(label))) +
   theme(panel.grid = element_blank()) +
   guides(fill = guide_legend(reverse = TRUE)) +
   labs(y = NULL, x = "Points", fill = NULL)
-ggsave("C://Users/Seth/Desktop/opp_points.jpg", width = 12, height = 14, dpi = 300)
+ggsave(here("Projects/Best trios//opp_points.jpg"), width = 12, height = 14, dpi = 300)
 
 
 

@@ -1,5 +1,5 @@
 ### Set variables
-season <- 85
+season <- 89
 
 
 ### Load libraries and dataframes
@@ -22,32 +22,32 @@ myrleid <- function(x) {
 }
 
 
-### Load boxscores
-boxscores <- file_boxscores(85, append = TRUE)
-goalie_boxscores <- file_goalie_summary(85, append = TRUE)
+### Load all datasets
+boxscores <- read_csv("Data/SHL/file_boxscore.csv")
+goalie_boxscores <- read_csv("Data/SHL/file_goalie_summary.csv")
+schedule <- read_csv("Data/SHL/index_schedule.csv")
+meta <- read_csv("Data/SHL/index_player_ratings.csv")
+g_meta <- read_csv("Data/SHL/index_goalie_ratings.csv")
+team_meta <- read_csv("Data/SHL/index_team_meta.csv")
 
 
-### Load schedule and filter for S66 and above 
-schedule <- index_schedule(85, append = TRUE)
+
+### Format all datasets ###
+
+### Format schedule and filter for S66 and above 
 schedule <- schedule %>%
   arrange(date) %>%
   filter(season >= 66)
 
 
 ### Create player mapping from ratings
-meta <- index_player_ratings(season, append = TRUE) 
 meta <- meta %>%
   select(id, name, season)
 
 
 ### Create goalie mapping from ratings
-g_meta <- index_goalie_ratings(season, append = TRUE)
 g_meta <- g_meta %>%
   select(id, name, season)
-
-
-### Load team meta
-team_meta <- index_meta(season, append = TRUE)
 
 
 ### Set team colors
@@ -89,8 +89,8 @@ goalie_boxscores_rg <- goalie_boxscores %>%
 ### Pick a stat here and calculate the top single game leaders
 ### Stat should be how it appears on the boxscores
 
-stat <- "TK"
-plot_filter <- 7
+stat <- "G"
+plot_filter <- 5
 
 sg_stat_leaders <- boxscores_rg %>%
   arrange(desc(get(stat))) %>%
@@ -181,7 +181,7 @@ ggsave(here("Projects/Game highs and streaks/plots/multi_tk.png"), height = 15, 
 ### Pick a stat here and calculate the streak number for players
 ### Stat should be how it appears on the boxscores
 
-stat <- "HT"
+stat <- "BS"
 
 streaks <- boxscores_rg %>%
   mutate(streak_stat = ifelse(get(stat) > 0, 1, 0)) %>%

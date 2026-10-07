@@ -18,28 +18,32 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Libraries
 setwd(here())
-source("scraper_functions.R")
+source(here("scraper_functions.R"))
 library(tidyverse)
 library(stringi)
 
-
 ### Data ###
 
-# Load schedule
-schedule <- index_schedule(85, append = T)
+# set the current season
+current_season <- 89
 
+# Load all the data, either by .csv import or scraping
+schedule <- read_csv(here("Data/SHL/index_schedule.csv"))
+boxscores <- read_csv(here("Data/SHL/file_scoring_summary.csv"))
+stats <- read_csv(here("Data/SHL/index_player_stats.csv"))
+team_meta <- index_meta(current_season)
+
+# Format the data from the raw imports 
 
 # Create opponent map
 opp_map <- schedule %>%
   select(season, gameid, homeTeam, awayTeam)
 
 # Load scoring summary files
-boxscores <- file_scoring_summary(85, append = T)
 boxscores <- boxscores %>% 
   filter(Game.Id %in% schedule$gameid)
 
 # Stats for player maps
-stats <- index_player_stats(85, append = TRUE)
 player_map <- stats %>%
   mutate(name = stri_trans_general(name, "Latin-ASCII")) %>%
   group_by(id, season) %>%
@@ -51,7 +55,6 @@ player_map <- stats %>%
             pos_a2 = position)
 
 # Load team colors
-team_meta <- index_meta(85)
 team_colors <- team_meta$colors_primary
 names(team_colors) <- team_meta$abbreviation
 ```

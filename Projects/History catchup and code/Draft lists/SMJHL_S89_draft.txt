@@ -1,16 +1,16 @@
 ANC S89: No pick
-CAR S89: No pick
-COL S89: No pick
+CAR S89: Scott Hunter (3 OA), Nathaniel Tisdale (15 OA)
+COL S89: Daniel Noxus (5 OA)
 DET S89: No pick
-GFG S89: No pick
-KEL S89: No pick
-MET S89: No pick
+GFG S89: Gunnar Gudjohnsen (1 OA), Dante Von Wolfe (11 OA), Izol (12 OA)
+KEL S89: Poe Javelski (6 OA)
+MET S89: Big Poppa (8 OA)
 NBB S89: No pick
-NL S89: No pick
-OTT S89: No pick
-QCC S89: No pick
-SDT S89: No pick
-STL S89: No pick
+NL S89: Aidan Hunt (7 OA), Nael Reyes Montañés (16 OA)
+OTT S89: Viktor Prawnov (10 OA)
+QCC S89: Zachary Bolt (14 OA)
+SDT S89: Maxime Bélanger (9 OA)
+STL S89: Shoresy (2 OA), Robert Trufant (13 OA)
 TBW S89: No pick
-VAN S89: No pick
+VAN S89: Hazel Adeline Mackenzie (4 OA)
 YUM S89: No pick
