@@ -61,8 +61,8 @@
 # draft_season_summary(league = "SMJHL",
 #                      season = 89)
 #
-# team_summary_page(league_numeric = 1,
-#                   season_numeric = 88)
+# team_summary_page(league_numeric = 0,
+#                   season_numeric = 89)
 # 
 # shl_all_stars(88)
 # 

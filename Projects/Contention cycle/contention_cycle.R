@@ -7,8 +7,8 @@ source("scraper_functions.R")
 
 contention_data <- read_csv("Projects/Contention cycle/contention_cycle.csv")
 
-seasons_included <- c(85:89)
-season_for_meta <- 88
+seasons_included <- c(85:90)
+season_for_meta <- 89
 
 colnames(contention_data) <- c("abbreviation", paste0(rep(seasons_included, each = 2), c("_now", "_future")))
 
@@ -102,5 +102,5 @@ anim = static_plot + transition_states(season, transition_length = 4, state_leng
 
 
 
-animate(anim, 200, fps = 30,  duration = length(seasons_included)*.75, width = 750, height = 500,
+animate(anim, 200, fps = 30,  duration = length(seasons_included)*1.25, width = 750, height = 500,
         renderer = gifski_renderer("contentioncyclefast.gif"))
